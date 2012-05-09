@@ -1,0 +1,30 @@
+﻿Build started 8/6/2011 3:12:06 PM.
+Project "C:\Users\annesam\Documents\devel\JDokan\DLL\JDokanDLL.vcxproj" on node 2 (build target(s)).
+InitializeBuildStatus:
+  Creating "Release\JDokan.unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  All outputs are up-to-date.
+  C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\Program Files\Java\jdk1.7.0\include\win32" /I"C:\Program Files\Java\jdk1.7.0\include" /Zi /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D JDokanDLL_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Release\JDokan.pch" /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt JDokanDLL.cpp
+  JDokanDLL.cpp
+JDokanDLL.cpp(59): warning C4244: '=' : conversion from 'jint' to 'USHORT', possible loss of data
+JDokanDLL.cpp(60): warning C4244: '=' : conversion from 'jlong' to 'ULONG', possible loss of data
+Link:
+  C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\Users\annesam\Documents\devel\JDokan\DLL\Release\ /LIBPATH:C:\work\prog\ufuse\trunk\uFuseWin\binary "C:\Program Files\Dokan\DokanLibrary\dokan.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\JDokan.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.lib" /MACHINE:X86 /DLL Release\DokanObjUtils.obj
+  Release\IDs.obj
+  Release\JDokanDLL.obj
+  Release\stdafx.obj
+  Release\Utils.obj
+     Creating library C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.lib and object C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.exp
+  Generating code
+  Finished generating code
+  JDokanDLL.vcxproj -> C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.dll
+Manifest:
+  C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\annesam\Documents\devel\JDokan\DLL\Release\JDokan.dll;#2" /manifest Release\JDokan.dll.intermediate.manifest
+FinalizeBuildStatus:
+  Deleting file "Release\JDokan.unsuccessfulbuild".
+  Touching "Release\JDokan.lastbuildstate".
+Done Building Project "C:\Users\annesam\Documents\devel\JDokan\DLL\JDokanDLL.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.74
