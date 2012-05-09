@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="javadoc" name="JDokan">
-	<target name="javadoc">
-		<javadoc access="protected" additionalparam=" -encoding UTF-8" author="true" classpath="lib/js.jar" destdir="../JavaDoc" doctitle="JDokan" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.decasdev.dokan" source="1.5" sourcepath="src" splitindex="true" use="true" version="true" locale="en"/>
-	</target>
-	<target name="jar">
-		<jar basedir="classes" destfile="../jdokan.jar" />
-	</target>
-</project>
