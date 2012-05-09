@@ -5,9 +5,8 @@
 */.cache
 #*/.DS_Store*
 #**/.DS_Store*
-**/*.iml
 **/.idea
 .idea
-.iml
+*.iml
 target
 .DS_Store
