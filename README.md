@@ -1,4 +1,5 @@
 jdokan
 ======
 
-A java wrapper of the dokan library
+A java wrapper of the dokan library.
+

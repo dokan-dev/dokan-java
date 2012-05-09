@@ -58,6 +58,13 @@ import net.decasdev.dokan.FileTimeUtils;
 import net.decasdev.dokan.Win32FindData;
 
 public class MemoryFS implements DokanOperations {
+    public static final int FILE_CASE_PRESERVED_NAMES = 0x00000002;
+    public static final int FILE_FILE_COMPRESSION = 0x00000010;
+    public static final int FILE_SUPPORTS_SPARSE_FILES = 0x00000040;
+    public static final int FILE_UNICODE_ON_DISK = 0x00000004;
+
+    public static final int SUPPORTED_FLAGS = FILE_CASE_PRESERVED_NAMES
+            | FILE_UNICODE_ON_DISK | FILE_SUPPORTS_SPARSE_FILES;
 	/** fileName -> MemFileInfo */
 	final ConcurrentHashMap<String, MemFileInfo> fileInfoMap = new ConcurrentHashMap<String, MemFileInfo>();
 	// TODO FIX THIS
@@ -67,14 +74,15 @@ public class MemoryFS implements DokanOperations {
 	final long rootCreateTime = FileTimeUtils.toFileTime(new Date());
 	long rootLastWrite = rootCreateTime;
 
+    private String driveLetter = "S:\\";
+
 	static void log(String msg) {
 		System.out.println("== app == " + msg);
 	}
 
 	public static void main(String[] args) {
-		char driveLetter = (args.length == 0) ? 'S' : args[0].charAt(0);
+		String driveLetter = (args.length == 0) ? "S:\\" : args[0];
 		new MemoryFS().mount(driveLetter);
-		System.exit(0);
 	}
 
 	public MemoryFS() {
@@ -88,11 +96,37 @@ public class MemoryFS implements DokanOperations {
 		System.out.println("driverVersion = " + driverVersion);
 	}
 
-	void mount(char driveLetter) {
+	void mount(String driveLetter) {
 		DokanOptions dokanOptions = new DokanOptions();
-		dokanOptions.driveLetter = driveLetter;
+		dokanOptions.mountPoint = driveLetter;
+        dokanOptions.threadCount = 1;
+        this.driveLetter = driveLetter;
 		int result = Dokan.mount(dokanOptions, this);
 		log("[MemoryFS] result = " + result);
+
+        if (result < 0) {
+            System.out.println("Unable to mount volume because result = "
+                    + result);
+            log("Unable to mount volume because result = " + result);
+            if (result == -1)
+                System.out.println("General Error");
+            if (result == -2)
+                System.out.println("Bad Drive letter");
+            if (result == -3)
+                System.out.println("Can't install driver");
+            if (result == -4)
+                System.out.println("Driver something wrong");
+            if (result == -5)
+                System.out
+                        .println("Can't assign a drive letter or mount point");
+            if (result == -6)
+                System.out.println("Mount point is invalid");
+            System.exit(-1);
+
+        } else {
+            log("######## mounted " + driveLetter + " with result " + result
+                    + " #############");
+        }
 	}
 
 	synchronized long getNextHandle() {
@@ -147,6 +181,7 @@ public class MemoryFS implements DokanOperations {
 		if (pathName.equals("\\"))
 			return getNextHandle();
 		pathName = Utils.trimTailBackSlash(pathName);
+        log("[onOpenDirectory] step 2");
 		if (fileInfoMap.containsKey(pathName))
 			return getNextHandle();
 		else
@@ -161,12 +196,15 @@ public class MemoryFS implements DokanOperations {
 		MemFileInfo fi = new MemFileInfo(fileName, true);
 		fileInfoMap.put(fi.fileName, fi);
 		updateParentLastWrite(fileName);
+        log("[onCreateDirectory] END");
 	}
 
-	public void onCleanup(String arg0, DokanFileInfo arg2) throws DokanOperationException {
+	public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
+        log("[onCleanup] " + fileName);
 	}
 
-	public void onCloseFile(String arg0, DokanFileInfo arg1) throws DokanOperationException {
+	public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
+        log("[onCloseFile] " + fileName);
 	}
 
 	public int onReadFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo arg3)
@@ -231,7 +269,8 @@ public class MemoryFS implements DokanOperations {
 		}
 	}
 
-	public void onFlushFileBuffers(String arg0, DokanFileInfo arg1) throws DokanOperationException {
+	public void onFlushFileBuffers(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
+        log("[onFlushFileBuffers] " + fileName);
 	}
 
 	public ByHandleFileInformation onGetFileInformation(String fileName, DokanFileInfo arg1)
@@ -264,6 +303,7 @@ public class MemoryFS implements DokanOperations {
 
 	public Win32FindData[] onFindFilesWithPattern(String arg0, String arg1, DokanFileInfo arg2)
 			throws DokanOperationException {
+        log("[onFindFilesWithPattern] ");
 		return null;
 	}
 
@@ -334,20 +374,33 @@ public class MemoryFS implements DokanOperations {
 		log("[onUnlockFile] " + fileName);
 	}
 
-	public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo arg0) throws DokanOperationException {
-		return null;
+	public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo fileInfo) throws DokanOperationException {
+        log("[onGetDiskFreeSpace] ");
+        DokanDiskFreeSpace free = new DokanDiskFreeSpace();
+        free.totalNumberOfBytes = 1024L * 1024L;
+        free.freeBytesAvailable = free.totalNumberOfFreeBytes / 2;
+        free.totalNumberOfFreeBytes = free.freeBytesAvailable;
+		return free;
 	}
 
 	public DokanVolumeInformation onGetVolumeInformation(String arg0, DokanFileInfo arg1)
 			throws DokanOperationException {
-		return null;
+        DokanVolumeInformation info = new DokanVolumeInformation();
+        info.fileSystemFlags = SUPPORTED_FLAGS;
+        info.maximumComponentLength = 256;
+        info.volumeName = "Dedup Filesystem";
+        info.fileSystemName = "SDFS";
+        info.volumeSerialNumber = volumeSerialNumber;
+        return info;
 	}
 
 	public void onUnmount(DokanFileInfo arg0) throws DokanOperationException {
 		log("[onUnmount]");
+        Dokan.removeMountPoint(driveLetter);
 	}
 
 	void updateParentLastWrite(String fileName) {
+        log("[updateParentLastWrite]");
 		if (fileName.length() <= 1)
 			return;
 		String parent = new File(fileName).getParent();
