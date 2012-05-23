@@ -48,11 +48,11 @@ public class FileAccess {
      */
     public static EnumSet<FileAccessFlags> getFlags(int value)
     {
-        EnumSet flags = EnumSet.noneOf(FileAccessFlags.class);
+        EnumSet<FileAccessFlags> flags = EnumSet.noneOf(FileAccessFlags.class);
 
-        for (CreationDisposition disp : CreationDisposition.values()) {
-            long flag = disp.getValue();
-            if ((flag & value) == value)
+        for (FileAccessFlags flag: FileAccessFlags.values()) {
+            long flagValue = flag.getValue();
+            if ((flagValue & value) == value)
                 flags.add(flag);
         }
 
