@@ -41,21 +41,10 @@ import static net.decasdev.dokan.WinError.ERROR_WRITE_FAULT;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.decasdev.dokan.ByHandleFileInformation;
-import net.decasdev.dokan.Dokan;
-import net.decasdev.dokan.DokanDiskFreeSpace;
-import net.decasdev.dokan.DokanFileInfo;
-import net.decasdev.dokan.DokanOperationException;
-import net.decasdev.dokan.DokanOperations;
-import net.decasdev.dokan.DokanOptions;
-import net.decasdev.dokan.DokanVolumeInformation;
-import net.decasdev.dokan.FileTimeUtils;
-import net.decasdev.dokan.Win32FindData;
+import net.decasdev.dokan.*;
 
 public class MemoryFS implements DokanOperations {
     public static final int FILE_CASE_PRESERVED_NAMES = 0x00000002;
@@ -135,9 +124,12 @@ public class MemoryFS implements DokanOperations {
 
 	public long onCreateFile(String fileName, int desiredAccess, int shareMode, int creationDisposition,
 			int flagsAndAttributes, DokanFileInfo arg5) throws DokanOperationException {
+        CreationDisposition disposition = CreationDisposition.values()[creationDisposition];
+
 		log("[onCreateFile] " + fileName + ", creationDisposition = " + creationDisposition);
+
 		if (fileName.equals("\\")) {
-			switch (creationDisposition) {
+			switch (disposition) {
 			case CREATE_NEW:
 			case CREATE_ALWAYS:
 				throw new DokanOperationException(ERROR_ALREADY_EXISTS);
@@ -147,7 +139,7 @@ public class MemoryFS implements DokanOperations {
 				return getNextHandle();
 			}
 		} else if (fileInfoMap.containsKey(fileName)) {
-			switch (creationDisposition) {
+			switch (disposition) {
 			case CREATE_NEW:
 				throw new DokanOperationException(ERROR_ALREADY_EXISTS);
 			case OPEN_ALWAYS:
@@ -160,7 +152,7 @@ public class MemoryFS implements DokanOperations {
 				return getNextHandle();
 			}
 		} else {
-			switch (creationDisposition) {
+			switch (disposition) {
 			case CREATE_NEW:
 			case CREATE_ALWAYS:
 			case OPEN_ALWAYS:
@@ -180,6 +172,7 @@ public class MemoryFS implements DokanOperations {
 		log("[onOpenDirectory] " + pathName);
 		if (pathName.equals("\\"))
 			return getNextHandle();
+
 		pathName = Utils.trimTailBackSlash(pathName);
         log("[onOpenDirectory] step 2");
 		if (fileInfoMap.containsKey(pathName))
@@ -374,9 +367,11 @@ public class MemoryFS implements DokanOperations {
 		log("[onUnlockFile] " + fileName);
 	}
 
+
 	public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo fileInfo) throws DokanOperationException {
         log("[onGetDiskFreeSpace] ");
         DokanDiskFreeSpace free = new DokanDiskFreeSpace();
+        //TODO: this is completely wrong, the size is not calculated
         free.totalNumberOfBytes = 1024L * 1024L;
         free.freeBytesAvailable = free.totalNumberOfFreeBytes / 2;
         free.totalNumberOfFreeBytes = free.freeBytesAvailable;
