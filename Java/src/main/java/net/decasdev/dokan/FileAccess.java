@@ -19,8 +19,58 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package net.decasdev.dokan;
 
-public interface FileAccess {
-	// these are the observed values that are passed to onCreateFile
-	public final static int GENERIC_WRITE = 0x40;
-	public final static int GENERIC_READ = 0x80;
+import java.util.EnumSet;
+import java.util.Set;
+
+public class FileAccess {
+    public enum FileAccessFlags {
+        // these are the observed values that are passed to onCreateFile
+        GENERIC_WRITE(0x40),
+        GENERIC_READ(0x80);
+
+        private int value;
+
+        FileAccessFlags(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Translates a numeric status code into a Set of StatusFlag enums
+     * @param value
+     * @return EnumSet representing a documents status
+     */
+    public static EnumSet<FileAccessFlags> getFlags(int value)
+    {
+        EnumSet flags = EnumSet.noneOf(FileAccessFlags.class);
+
+        for (CreationDisposition disp : CreationDisposition.values()) {
+            long flag = disp.getValue();
+            if ((flag & value) == value)
+                flags.add(flag);
+        }
+
+        return flags;
+    }
+
+
+    /**
+     * Translates a set of flags enums into a numeric status code
+     * @param flags if statusFlags
+     * @return numeric representation of the document status
+     */
+    public static long getStatusValue(Set<FileAccessFlags> flags)
+    {
+        long value=0;
+        for (FileAccessFlags flag: flags) {
+            value |= flag.getValue();
+        }
+        return value;
+    }
+
+
 }
