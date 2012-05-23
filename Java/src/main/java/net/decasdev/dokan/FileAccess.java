@@ -25,8 +25,10 @@ import java.util.Set;
 public class FileAccess {
     public enum FileAccessFlags {
         // these are the observed values that are passed to onCreateFile
-        GENERIC_WRITE(0x40),
-        GENERIC_READ(0x80);
+        GENERIC_ALL(0x10000000),
+        GENERIC_EXECUTE(0x20000000),
+        GENERIC_WRITE(0x40000000),
+        GENERIC_READ(0x80000000);
 
         private int value;
 

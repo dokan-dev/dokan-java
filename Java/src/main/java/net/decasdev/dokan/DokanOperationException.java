@@ -25,8 +25,15 @@ public class DokanOperationException extends Exception {
 
 	/** Usually you should return GetLastError() */
 	public int errorCode;
+    private WinError error;
 
 	public DokanOperationException(WinError error) {
 		this.errorCode = error.getValue();
+        this.error = error;
 	}
+
+    public String toString()
+    {
+        return this.error.toString();
+    }
 }
