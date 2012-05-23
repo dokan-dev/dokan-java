@@ -25,7 +25,8 @@ public enum CreationDisposition {
     OPEN_ALWAYS(2),
     OPEN_EXISTING(3),
     CREATE_ALWAYS(4),
-    TRUNCATE_EXISTING(5);
+    TRUNCATE_EXISTING(5),
+    UNDEFINED(0);
 
     private int value;
 
@@ -35,6 +36,15 @@ public enum CreationDisposition {
 
     public int getValue() {
         return value;
+    }
+
+    public static CreationDisposition build(int value) {
+        for ( CreationDisposition current : values() ) {
+            if ( current.getValue() == value ) {
+                return current;
+            }
+        }
+        return UNDEFINED;
     }
 
 

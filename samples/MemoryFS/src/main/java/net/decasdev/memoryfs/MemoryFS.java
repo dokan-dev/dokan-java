@@ -113,7 +113,7 @@ public class MemoryFS implements DokanOperations {
 
 	public long onCreateFile(String fileName, int desiredAccess, int shareMode, int creationDisposition,
 			int flagsAndAttributes, DokanFileInfo arg5) throws DokanOperationException {
-        CreationDisposition disposition = CreationDisposition.values()[creationDisposition];
+        CreationDisposition disposition = CreationDisposition.build(creationDisposition);
 
 		log("[onCreateFile] " + fileName + ", creationDisposition = " + creationDisposition);
 
@@ -126,6 +126,8 @@ public class MemoryFS implements DokanOperations {
 			case OPEN_EXISTING:
 			case TRUNCATE_EXISTING:
 				return getNextHandle();
+            case UNDEFINED:
+                assert(false);
 			}
 		} else if (fileInfoMap.containsKey(fileName)) {
 			switch (disposition) {
@@ -139,6 +141,8 @@ public class MemoryFS implements DokanOperations {
 				fileInfoMap.get(fileName).content.clear();
 				updateParentLastWrite(fileName);
 				return getNextHandle();
+            case UNDEFINED:
+                assert(false);
 			}
 		} else {
 			switch (disposition) {
@@ -152,6 +156,8 @@ public class MemoryFS implements DokanOperations {
 			case OPEN_EXISTING:
 			case TRUNCATE_EXISTING:
 				throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+            case UNDEFINED:
+                assert(false);
 			}
 		}
 		throw new DokanOperationException(WinError.ERROR_INVALID_FUNCTION);
