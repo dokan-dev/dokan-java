@@ -48,7 +48,7 @@ public class RhinoMountWrapper implements DokanOperations {
 		if (obj instanceof DokanOperationException)
 			throw (DokanOperationException) obj;
 		else
-			throw new DokanOperationException(1);
+			throw new DokanOperationException(WinError.ERROR_INVALID_FUNCTION);
 	}
 
 	public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
