@@ -28,8 +28,8 @@ import net.decasdev.dokan.Dokan;
 
 public class UnmountFS {
 	public static void main(String[] args) {
-		char driveLetter = (args.length == 0) ? 'S' : args[0].charAt(0);
-		Dokan.unmount(driveLetter);
+		String driveLetter = (args.length == 0) ? "S:\\" : args[0];
+		Dokan.removeMountPoint(driveLetter);
 		System.exit(0);
 	}
 }

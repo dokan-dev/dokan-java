@@ -20,10 +20,22 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package net.decasdev.dokan;
 
-public interface CreationDisposition {
-	public final static int CREATE_ALWAYS = 4;
-	public final static int CREATE_NEW = 1;
-	public final static int OPEN_ALWAYS = 2;
-	public final static int OPEN_EXISTING = 3;
-	public final static int TRUNCATE_EXISTING = 5;
+public enum CreationDisposition {
+    CREATE_NEW(1),
+    OPEN_ALWAYS(2),
+    OPEN_EXISTING(3),
+    CREATE_ALWAYS(4),
+    TRUNCATE_EXISTING(5);
+
+    private int value;
+
+    CreationDisposition(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+
 }
