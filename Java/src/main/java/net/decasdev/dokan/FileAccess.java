@@ -25,10 +25,10 @@ import java.util.Set;
 public class FileAccess {
     public enum FileAccessFlags {
         // these are the observed values that are passed to onCreateFile
-        GENERIC_ALL(0x10000000),
-        GENERIC_EXECUTE(0x20000000),
-        GENERIC_WRITE(0x40000000),
-        GENERIC_READ(0x80000000);
+        GENERIC_ALL(0x10),
+        GENERIC_EXECUTE(0x20),
+        GENERIC_WRITE(0x40),
+        GENERIC_READ(0x80);
 
         private int value;
 
@@ -48,11 +48,11 @@ public class FileAccess {
      */
     public static EnumSet<FileAccessFlags> getFlags(int value)
     {
-        EnumSet flags = EnumSet.noneOf(FileAccessFlags.class);
+        EnumSet<FileAccessFlags> flags = EnumSet.noneOf(FileAccessFlags.class);
 
-        for (CreationDisposition disp : CreationDisposition.values()) {
-            long flag = disp.getValue();
-            if ((flag & value) == value)
+        for (FileAccessFlags flag: FileAccessFlags.values()) {
+            long flagValue = flag.getValue();
+            if ((flagValue & value) == value)
                 flags.add(flag);
         }
 
