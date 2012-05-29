@@ -20,8 +20,67 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package net.decasdev.dokan;
 
-public interface FileShareMode {
-	public final static int FILE_SHARE_DELETE = 0x00000004;
-	public final static int FILE_SHARE_READ = 0x00000001;
-	public final static int FILE_SHARE_WRITE = 0x00000002;
+import java.util.EnumSet;
+import java.util.Set;
+
+public class FileShareMode {
+    public enum FileShareModeFlags {
+	    FILE_SHARE_DELETE(0x00000004),
+	    FILE_SHARE_READ(0x00000001),
+	    FILE_SHARE_WRITE(0x00000002);
+
+        private int value;
+
+        FileShareModeFlags(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Translates a numeric status code into a Set of StatusFlag enums
+     * @param value
+     * @return EnumSet representing a documents status
+     */
+    public static EnumSet<FileShareModeFlags> getFlags(int value)
+    {
+        EnumSet<FileShareModeFlags> flags = EnumSet.noneOf(FileShareModeFlags.class);
+
+        for (FileShareModeFlags flag: FileShareModeFlags.values()) {
+            long flagValue = flag.getValue();
+            if ((flagValue & value) == flagValue)
+                flags.add(flag);
+        }
+
+        return flags;
+    }
+
+
+    /**
+     * Translates a set of flags enums into a numeric status code
+     * @param flags if statusFlags
+     * @return numeric representation of the document status
+     */
+    public static long getStatusValue(Set<FileShareModeFlags> flags)
+    {
+        long value=0;
+        for (FileShareModeFlags flag: flags) {
+            value |= flag.getValue();
+        }
+        return value;
+    }
+
+    public static String toString(int value) {
+        String result = new String("");
+        Set<FileShareModeFlags> flags = getFlags(value);
+
+        for (FileShareModeFlags flag: flags) {
+            result += flag.toString()+ " | ";
+        }
+
+        return result;
+    }
 }
