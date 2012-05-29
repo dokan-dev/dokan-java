@@ -52,7 +52,7 @@ public class FileAccess {
 
         for (FileAccessFlags flag: FileAccessFlags.values()) {
             long flagValue = flag.getValue();
-            if ((flagValue & value) == value)
+            if ((flagValue & value) == flagValue)
                 flags.add(flag);
         }
 
@@ -72,6 +72,17 @@ public class FileAccess {
             value |= flag.getValue();
         }
         return value;
+    }
+
+    public static String toString(int value) {
+        String result = new String("");
+        Set<FileAccessFlags> flags = getFlags(value);
+
+        for (FileAccessFlags flag: flags) {
+            result += flag.toString()+ " | ";
+        }
+
+        return result;
     }
 
 

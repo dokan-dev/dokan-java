@@ -25,14 +25,13 @@ public class FileAccessTest {
         EnumSet<FileAccess.FileAccessFlags> flags = FileAccess.getFlags(value);
         Assert.assertTrue(flags.contains(FileAccess.FileAccessFlags.GENERIC_READ));
         Assert.assertFalse(flags.contains(FileAccess.FileAccessFlags.GENERIC_WRITE));
+        logger.debug("access = " + FileAccess.toString(value));
 
-        value = 0x80 & 0x40;
+        value = 0x80 + 0x40;
         flags = FileAccess.getFlags(value);
         Assert.assertTrue(flags.contains(FileAccess.FileAccessFlags.GENERIC_READ));
         Assert.assertTrue(flags.contains(FileAccess.FileAccessFlags.GENERIC_WRITE));
 
-        value = 0x10080;
-        flags = FileAccess.getFlags(value);
-
+        logger.debug("access = " + FileAccess.toString(value));
     }
 }
