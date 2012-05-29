@@ -24,8 +24,6 @@ THE SOFTWARE.
 
 package net.decasdev.memoryfs;
 
-import static net.decasdev.dokan.FileAttribute.FILE_ATTRIBUTE_DIRECTORY;
-import static net.decasdev.dokan.FileAttribute.FILE_ATTRIBUTE_NORMAL;
 import net.decasdev.dokan.WinError;
 
 import java.io.File;
@@ -118,7 +116,8 @@ public class MemoryFS implements DokanOperations {
 		log("[onCreateFile] " + fileName +
                 ",\n\t creationDisposition = " + creationDisposition
                 + ",\n\t desiredAccess = " + FileAccess.toString(desiredAccess)
-                + ",\n\t flags = " + FileFlag.toString(flagsAndAttributes));
+                + ",\n\t flags = " + FileFlag.toString(flagsAndAttributes)
+                + ",\n\t attributes = " + FileAttribute.toString(flagsAndAttributes));
 
 		if (fileName.equals("\\")) {
 			switch (disposition) {
@@ -268,7 +267,9 @@ public class MemoryFS implements DokanOperations {
 			throws DokanOperationException {
 		log("[onGetFileInformation] " + fileName);
 		if (fileName.equals("\\")) {
-			return new ByHandleFileInformation(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY,
+			return new ByHandleFileInformation(
+                    FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_NORMAL.getValue() |
+                    FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_DIRECTORY.getValue(),
 					rootCreateTime, rootCreateTime, rootLastWrite, volumeSerialNumber, 0, 1, 1);
 		}
 		MemFileInfo fi = fileInfoMap.get(fileName);

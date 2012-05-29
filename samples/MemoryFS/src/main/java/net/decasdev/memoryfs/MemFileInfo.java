@@ -24,8 +24,8 @@ THE SOFTWARE.
 
 package net.decasdev.memoryfs;
 
-import static net.decasdev.dokan.FileAttribute.FILE_ATTRIBUTE_DIRECTORY;
-import static net.decasdev.dokan.FileAttribute.FILE_ATTRIBUTE_NORMAL;
+import static net.decasdev.dokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_DIRECTORY;
+import static net.decasdev.dokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_NORMAL;
 import gnu.trove.TByteArrayList;
 
 import java.util.Date;
@@ -42,7 +42,7 @@ public class MemFileInfo {
 	String fileName;
 	final boolean isDirectory;
 	final TByteArrayList content = new TByteArrayList();
-	int fileAttribute = FILE_ATTRIBUTE_NORMAL;
+	int fileAttribute = FILE_ATTRIBUTE_NORMAL.getValue();
 	long creationTime = 0;
 	long lastAccessTime = 0;
 	long lastWriteTime = 0;
@@ -53,7 +53,7 @@ public class MemFileInfo {
 		this.isDirectory = isDirectory;
 		fileIndex = getNextFileIndex();
 		if (isDirectory)
-			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY;
+			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY.getValue();
 		long fileTime = FileTimeUtils.toFileTime(new Date());
 		creationTime = fileTime;
 		lastAccessTime = fileTime;

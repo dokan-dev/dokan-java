@@ -19,21 +19,81 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package net.decasdev.dokan;
 
-public interface FileAttribute {
-	public final static int	ATTRIBUTE_MASK= 0x0000FFFF;
+import java.util.EnumSet;
+import java.util.Set;
+
+public class FileAttribute {
+		public static final int ATTRIBUTE_MASK= 0x0000FFFF;
 	
-	public final static int FILE_ATTRIBUTE_ARCHIVE = 0x00000020;
-	public final static int FILE_ATTRIBUTE_COMPRESSED = 0x00000800;
-	public final static int FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
-	public final static int FILE_ATTRIBUTE_ENCRYPTED = 0x00000040;
-	public final static int FILE_ATTRIBUTE_HIDDEN = 0x00000002;
-	public final static int FILE_ATTRIBUTE_NORMAL = 0x00000080;
-	public final static int FILE_ATTRIBUTE_OFFLINE = 0x00001000;
-	public final static int FILE_ATTRIBUTE_READONLY = 0x00000001;
-	public final static int FILE_ATTRIBUTE_REPARSE_POINT = 0x00000400;
-	public final static int FILE_ATTRIBUTE_SPARSE_FILE = 0x00000200;
-	public final static int FILE_ATTRIBUTE_SYSTEM = 0x00000004;
-	public final static int FILE_ATTRIBUTE_TEMPORARY = 0x00000100;
-	public final static int FILE_ATTRIBUTE_NOT_CONTENT_INDEXED = 0x00002000;
-	public final static int FILE_ATTRIBUTE_VIRTUAL = 0x00010000;
+    public enum FileAttributeFlags {
+         FILE_ATTRIBUTE_ARCHIVE(0x00000020),
+         FILE_ATTRIBUTE_COMPRESSED(0x00000800),
+         FILE_ATTRIBUTE_DIRECTORY(0x00000010),
+         FILE_ATTRIBUTE_ENCRYPTED(0x00000040),
+         FILE_ATTRIBUTE_HIDDEN(0x00000002),
+         FILE_ATTRIBUTE_NORMAL(0x00000080),
+         FILE_ATTRIBUTE_OFFLINE(0x00001000),
+         FILE_ATTRIBUTE_READONLY(0x00000001),
+         FILE_ATTRIBUTE_REPARSE_POINT(0x00000400),
+         FILE_ATTRIBUTE_SPARSE_FILE(0x00000200),
+         FILE_ATTRIBUTE_SYSTEM(0x00000004),
+         FILE_ATTRIBUTE_TEMPORARY(0x00000100),
+         FILE_ATTRIBUTE_NOT_CONTENT_INDEXED(0x00002000),
+         FILE_ATTRIBUTE_VIRTUAL(0x00010000);
+
+        private int value;
+
+        FileAttributeFlags(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Translates a numeric status code into a Set of StatusFlag enums
+     * @param value
+     * @return EnumSet representing a documents status
+     */
+    public static EnumSet<FileAttributeFlags> getFlags(int value)
+    {
+        EnumSet<FileAttributeFlags> flags = EnumSet.noneOf(FileAttributeFlags.class);
+
+        for (FileAttributeFlags flag: FileAttributeFlags.values()) {
+            long flagValue = flag.getValue();
+            if ((flagValue & value) == flagValue)
+                flags.add(flag);
+        }
+
+        return flags;
+    }
+
+
+    /**
+     * Translates a set of flags enums into a numeric status code
+     * @param flags if statusFlags
+     * @return numeric representation of the document status
+     */
+    public static long getStatusValue(Set<FileAttributeFlags> flags)
+    {
+        long value=0;
+        for (FileAttributeFlags flag: flags) {
+            value |= flag.getValue();
+        }
+        return value;
+    }
+
+    public static String toString(int value) {
+        String result = new String("");
+        Set<FileAttributeFlags> flags = getFlags(value);
+
+        for (FileAttributeFlags flag: flags) {
+            result += flag.toString()+ " | ";
+        }
+
+        return result;
+    }
+
 }
