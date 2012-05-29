@@ -115,7 +115,10 @@ public class MemoryFS implements DokanOperations {
 			int flagsAndAttributes, DokanFileInfo arg5) throws DokanOperationException {
         CreationDisposition disposition = CreationDisposition.build(creationDisposition);
 
-		log("[onCreateFile] " + fileName + ", creationDisposition = " + creationDisposition);
+		log("[onCreateFile] " + fileName +
+                ",\n\t creationDisposition = " + creationDisposition
+                + ",\n\t desiredAccess = " + FileAccess.toString(desiredAccess)
+                + ",\n\t flags = " + FileFlag.toString(flagsAndAttributes));
 
 		if (fileName.equals("\\")) {
 			switch (disposition) {
@@ -284,8 +287,7 @@ public class MemoryFS implements DokanOperations {
 			if (pathNameFile.equals(new File(fi.fileName).getParentFile())) {
 				files.add(fi.toWin32FindData());
 			}
-		}
-		log("[onFindFiles] " + files);
+        }
 		return files.toArray(new Win32FindData[0]);
 	}
 
