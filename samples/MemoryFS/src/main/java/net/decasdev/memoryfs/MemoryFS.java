@@ -74,8 +74,9 @@ public class MemoryFS implements DokanOperations {
 
 	void mount(String driveLetter) {
 		DokanOptions dokanOptions = new DokanOptions();
-		dokanOptions.mountPoint = driveLetter;
+        dokanOptions.mountPoint = driveLetter;
         dokanOptions.threadCount = 1;
+        dokanOptions.optionsMode = DokanOptionsMode.Mode.REMOVABLE_DRIVE.getValue() + DokanOptionsMode.Mode.KEEP_ALIVE.getValue();
         this.driveLetter = driveLetter;
 		int result = Dokan.mount(dokanOptions, this);
 		log("[MemoryFS] result = " + result);
