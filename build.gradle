@@ -19,7 +19,8 @@ model {
     }
   }
   components {     
-    cpp(NativeLibrarySpec) {
+    'native'(NativeLibrarySpec) {
+      baseName 'jdokan'
       binaries.all {
         cppCompiler.define "UNICODE"
       }
@@ -27,16 +28,18 @@ model {
         lib library: 'jni', linkage: 'api'
         lib library: 'dokan', linkage: 'shared'
 	source {
-          srcDir "src/cpp"
+          srcDir "src/main/cpp"
 	  include "**/*.cpp"
 	}
         exportedHeaders {
-          srcDir "src/cpp/include"
+          srcDir "src/main/cpp/include"
         }
       }
-      
     }
-    java(JvmLibrarySpec)
+    java(JvmLibrarySpec) {
+      baseName 'jdokan'
+      sources.java.source.srcDirs "src/main/java", "src/test/java"
+    }
   }
 
 }
