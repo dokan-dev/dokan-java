@@ -50,6 +50,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath);$(DOKAN_HOME)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath);$(DOKAN_HOME)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -63,7 +66,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Program Files\Dokan\DokanLibrary\dokan.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(DOKAN_HOME)\dokan.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\uFuseWin\uFuse\;..\..\..\uFuseWin\binary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
