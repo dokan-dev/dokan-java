@@ -38,6 +38,10 @@ model {
   }
 }
 
+tasks.matching{ it.name.contains('StaticLibrary') }
+  .whenTaskAdded { it.enabled = false }
+tasks.matching{ it.name.contains('LibVisualStudio') }
+  .whenTaskAdded { it.enabled = false }
 
 
 repositories {
