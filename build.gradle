@@ -1,0 +1,42 @@
+plugins {
+  id 'jvm-component'
+  id 'java-lang'
+  id 'cpp'
+  id 'visual-studio'
+  id 'eclipse'
+}
+
+model {
+  repositories {
+    libs(PrebuiltLibraries) {
+      jni.headers.srcDirs "${System.env.JAVA_HOME}/include", "${System.env.JAVA_HOME}/include/win32"
+      dokan {
+        headers.srcDir System.env.DOKAN_HOME
+	binaries.withType(SharedLibraryBinary) {
+          sharedLibraryLinkFile = file("${System.env.DOKAN_HOME}/dokan.lib")
+	}
+      }
+    }
+  }
+  components {     
+    cpp(NativeLibrarySpec) {
+      binaries.all {
+        cppCompiler.define "UNICODE"
+      }
+      sources.cpp {
+        lib library: 'jni', linkage: 'api'
+        lib library: 'dokan', linkage: 'shared'
+	source {
+          srcDir "src/cpp"
+	  include "**/*.cpp"
+	}
+        exportedHeaders {
+          srcDir "src/cpp/include"
+        }
+      }
+      
+    }
+    java(JvmLibrarySpec)
+  }
+
+}
