@@ -1,12 +1,2 @@
-*/target/**
-*/.project
-*/.classpath
-*/.settings
-*/.cache
-#*/.DS_Store*
-#**/.DS_Store*
-**/.idea
-.idea
-*.iml
-target
-.DS_Store
+/build
+.gradle
