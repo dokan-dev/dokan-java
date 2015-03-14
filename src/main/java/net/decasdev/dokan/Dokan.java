@@ -22,7 +22,7 @@ package net.decasdev.dokan;
 
 public class Dokan {
 	static {
-		System.loadLibrary("JDokan");
+		System.loadLibrary("jdokan");
 	}
 	
 	// mount returns error codes

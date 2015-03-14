@@ -1,6 +1,5 @@
 plugins {
-  id 'jvm-component'
-  id 'java-lang'
+  id 'java'
   id 'cpp'
   id 'visual-studio'
   id 'eclipse'
@@ -36,10 +35,21 @@ model {
         }
       }
     }
-    java(JvmLibrarySpec) {
-      baseName 'jdokan'
-      sources.java.source.srcDirs "src/main/java", "src/test/java"
-    }
   }
+}
 
+
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile 'org.slf4j:slf4j-api:1.7.10'  
+  compile 'rhino:js:1.7R1'
+  testCompile 'junit:junit:4.+'
+}
+
+eclipse {
+  project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
 }
