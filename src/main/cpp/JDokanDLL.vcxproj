@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -51,7 +51,7 @@
     <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath);$(DOKAN_HOME)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath);$(DOKAN_HOME)</IncludePath>
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath);$(DOKAN_HOME);$(SolutionDir)\..\headers</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -102,14 +102,13 @@
     </ClCompile>
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\dokan\dokan.h" />
-    <ClInclude Include="DokanObjUtils.h" />
-    <ClInclude Include="IDs.h" />
-    <ClInclude Include="JDokanDLL.h" />
-    <ClInclude Include="net_decasdev_dokan_Dokan.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Utils.h" />
+  <ItemGroup Label="Headers">
+    <ClInclude Include="..\headers\DokanObjUtils.h" />
+    <ClInclude Include="..\headers\IDs.h" />
+    <ClInclude Include="..\headers\JDokanDLL.h" />
+    <ClInclude Include="..\headers\net_decasdev_dokan_Dokan.h" />
+    <ClInclude Include="..\headers\stdafx.h" />
+    <ClInclude Include="..\headers\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
