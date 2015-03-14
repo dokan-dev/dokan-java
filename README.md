@@ -7,7 +7,7 @@ Take a look at opendedup source for detail on how this works.
 
 http://code.google.com/p/opendedup/source/browse/trunk/src/org/opendedup/sdfs/windows/fs/WinSDFS.java
 
-# Building
+## Building
 This project uses [gradle](http://gradle.org/) as build tool.
 
 1. Make sure 'JAVA_HOME' env variable is pointing to your JDK installation
