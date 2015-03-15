@@ -8,7 +8,7 @@
 
 package net.decasdev.dokan;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.decasdev.dokan.FileAttribute.FileAttributeFlags;
 import org.junit.Test;
 import org.slf4j.Logger;
