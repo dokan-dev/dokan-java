@@ -1,0 +1,12 @@
+version: {build}
+os: Windows Server 2012 R2
+environment:
+  DOKAN_HOME: C:\Program Files (x86)\Dokan\DokanLibrary
+  JAVA_HOME: C:\Program Files (x86)\Java\jdk1.8.0
+install:
+- ps: >-
+    Start-FileDownload 'https://github.com/Maxhy/dokany/releases/download/0.7.1/DokanInstall_0.7.1.exe'
+
+    .\DokanInstall_0.7.1 /S
+build_script:
+- ps: .\gradlew build
