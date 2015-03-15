@@ -51,7 +51,9 @@ repositories {
 version = '1.1-SNAPSHOT'
 
 dependencies {
+  compile 'com.google.guava:guava:18.+'
   testCompile 'junit:junit:4.+'
+  testCompile 'com.google.truth:truth:0.25'
 }
 
 eclipse {
