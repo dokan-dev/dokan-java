@@ -57,3 +57,14 @@ dependencies {
 eclipse {
   project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
 }
+
+task generateHeader {
+  dependsOn('classes')
+  def clazz = 'net.decasdev.dokan.Dokan'
+  def header = "${rootDir}/src/main/cpp/include/jdokan.h"
+  inputs.file "${sourceSets.main.output.classesDir}/${clazz.replaceAll('.', '/')}"
+  outputs.file header
+  doLast {
+    ant.javah(class: clazz, outputFile: header, classpath: sourceSets.main.output.classesDir)
+  }
+}
