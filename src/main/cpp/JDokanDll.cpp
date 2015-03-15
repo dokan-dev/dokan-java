@@ -811,18 +811,13 @@ JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_isNameInExpression
  * Method:    getVersion
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_getVersion
+JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_version
   (JNIEnv *env, jclass)
 {
 	return DokanVersion();
 }
 
-/*
- * Class:     net_decasdev_dokan_Dokan
- * Method:    getDriverVersion
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_getDriverVersion
+JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_driverVersion
   (JNIEnv *env, jclass)
 {
 	return DokanDriverVersion();
