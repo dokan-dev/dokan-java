@@ -1,6 +1,6 @@
 jdokan
 ======
-
+[![Build status](https://ci.appveyor.com/api/projects/status/bbc77ypvx96ijqif?svg=true)](https://ci.appveyor.com/project/sherter/jdokan-nu5cd)
 jdokan is a Java wrapper for Dokan 6.0 and above.
 
 Take a look at opendedup source for detail on how this works.
