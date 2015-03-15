@@ -16,24 +16,28 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
-public class DokanOperationException extends Exception {
-	private static final long serialVersionUID = -2759529773077624821L;
+public class DokanOptions {
+	//public char driveLetter = 'S';
+	public String mountPoint = "S:\\";
+	public int threadCount = 1;
+	public long optionsMode = DokanOptionsMode.Mode.REMOVABLE_DRIVE.getValue();
 
-	/** Usually you should return GetLastError() */
-	public int errorCode;
-    private WinError error;
-
-	public DokanOperationException(WinError error) {
-		this.errorCode = error.getValue();
-        this.error = error;
+	public DokanOptions() {
 	}
 
-    public String toString()
-    {
-        return this.error.toString();
-    }
+	public DokanOptions(String mountPoint, int threadCount, long optionsMode) {
+		//this.driveLetter = driveLetter;
+		this.mountPoint = mountPoint;
+		this.threadCount = threadCount;
+		this.optionsMode = optionsMode;
+	}
+
+	@Override public String toString() {
+		return "DokanOptions(" + "mountPoint=" + mountPoint + "," + "threadCount=" + threadCount + ","
+				+ "optionsMode=" + optionsMode + ")";
+	}
 }

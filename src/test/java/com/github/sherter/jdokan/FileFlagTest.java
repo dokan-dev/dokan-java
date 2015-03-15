@@ -6,14 +6,15 @@
  * Author: Ivan Frain
  ******************************************************************************/
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 
-import net.decasdev.dokan.FileFlag.FileFlags;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.github.sherter.jdokan.FileFlag;
+import com.github.sherter.jdokan.FileFlag.FileFlags;
 public class FileFlagTest {
 
     @Test

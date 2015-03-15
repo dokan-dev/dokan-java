@@ -18,23 +18,21 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
-public class DokanFileInfo {
-	public long handle;
-	/** process id for the thread that originally requested a given I/O operation */
-	public int processId;
-	/** requesting a directory file */
-	public boolean isDirectory;
+public class DokanVolumeInformation {
+	public String volumeName;
+	public int volumeSerialNumber;
+	public int maximumComponentLength;
+	public int fileSystemFlags;
+	public String fileSystemName;
 
-	public DokanFileInfo(long handle, int processId, boolean isDirectory) {
-		this.handle = handle;
-		this.processId = processId;
-		this.isDirectory = isDirectory;
+	public DokanVolumeInformation() {
 	}
 
 	@Override public String toString() {
-		return "DokanFileInfo(" + "handle=" + handle + "," + "processId=" + processId + ","
-				+ "isDirectory=" + isDirectory + ")";
+		return "DokanVolumeInformation(" + "volumeName=" + volumeName + "," + "volumeSerialNumber="
+				+ volumeSerialNumber + "," + "maximumComponentLength=" + maximumComponentLength + ","
+				+ "fileSystemFlags=" + fileSystemFlags + "," + "fileSystemName=" + fileSystemName + ")";
 	}
 }

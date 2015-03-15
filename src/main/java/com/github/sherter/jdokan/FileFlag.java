@@ -1,8 +1,10 @@
 /*
   JDokan : Java library for Dokan
-
+  
   Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/
   				2009 Caleido AG   http://www.wuala.com/
+
+  http://decas-dev.net/en
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free
@@ -17,22 +19,29 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public class FileAccess {
-    public enum FileAccessFlags {
-        // these are the observed values that are passed to onCreateFile
-        GENERIC_ALL(0x10),
-        GENERIC_EXECUTE(0x20),
-        GENERIC_WRITE(0x40),
-        GENERIC_READ(0x80);
+public class FileFlag {
+	public final static int FLAGS_MASK= 0xFFFF0000;
+
+    public enum FileFlags {
+        FILE_FLAG_BACKUP_SEMANTICS(0x02000000),
+        FILE_FLAG_DELETE_ON_CLOSE(0x04000000),
+        FILE_FLAG_NO_BUFFERING(0x20000000),
+        FILE_FLAG_OPEN_NO_RECALL(0x00100000),
+        FILE_FLAG_OPEN_REPARSE_POINT(0x00200000),
+        FILE_FLAG_OVERLAPPED(0x40000000),
+        FILE_FLAG_POSIX_SEMANTICS(0x01000000),
+        FILE_FLAG_RANDOM_ACCESS(0x10000000),
+        FILE_FLAG_SEQUENTIAL_SCAN(0x08000000),
+        FILE_FLAG_WRITE_THROUGH(0x80000000);
 
         private int value;
 
-        FileAccessFlags(int value) {
+        FileFlags(int value) {
             this.value = value;
         }
 
@@ -41,16 +50,17 @@ public class FileAccess {
         }
     }
 
+
     /**
      * Translates a numeric status code into a Set of StatusFlag enums
      * @param value
      * @return EnumSet representing a documents status
      */
-    public static EnumSet<FileAccessFlags> getFlags(int value)
+    public static EnumSet<FileFlags> getFlags(int value)
     {
-        EnumSet<FileAccessFlags> flags = EnumSet.noneOf(FileAccessFlags.class);
+        EnumSet<FileFlags> flags = EnumSet.noneOf(FileFlags.class);
 
-        for (FileAccessFlags flag: FileAccessFlags.values()) {
+        for (FileFlags flag: FileFlags.values()) {
             long flagValue = flag.getValue();
             if ((flagValue & value) == flagValue)
                 flags.add(flag);
@@ -65,10 +75,10 @@ public class FileAccess {
      * @param flags if statusFlags
      * @return numeric representation of the document status
      */
-    public static long getStatusValue(Set<FileAccessFlags> flags)
+    public static long getStatusValue(Set<FileFlags> flags)
     {
         long value=0;
-        for (FileAccessFlags flag: flags) {
+        for (FileFlags flag: flags) {
             value |= flag.getValue();
         }
         return value;
@@ -76,14 +86,12 @@ public class FileAccess {
 
     public static String toString(int value) {
         String result = new String("");
-        Set<FileAccessFlags> flags = getFlags(value);
+        Set<FileFlags> flags = getFlags(value);
 
-        for (FileAccessFlags flag: flags) {
+        for (FileFlags flag: flags) {
             result += flag.toString()+ " | ";
         }
 
         return result;
     }
-
-
 }

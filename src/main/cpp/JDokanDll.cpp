@@ -28,11 +28,11 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 #include "IDs.h"
 
 /*
- * Class:     net_decasdev_dokan_Dokan
+ * Class:     com_github_sherter_jdokan_Dokan
  * Method:    mount
- * Signature: (Lnet/decasdev/dokan/DokanOptions;Lnet/decasdev/dokan/DokanOperations;)I
+ * Signature: (Lcom/github/sherter/jdokan/DokanOptions;Lcom/github/sherter/jdokan/DokanOperations;)I
  */
-JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_mount
+JNIEXPORT jint JNICALL Java_com_github_sherter_jdokan_Dokan_mount
   (JNIEnv *env, jclass, jobject joptions, jobject joperations)
 {
 	try {
@@ -747,22 +747,22 @@ int DOKAN_CALLBACK OnUnmount(
 }
 
 ///*
-// * Class:     net_decasdev_dokan_Dokan
+// * Class:     com_github_sherter_jdokan_Dokan
 // * Method:    unmount
 // * Signature: (C)Z
 // */
-//JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_unmount
+//JNIEXPORT jboolean JNICALL Java_com_github_sherter_jdokan_Dokan_unmount
 //  (JNIEnv *, jclass, jchar jdriveLetter)
 //{
 //	return DokanUnmount(jdriveLetter);
 //}
 
 /*
- * Class:     net_decasdev_dokan_Dokan
+ * Class:     com_github_sherter_jdokan_Dokan
  * Method:    removeMountPoint
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_removeMountPoint
+JNIEXPORT jboolean JNICALL Java_com_github_sherter_jdokan_Dokan_removeMountPoint
   (JNIEnv *env, jclass, jstring jMountPoint)
 {
 		int len = env->GetStringLength(jMountPoint);
@@ -778,11 +778,11 @@ JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_removeMountPoint
 }
 
 /*
- * Class:     net_decasdev_dokan_Dokan
+ * Class:     com_github_sherter_jdokan_Dokan
  * Method:    isNameInExpression
  * Signature: (Ljava/lang/String;Ljava/lang/String;Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_isNameInExpression
+JNIEXPORT jboolean JNICALL Java_com_github_sherter_jdokan_Dokan_isNameInExpression
   (JNIEnv *env, jclass, jstring jexpression, jstring jname, jboolean jignoreCase)
 {
 	try {
@@ -807,17 +807,17 @@ JNIEXPORT jboolean JNICALL Java_net_decasdev_dokan_Dokan_isNameInExpression
 }
 
 /*
- * Class:     net_decasdev_dokan_Dokan
+ * Class:     com_github_sherter_jdokan_Dokan
  * Method:    getVersion
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_version
+JNIEXPORT jint JNICALL Java_com_github_sherter_jdokan_Dokan_version
   (JNIEnv *env, jclass)
 {
 	return DokanVersion();
 }
 
-JNIEXPORT jint JNICALL Java_net_decasdev_dokan_Dokan_driverVersion
+JNIEXPORT jint JNICALL Java_com_github_sherter_jdokan_Dokan_driverVersion
   (JNIEnv *env, jclass)
 {
 	return DokanDriverVersion();

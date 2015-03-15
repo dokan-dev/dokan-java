@@ -1,4 +1,4 @@
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 import java.util.Set;

@@ -16,23 +16,24 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
-public class DokanVolumeInformation {
-	public String volumeName;
-	public int volumeSerialNumber;
-	public int maximumComponentLength;
-	public int fileSystemFlags;
-	public String fileSystemName;
+public class DokanOperationException extends Exception {
+	private static final long serialVersionUID = -2759529773077624821L;
 
-	public DokanVolumeInformation() {
+	/** Usually you should return GetLastError() */
+	public int errorCode;
+    private WinError error;
+
+	public DokanOperationException(WinError error) {
+		this.errorCode = error.getValue();
+        this.error = error;
 	}
 
-	@Override public String toString() {
-		return "DokanVolumeInformation(" + "volumeName=" + volumeName + "," + "volumeSerialNumber="
-				+ volumeSerialNumber + "," + "maximumComponentLength=" + maximumComponentLength + ","
-				+ "fileSystemFlags=" + fileSystemFlags + "," + "fileSystemName=" + fileSystemName + ")";
-	}
+    public String toString()
+    {
+        return this.error.toString();
+    }
 }

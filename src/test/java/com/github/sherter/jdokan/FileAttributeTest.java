@@ -6,14 +6,15 @@
  * Author: Ivan Frain
  ******************************************************************************/
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 
-import net.decasdev.dokan.FileAttribute.FileAttributeFlags;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.github.sherter.jdokan.FileAttribute;
+import com.github.sherter.jdokan.FileAttribute.FileAttributeFlags;
 
 public class FileAttributeTest {
 

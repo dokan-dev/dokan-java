@@ -6,12 +6,14 @@
  * Author: Ivan Frain
  ******************************************************************************/
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.github.sherter.jdokan.FileAccess;
 
 public class FileAccessTest {
 

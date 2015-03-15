@@ -1,8 +1,7 @@
 /*
   JDokan : Java library for Dokan
-  
+
   Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/
-  				2009 Caleido AG   http://www.wuala.com/
 
   http://decas-dev.net/en
 
@@ -19,29 +18,20 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public class FileFlag {
-	public final static int FLAGS_MASK= 0xFFFF0000;
-
-    public enum FileFlags {
-        FILE_FLAG_BACKUP_SEMANTICS(0x02000000),
-        FILE_FLAG_DELETE_ON_CLOSE(0x04000000),
-        FILE_FLAG_NO_BUFFERING(0x20000000),
-        FILE_FLAG_OPEN_NO_RECALL(0x00100000),
-        FILE_FLAG_OPEN_REPARSE_POINT(0x00200000),
-        FILE_FLAG_OVERLAPPED(0x40000000),
-        FILE_FLAG_POSIX_SEMANTICS(0x01000000),
-        FILE_FLAG_RANDOM_ACCESS(0x10000000),
-        FILE_FLAG_SEQUENTIAL_SCAN(0x08000000),
-        FILE_FLAG_WRITE_THROUGH(0x80000000);
+public class FileShareMode {
+    public enum FileShareModeFlags {
+	    FILE_SHARE_DELETE(0x00000004),
+	    FILE_SHARE_READ(0x00000001),
+	    FILE_SHARE_WRITE(0x00000002);
 
         private int value;
 
-        FileFlags(int value) {
+        FileShareModeFlags(int value) {
             this.value = value;
         }
 
@@ -50,17 +40,16 @@ public class FileFlag {
         }
     }
 
-
     /**
      * Translates a numeric status code into a Set of StatusFlag enums
      * @param value
      * @return EnumSet representing a documents status
      */
-    public static EnumSet<FileFlags> getFlags(int value)
+    public static EnumSet<FileShareModeFlags> getFlags(int value)
     {
-        EnumSet<FileFlags> flags = EnumSet.noneOf(FileFlags.class);
+        EnumSet<FileShareModeFlags> flags = EnumSet.noneOf(FileShareModeFlags.class);
 
-        for (FileFlags flag: FileFlags.values()) {
+        for (FileShareModeFlags flag: FileShareModeFlags.values()) {
             long flagValue = flag.getValue();
             if ((flagValue & value) == flagValue)
                 flags.add(flag);
@@ -75,10 +64,10 @@ public class FileFlag {
      * @param flags if statusFlags
      * @return numeric representation of the document status
      */
-    public static long getStatusValue(Set<FileFlags> flags)
+    public static long getStatusValue(Set<FileShareModeFlags> flags)
     {
         long value=0;
-        for (FileFlags flag: flags) {
+        for (FileShareModeFlags flag: flags) {
             value |= flag.getValue();
         }
         return value;
@@ -86,9 +75,9 @@ public class FileFlag {
 
     public static String toString(int value) {
         String result = new String("");
-        Set<FileFlags> flags = getFlags(value);
+        Set<FileShareModeFlags> flags = getFlags(value);
 
-        for (FileFlags flag: flags) {
+        for (FileShareModeFlags flag: flags) {
             result += flag.toString()+ " | ";
         }
 

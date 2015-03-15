@@ -17,7 +17,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 public class Dokan {
 

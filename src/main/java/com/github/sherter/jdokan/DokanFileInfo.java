@@ -18,26 +18,23 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
-public class DokanOptions {
-	//public char driveLetter = 'S';
-	public String mountPoint = "S:\\";
-	public int threadCount = 1;
-	public long optionsMode = DokanOptionsMode.Mode.REMOVABLE_DRIVE.getValue();
+public class DokanFileInfo {
+	public long handle;
+	/** process id for the thread that originally requested a given I/O operation */
+	public int processId;
+	/** requesting a directory file */
+	public boolean isDirectory;
 
-	public DokanOptions() {
-	}
-
-	public DokanOptions(String mountPoint, int threadCount, long optionsMode) {
-		//this.driveLetter = driveLetter;
-		this.mountPoint = mountPoint;
-		this.threadCount = threadCount;
-		this.optionsMode = optionsMode;
+	public DokanFileInfo(long handle, int processId, boolean isDirectory) {
+		this.handle = handle;
+		this.processId = processId;
+		this.isDirectory = isDirectory;
 	}
 
 	@Override public String toString() {
-		return "DokanOptions(" + "mountPoint=" + mountPoint + "," + "threadCount=" + threadCount + ","
-				+ "optionsMode=" + optionsMode + ")";
+		return "DokanFileInfo(" + "handle=" + handle + "," + "processId=" + processId + ","
+				+ "isDirectory=" + isDirectory + ")";
 	}
 }

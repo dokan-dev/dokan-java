@@ -18,20 +18,23 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.decasdev.dokan;
+package com.github.sherter.jdokan;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public class FileShareMode {
-    public enum FileShareModeFlags {
-	    FILE_SHARE_DELETE(0x00000004),
-	    FILE_SHARE_READ(0x00000001),
-	    FILE_SHARE_WRITE(0x00000002);
+public class FileSecurity {
+    public enum FileSecurityFlags{
+         SECURITY_ANONYMOUS(0x00000000),
+         SECURITY_CONTEXT_TRACKING(0x00040000),
+         SECURITY_DELEGATION(0x00030000),
+         SECURITY_EFFECTIVE_ONLY(0x00080000),
+         SECURITY_IDENTIFICATION(0x00010000),
+         SECURITY_IMPERSONATION(0x00020000);
 
         private int value;
 
-        FileShareModeFlags(int value) {
+        FileSecurityFlags(int value) {
             this.value = value;
         }
 
@@ -45,11 +48,11 @@ public class FileShareMode {
      * @param value
      * @return EnumSet representing a documents status
      */
-    public static EnumSet<FileShareModeFlags> getFlags(int value)
+    public static EnumSet<FileSecurityFlags> getFlags(int value)
     {
-        EnumSet<FileShareModeFlags> flags = EnumSet.noneOf(FileShareModeFlags.class);
+        EnumSet<FileSecurityFlags> flags = EnumSet.noneOf(FileSecurityFlags.class);
 
-        for (FileShareModeFlags flag: FileShareModeFlags.values()) {
+        for (FileSecurityFlags flag: FileSecurityFlags.values()) {
             long flagValue = flag.getValue();
             if ((flagValue & value) == flagValue)
                 flags.add(flag);
@@ -64,10 +67,10 @@ public class FileShareMode {
      * @param flags if statusFlags
      * @return numeric representation of the document status
      */
-    public static long getStatusValue(Set<FileShareModeFlags> flags)
+    public static long getStatusValue(Set<FileSecurityFlags> flags)
     {
         long value=0;
-        for (FileShareModeFlags flag: flags) {
+        for (FileSecurityFlags flag: flags) {
             value |= flag.getValue();
         }
         return value;
@@ -75,9 +78,9 @@ public class FileShareMode {
 
     public static String toString(int value) {
         String result = new String("");
-        Set<FileShareModeFlags> flags = getFlags(value);
+        Set<FileSecurityFlags> flags = getFlags(value);
 
-        for (FileShareModeFlags flag: flags) {
+        for (FileSecurityFlags flag: flags) {
             result += flag.toString()+ " | ";
         }
 
