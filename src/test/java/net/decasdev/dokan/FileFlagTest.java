@@ -8,16 +8,13 @@
 
 package net.decasdev.dokan;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.EnumSet;
 
 import net.decasdev.dokan.FileFlag.FileFlags;
-public class FileFlagTest {
 
-    private static Logger logger = LoggerFactory.getLogger(FileFlagTest.class);
+import org.junit.Assert;
+import org.junit.Test;
+public class FileFlagTest {
 
     @Test
     public void getFlagsTest(){
@@ -30,7 +27,6 @@ public class FileFlagTest {
         flags = FileFlag.getFlags(value);
         Assert.assertTrue(flags.contains(FileFlags.FILE_FLAG_BACKUP_SEMANTICS));
         Assert.assertTrue(flags.contains(FileFlags.FILE_FLAG_DELETE_ON_CLOSE));
-        logger.debug("value = " + value + ": " +FileFlag.toString(value));
 
     }
 
