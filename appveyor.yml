@@ -1,4 +1,4 @@
-version: {build}
+version: '{build}'
 os: Windows Server 2012 R2
 environment:
   DOKAN_HOME: C:\Program Files (x86)\Dokan\DokanLibrary
