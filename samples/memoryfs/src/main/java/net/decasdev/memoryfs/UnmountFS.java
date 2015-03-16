@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 package net.decasdev.memoryfs;
 
-import net.decasdev.dokan.Dokan;
+import com.github.sherter.jdokan.Dokan;
 
 public class UnmountFS {
 	public static void main(String[] args) {

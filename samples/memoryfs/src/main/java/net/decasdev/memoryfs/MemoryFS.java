@@ -24,14 +24,12 @@ THE SOFTWARE.
 
 package net.decasdev.memoryfs;
 
-import net.decasdev.dokan.WinError;
-
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.decasdev.dokan.*;
+import com.github.sherter.jdokan.*;
 
 public class MemoryFS implements DokanOperations {
     public static final int FILE_CASE_PRESERVED_NAMES = 0x00000002;
@@ -66,9 +64,9 @@ public class MemoryFS implements DokanOperations {
 	}
 
 	void showVersions() {
-		int version = Dokan.getVersion();
+		int version = Dokan.version();
 		System.out.println("version = " + version);
-		int driverVersion = Dokan.getDriverVersion();
+		int driverVersion = Dokan.driverVersion();
 		System.out.println("driverVersion = " + driverVersion);
 	}
 

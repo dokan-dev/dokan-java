@@ -24,17 +24,17 @@ THE SOFTWARE.
 
 package net.decasdev.memoryfs;
 
-import static net.decasdev.dokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_DIRECTORY;
-import static net.decasdev.dokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_NORMAL;
+import static com.github.sherter.jdokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_DIRECTORY;
+import static com.github.sherter.jdokan.FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_NORMAL;
 import gnu.trove.TByteArrayList;
 
 import java.util.Date;
 
-import net.decasdev.dokan.ByHandleFileInformation;
-import net.decasdev.dokan.FileTimeUtils;
-import net.decasdev.dokan.Win32FindData;
-
 import org.apache.commons.io.FilenameUtils;
+
+import com.github.sherter.jdokan.ByHandleFileInformation;
+import com.github.sherter.jdokan.FileTimeUtils;
+import com.github.sherter.jdokan.Win32FindData;
 
 public class MemFileInfo {
 	static long nextFileIndex = 2;
