@@ -9,7 +9,4 @@ install:
 
     .\DokanInstall_0.7.1 /S
 build_script:
-- ps: >-
-    .\gradlew generateHeader
-
-    .\gradlew build
+- ps: .\gradlew build
