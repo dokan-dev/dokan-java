@@ -6,7 +6,8 @@ environment:
 install:
 - ps: >-
     Start-FileDownload 'https://github.com/Maxhy/dokany/releases/download/0.7.1/DokanInstall_0.7.1.exe'
-
     .\DokanInstall_0.7.1 /S
 build_script:
-- ps: .\gradlew build
+- ps: >-
+    .\gradlew generateHeader
+    .\gradlew build
