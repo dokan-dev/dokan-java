@@ -60,6 +60,10 @@ eclipse {
   project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
 }
 
+test {
+  systemProperties['java.library.path'] = 'src/test/resources'
+}
+
 task generateHeader {
   dependsOn('classes')
   def clazz = 'com.github.sherter.jdokan.Dokan'
@@ -69,4 +73,9 @@ task generateHeader {
   doLast {
     ant.javah(class: clazz, outputFile: header, classpath: sourceSets.main.output.classesDir)
   }
+}
+
+jar {
+  dependsOn('compileNativeSharedLibraryNativeCpp')
+  from 'build/binaries/nativeSharedLibrary/jdokan.dll'
 }

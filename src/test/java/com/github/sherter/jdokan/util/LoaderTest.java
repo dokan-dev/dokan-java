@@ -1,4 +1,4 @@
-package com.github.sherter.jdokan;
+package com.github.sherter.jdokan.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -7,9 +7,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.junit.Test;
 
@@ -18,6 +15,24 @@ import com.google.common.jimfs.Jimfs;
 
 public class LoaderTest {
 
+  @Test(expected = UnsatisfiedLinkError.class)
+  public void loadNonExistentLibrary() throws Exception {
+//    Loader.loadLibrary("i_do_not_exist");
+  }
+
+  @Test
+  public void loadExistentx86LibraryFromOutsideJar() throws Exception {
+    if (System.getProperty("os.arch").equals("x86")) {
+//      Loader.loadLibrary("jdokan_x86");
+    }
+  }
+
+  @Test
+  public void loadExistentamd64LibraryFromOutsideJar() throws Exception {
+    if (System.getProperty("os.arch").equals("amd64")) {
+ //     Loader.loadLibrary("jdokan_x64");
+    }
+  }
 
   @Test
   public void destinationFileHasSameContentAsResource() throws IOException {
