@@ -36,14 +36,12 @@ model {
       }
     }
   }
+  tasks {
+    getByName 'nativeSharedLibrary', { dependsOn generateHeader }
+    matching { it.name.contains('LibVisualStudio') }.each { it.enabled = false }
+    matching { it.name.contains('StaticLibrary') }.each { it.enabled = false }
+  }
 }
-
-tasks.matching{ it.name.contains('StaticLibrary') }
-  .whenTaskAdded { it.enabled = false }
-tasks.matching{ it.name.contains('LibVisualStudio') }
-  .whenTaskAdded { it.enabled = false }
-tasks.matching{ it.name.contains('compileNativeSharedLibrary') }
-  .whenTaskAdded { it.dependsOn('generateHeader') }
 
 repositories {
   jcenter()
