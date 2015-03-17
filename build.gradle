@@ -36,8 +36,8 @@ model {
       }
     }
   }
+  tasks.compileNativeSharedLibraryNativeCpp { dependsOn generateHeader }
   tasks {
-    getByName 'nativeSharedLibrary', { dependsOn generateHeader }
     matching { it.name.contains('LibVisualStudio') }.each { it.enabled = false }
     matching { it.name.contains('StaticLibrary') }.each { it.enabled = false }
   }
