@@ -62,10 +62,6 @@ eclipse {
   project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
 }
 
-test {
-  systemProperties['java.library.path'] = 'src/test/resources'
-}
-
 task generateHeader {
   dependsOn('classes')
   def clazz = 'com.github.sherter.jdokan.Dokan'
