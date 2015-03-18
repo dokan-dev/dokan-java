@@ -3,6 +3,7 @@ plugins {
   id 'cpp'
   id 'visual-studio'
   id 'eclipse'
+  id 'maven'
 }
 
 model {
@@ -48,6 +49,8 @@ repositories {
 }
 
 version = '1.1-SNAPSHOT'
+group = 'com.github.sherter.jdokan'
+archivesBaseName = 'jdokan'
 
 dependencies {
   compile 'com.google.guava:guava:18.+'
@@ -76,4 +79,18 @@ task generateHeader {
 jar {
   dependsOn('compileNativeSharedLibraryNativeCpp')
   from 'build/binaries/nativeSharedLibrary/jdokan.dll'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+  archives javadocJar, sourcesJar
 }
