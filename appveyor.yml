@@ -7,12 +7,13 @@ environment:
     secure: KcJMy3M1M+wPExeKn0lvLA==
   CI_DEPLOY_PASSWORD:
     secure: 09SvkofvJRaojG7QHCVy7GIdcLvxmJbJX/qimwfbSAvR4uzG7MohJEEkJj0CwRCQ
-install:
-- ps: >-
-    Start-FileDownload 'https://github.com/Maxhy/dokany/releases/download/0.7.1/DokanInstall_0.7.1.exe'
 
-    .\DokanInstall_0.7.1 /S
+install:
+- ps: Start-FileDownload 'https://github.com/Maxhy/dokany/releases/download/0.7.1/DokanInstall_0.7.1.exe'
+- cmd: .\DokanInstall_0.7.1 /S
+
 build_script:
-- ps: .\gradlew build
+- cmd: .\gradlew build
+
 on_success:
-- ps: .\gradlew publish
+- cmd: .\gradlew publish
