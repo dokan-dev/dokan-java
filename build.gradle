@@ -3,7 +3,7 @@ plugins {
   id 'cpp'
   id 'visual-studio'
   id 'eclipse'
-  id 'maven'
+  id 'maven-publish'
 }
 
 model {
@@ -50,14 +50,13 @@ repositories {
 
 version = '1.1-SNAPSHOT'
 group = 'com.github.sherter.jdokan'
-archivesBaseName = 'jdokan'
 
 dependencies {
-  compile 'com.google.guava:guava:18.+'
+  compile 'com.google.guava:guava:18.0'
   compile 'org.slf4j:slf4j-api:1.7.10'
   compile 'ch.qos.logback:logback-classic:1.1.2'
-  testCompile 'com.google.jimfs:jimfs:1.+'
-  testCompile 'junit:junit:4.+'
+  testCompile 'com.google.jimfs:jimfs:1.0,'
+  testCompile 'junit:junit:4.12'
   testCompile 'com.google.truth:truth:0.25'
 }
 
@@ -77,7 +76,7 @@ task generateHeader {
 }
 
 jar {
-  dependsOn('compileNativeSharedLibraryNativeCpp')
+  dependsOn('nativeSharedLibrary')
   from 'build/binaries/nativeSharedLibrary/jdokan.dll'
 }
 
@@ -94,6 +93,12 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-artifacts {
-  archives javadocJar, sourcesJar
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.java
+      artifact sourcesJar { classifier 'sources' }
+      artifact javadocJar { classifier 'javadoc' }
+    }
+  }
 }
