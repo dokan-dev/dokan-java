@@ -48,9 +48,6 @@ repositories {
   jcenter()
 }
 
-version = '1.1-SNAPSHOT'
-group = 'com.github.sherter.jdokan'
-
 dependencies {
   compile 'com.google.guava:guava:18.0'
   compile 'org.slf4j:slf4j-api:1.7.10'
@@ -96,9 +93,23 @@ task sourcesJar(type: Jar) {
 publishing {
   publications {
     maven(MavenPublication) {
+      groupId 'com.github.sherter.jdokan'
+      artifactId 'jdokan'
+      version '1.1-SNAPSHOT'
+
       from components.java
       artifact sourcesJar { classifier 'sources' }
       artifact javadocJar { classifier 'javadoc' }
+    }
+  }
+  repositories {
+    maven {
+      name = 'SonatypeSnapshot'
+      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+      credentials {
+        username System.env.CI_DEPLOY_USERNAME
+	password System.env.CI_DEPLOY_PASSWORD
+      }
     }
   }
 }
