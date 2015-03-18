@@ -81,6 +81,9 @@ jar {
   from 'build/binaries/nativeSharedLibrary/jdokan.dll'
 }
 
+// TODO: change this back to true when documentation is added
+javadoc.failOnError = false
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
