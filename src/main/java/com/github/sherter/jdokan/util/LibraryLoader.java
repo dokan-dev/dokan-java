@@ -14,9 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.annotations.VisibleForTesting;
 
 public final class LibraryLoader {
+
+  private static final Logger log = LoggerFactory.getLogger(LibraryLoader.class);
 
   private LibraryLoader() {}
 
@@ -51,7 +56,7 @@ public final class LibraryLoader {
           System.load(libPath.toString());
           return true;
         } catch (UnsatisfiedLinkError e) {
-          // try next
+          continue;
         }
       }
     }
@@ -64,7 +69,9 @@ public final class LibraryLoader {
       return false;
     } else {
       try {
-        Path temp = Files.createTempFile("jdokan_", ".dll");
+        String[] splits = filename.split("\\.", 2);
+        Path temp = Files.createTempFile(splits[0], splits.length > 1 ? splits[1] : ".tmp");
+        deleteExistingTempFiles(temp.getParent(), splits[0], splits.length > 1 ? splits[1] : ".tmp");
         temp.toFile().deleteOnExit();
         copyResource(ClassLoader.getSystemClassLoader(), filename, temp,
             StandardCopyOption.REPLACE_EXISTING);
@@ -73,6 +80,29 @@ public final class LibraryLoader {
       } catch (IOException | UnsatisfiedLinkError e) {
         return false;
       }
+    }
+  }
+
+  @VisibleForTesting
+  static void deleteExistingTempFiles(Path tempDir, String prefix, String suffix) {
+    try {
+      Files
+          .list(tempDir)
+          .filter(
+              f -> f.getFileName().toString().startsWith(prefix)
+                  && f.getFileName().toString().endsWith(suffix))
+          .forEach(
+              f -> {
+                try {
+                  Files.delete(f);
+                } catch (IOException e) {
+                  log.info("Couldn't delete temporary file {}, which was most"
+                      + " likely created on previous runs of this program."
+                      + " You may wan't to try to delete it manually.", f);
+                }
+              });
+    } catch (IOException e) {
+      // TODO is ignoring good enough?
     }
   }
 
