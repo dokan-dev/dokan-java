@@ -1,4 +1,4 @@
-Jdokan [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc?svg=true)](https://ci.appveyor.com/project/sherter/jdokan)
+Jdokan [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc/branch/master?svg=true)](https://ci.appveyor.com/project/sherter/jdokan/branch/master)
 ======
 
 Jdokan is a Java wrapper for Dokan 0.6.0 and above using JNI.
