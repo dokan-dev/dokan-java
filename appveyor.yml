@@ -16,4 +16,7 @@ build_script:
 - cmd: .\gradlew build
 
 on_success:
-- cmd: .\gradlew publish
+- ps: >-
+    if($env:appveyor_repo_branch -eq 'master') {
+      .\gradlew publish
+    }
