@@ -18,5 +18,5 @@ build_script:
 on_success:
 - ps: >-
     if($env:appveyor_repo_branch -eq 'master') {
-      .\gradlew publish
+      cmd /c .\gradlew publish 2`>`&1
     }
