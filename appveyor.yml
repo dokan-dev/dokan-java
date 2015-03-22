@@ -17,6 +17,6 @@ build_script:
 
 on_success:
 - ps: >-
-    if($env:appveyor_repo_branch -eq 'deploy-only-from-master') {
-      .\gradlew publish 2>&1
+    if($env:appveyor_repo_branch -eq 'master') {
+      cmd /c .\gradlew publish 2`>`&1
     }
