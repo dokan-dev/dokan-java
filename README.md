@@ -1,7 +1,7 @@
-Jdokan [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc/branch/master?svg=true)](https://ci.appveyor.com/project/sherter/jdokan/branch/master)
+Dokan-Java [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc/branch/master?svg=true)](https://ci.appveyor.com/project/sherter/jdokan/branch/master)
 ======
 
-Jdokan is a Java wrapper for Dokan 0.6.0 and above using JNI.
+Dokan-Java is a Java wrapper for Dokan 0.6.0 and above using JNI.
 The original version is no longer maintained. I made this fork 
 in order to clean the library up and improve the build process (with gradle).
 

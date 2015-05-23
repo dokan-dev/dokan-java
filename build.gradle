@@ -93,9 +93,9 @@ task sourcesJar(type: Jar) {
 publishing {
   publications {
     maven(MavenPublication) {
-      groupId 'com.github.sherter.jdokan'
-      artifactId 'jdokan'
-      version '1.1-SNAPSHOT'
+      groupId 'com.github.dokan-dev.dokan-java'
+      artifactId 'dokan-java'
+      version '0.1-SNAPSHOT'
 
       from components.java
       artifact sourcesJar { classifier 'sources' }
