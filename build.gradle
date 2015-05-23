@@ -63,7 +63,7 @@ eclipse {
 
 task generateHeader {
   dependsOn('classes')
-  def clazz = 'com.github.sherter.jdokan.Dokan'
+  def clazz = 'com.github.dokandev.dokanjava.Dokan'
   def header = "${rootDir}/src/main/cpp/include/jdokan_jni.h"
   inputs.file "${sourceSets.main.output.classesDir}/${clazz.replaceAll('.', '/')}"
   outputs.file header
