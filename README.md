@@ -8,6 +8,22 @@ in order to clean the library up and improve the build process (with gradle).
 For an example on how to use this library see 
 [opendedup](http://code.google.com/p/opendedup/source/browse/trunk/src/org/opendedup/sdfs/windows/fs/WinSDFS.java).
 
+## Download
+Snapshot versions are available on sonatype snapshot [repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/dokan-dev/dokan-java/dokan-java/).
+
+Add the following to your `build.gradle`:
+
+```groovy
+repositories {
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+  }
+}
+dependencies {
+  compile 'com.github.dokan-dev.dokan-java:dokan-java:0.1-SNAPSHOT'
+}
+```
+
 ## Building
 This project uses [gradle](http://gradle.org/) as build tool.
 
