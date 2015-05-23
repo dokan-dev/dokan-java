@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 
 public final class LibraryLoader {
 
@@ -25,26 +26,45 @@ public final class LibraryLoader {
 
   private LibraryLoader() {}
 
+  /**
+   * Loads the native library specified by the {@code libname} argument. The {@code libname}
+   * argument must not contain any platform specific prefix, file extension or path. Searches for
+   * the native library in the following locations (in this order):
+   * <ul>
+   * <li>{@code java.library.path}</li>
+   * <li>{@code java.class.path}
+   * <li>{@code .jar} file from which this {@link LibraryLoader} was loaded.</li>
+   * </ul>
+   * Returns as soon as a match is found. In case the native library is found inside a {@code .jar}
+   * file, it is extracted to a temp file and loaded from there. There is no guarantee that the temp
+   * file is deleted after jvm shutdown.
+   * 
+   * @param libname name of the native library without platform specific prefix, file extension or
+   *        path.
+   * 
+   * @throws UnsatisfiedLinkError in case the native library could not be found
+   */
   public static void load(String libname) {
     try {
+      log.debug("loading native library '{}' from java.library.path ...", libname);
       System.loadLibrary(libname);
+      log.debug("Successfully loaded library '{}' from java.library.path", libname);
       return;
     } catch (UnsatisfiedLinkError e) {
       // not in java.library.path
     }
-    boolean loaded = false;
-    if (isLoadedFromJar(LibraryLoader.class)) {
-      loaded = loadFromJar(libname);
-    } else {
-      loaded = loadFromClasspath(libname);
+    boolean isLoaded = loadFromClasspath(libname);
+    if (!isLoaded && isLoadedFromJar(LibraryLoader.class)) {
+      isLoaded = loadFromJar(libname);
     }
-    if (!loaded) {
+    if (!isLoaded) {
       throw new UnsatisfiedLinkError(
           "native library is missing or was compiled for wrong architecture");
     }
   }
 
   private static boolean loadFromClasspath(String libname) {
+    log.debug("loading native library '{}' from java.class.path ...", libname);
     String filename = System.mapLibraryName(libname);
     List<Path> classPathDirs =
         Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
@@ -54,6 +74,7 @@ public final class LibraryLoader {
       if (Files.exists(libPath)) {
         try {
           System.load(libPath.toString());
+          log.debug("Successfully loaded library '{}' from '{}'", libname, libPath.normalize());
           return true;
         } catch (UnsatisfiedLinkError e) {
           continue;
@@ -64,46 +85,30 @@ public final class LibraryLoader {
   }
 
   private static boolean loadFromJar(String libname) {
+    log.debug("loading native library '{}' from '{}'", libname, jarFileName());
     String filename = System.mapLibraryName(libname);
     if (ClassLoader.getSystemClassLoader().getResource(filename) == null) {
+      log.debug("{} was not found in {}", filename, jarFileName());
       return false;
     } else {
       try {
         String[] splits = filename.split("\\.", 2);
-        Path temp = Files.createTempFile(splits[0], splits.length > 1 ? splits[1] : ".tmp");
-        deleteExistingTempFiles(temp.getParent(), splits[0], splits.length > 1 ? splits[1] : ".tmp");
+        Path temp = Files.createTempFile(splits[0], splits.length > 1 ? "." + splits[1] : ".dll");
+        log.debug("extracting '{}' from '{}' to '{}'", filename, jarFileName(), temp);
         temp.toFile().deleteOnExit();
         copyResource(ClassLoader.getSystemClassLoader(), filename, temp,
             StandardCopyOption.REPLACE_EXISTING);
         System.load(temp.toString());
         return true;
-      } catch (IOException | UnsatisfiedLinkError e) {
-        return false;
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
       }
     }
   }
 
-  @VisibleForTesting
-  static void deleteExistingTempFiles(Path tempDir, String prefix, String suffix) {
-    try {
-      Files
-          .list(tempDir)
-          .filter(
-              f -> f.getFileName().toString().startsWith(prefix)
-                  && f.getFileName().toString().endsWith(suffix))
-          .forEach(
-              f -> {
-                try {
-                  Files.delete(f);
-                } catch (IOException e) {
-                  log.info("Couldn't delete temporary file {}, which was most"
-                      + " likely created on previous runs of this program."
-                      + " You may wan't to try to delete it manually.", f);
-                }
-              });
-    } catch (IOException e) {
-      // TODO is ignoring good enough?
-    }
+  private static String jarFileName() {
+    return new File(LibraryLoader.class.getProtectionDomain().getCodeSource().getLocation()
+        .getPath()).getName();
   }
 
   @VisibleForTesting
