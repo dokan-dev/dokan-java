@@ -88,7 +88,7 @@ jobject ToDokanFileInfoJavaObject(JNIEnv* env, PDOKAN_FILE_INFO DokanFileInfo) t
 	if (DokanFileInfo == NULL)
 		return NULL;
 
-	jclass clz = env->FindClass("com/github/sherter/jdokan/DokanFileInfo");
+	jclass clz = env->FindClass("com/github/dokandev/dokanjava/DokanFileInfo");
 	if (clz == NULL) 
 		return NULL;
 	
