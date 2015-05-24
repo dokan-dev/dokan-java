@@ -34,8 +34,10 @@ extern jclass win32FindDataClass;
 
 //extern jfieldID driveLetterID;
 extern jfieldID mountPointID;
+extern jfieldID versionID;
 extern jfieldID threadCountID;
-extern jfieldID optionsModeID;
+extern jfieldID optionsID;
+extern jfieldID globalContextID;
 //extern jfieldID useStdErrID;
 //extern jfieldID useAltStreamID;
 extern jfieldID errorCodeID;

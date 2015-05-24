@@ -25,7 +25,7 @@ public class StatusTest {
 
 	@Test
 	public void randomUnkownReturnCodeIsUnknown() throws Exception {
-		Set<Integer> known = Arrays.stream(Status.values()).map(s -> s.exitCode)
+		Set<Integer> known = Arrays.stream(Status.values()).map(s -> s.code())
 				.collect(Collectors.toSet());
 		int unknownReturnValue = new Random().ints().filter(v -> !known.contains(v)).findFirst()
 				.getAsInt();

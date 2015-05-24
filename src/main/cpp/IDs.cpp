@@ -33,10 +33,11 @@ jclass dokanOperationExceptionClass = NULL;
 jclass dokanVolumeInfoClass = NULL;
 jclass win32FindDataClass = NULL;
 
-jfieldID mountPointID = NULL;
-//jfieldID driveLetterID = NULL;
+jfieldID versionID = NULL;
 jfieldID threadCountID = NULL;
-jfieldID optionsModeID = NULL;
+jfieldID optionsID = NULL;
+jfieldID globalContextID = NULL;
+jfieldID mountPointID = NULL;
 //jfieldID useStdErrID = NULL;
 //jfieldID useAltStreamID = NULL;
 jfieldID errorCodeID = NULL;
@@ -323,15 +324,25 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 	if(mountPointID == NULL)
 		throw "Cannot find field mountPoint at DokanOperations class";
 
+	// DokanOptions.version
+	versionID = env->GetFieldID(dokanOptionsClass, "version", "S");
+	if (versionID == NULL)
+		throw "Cannot find field threadCount at DokanOperations class";
+
 	// DokanOptions.threadCount
-	threadCountID = env->GetFieldID(dokanOptionsClass, "threadCount", "I");
+	threadCountID = env->GetFieldID(dokanOptionsClass, "threadCount", "S");
 	if(threadCountID == NULL)
 		throw "Cannot find field threadCount at DokanOperations class";
 
-	// DokanOptions.optionsMode
-	optionsModeID = env->GetFieldID(dokanOptionsClass, "optionsMode", "J");
-	if(optionsModeID == NULL)
-		throw "Cannot find field optionsMode at DokanOperations class";
+	// DokanOptions.options
+	optionsID = env->GetFieldID(dokanOptionsClass, "options", "I");
+	if(optionsID == NULL)
+		throw "Cannot find field options at DokanOperations class";
+
+	// DokanOptions.globalContext
+	globalContextID = env->GetFieldID(dokanOptionsClass, "globalContext", "J");
+	if (globalContextID == NULL)
+		throw "Cannot find field options at DokanOperations class";
 
 	// DokanOptions.useStdErr
 	/*
