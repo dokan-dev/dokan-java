@@ -9,27 +9,27 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.github.dokandev.dokanjava.util.Status;
+import com.github.dokandev.dokanjava.util.DokanStatus;
 
 public class StatusTest {
 
 	@Test
 	public void returnCodeZeroIsSuccess() {
-		assertThat(Status.from(0)).isSameAs(Status.SUCCESS);
+		assertThat(DokanStatus.fromInt(0)).isSameAs(DokanStatus.SUCCESS);
 	}
 
 	@Test
 	public void returnCodeMinusFiveIsMountError() {
-		assertThat(Status.from(-5)).isSameAs(Status.MOUNT_ERROR);
+		assertThat(DokanStatus.fromInt(-5)).isSameAs(DokanStatus.MOUNT_ERROR);
 	}
 
 	@Test
 	public void randomUnkownReturnCodeIsUnknown() throws Exception {
-		Set<Integer> known = Arrays.stream(Status.values()).map(s -> s.code())
+		Set<Integer> known = Arrays.stream(DokanStatus.values()).map(s -> s.code())
 				.collect(Collectors.toSet());
 		int unknownReturnValue = new Random().ints().filter(v -> !known.contains(v)).findFirst()
 				.getAsInt();
-		assertThat(Status.from(unknownReturnValue)).isSameAs(Status.UNKNOWN);
+		assertThat(DokanStatus.fromInt(unknownReturnValue)).isSameAs(DokanStatus.UNKNOWN);
 	}
 
 }

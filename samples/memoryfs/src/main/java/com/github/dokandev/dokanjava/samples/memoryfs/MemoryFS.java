@@ -44,13 +44,14 @@ import com.github.dokandev.dokanjava.DokanOperationException;
 import com.github.dokandev.dokanjava.DokanOperations;
 import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
-import com.github.dokandev.dokanjava.FileAccess;
 import com.github.dokandev.dokanjava.FileAttribute;
 import com.github.dokandev.dokanjava.FileFlag;
 import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
 import com.github.dokandev.dokanjava.WinError;
-import com.github.dokandev.dokanjava.util.Status;
+import com.github.dokandev.dokanjava.util.AccessMask;
+import com.github.dokandev.dokanjava.util.DokanStatus;
+import com.github.dokandev.dokanjava.util.ShareMode;
 
 public class MemoryFS implements DokanOperations {
 
@@ -83,10 +84,10 @@ public class MemoryFS implements DokanOperations {
         .options(REMOVABLE, KEEP_ALIVE, DEBUG)
         .globalContext(12345L)
         .build();
-    Status status = Status.from(Dokan.mount(dokanOptions, this));
+    DokanStatus status = DokanStatus.fromInt(Dokan.mount(dokanOptions, this));
     log("[MemoryFS] status = %s", status);
 
-    if (status != Status.SUCCESS) {
+    if (status != DokanStatus.SUCCESS) {
       System.exit(-1);
     } else {
       log("######## mounted " + mountPoint + " with result " + status + " #############");
@@ -107,14 +108,21 @@ public class MemoryFS implements DokanOperations {
   
   
   public long onCreateFile(String fileName, int desiredAccess, int shareMode,
-      int creationDisposition, int flagsAndAttributes, DokanFileInfo arg5)
+      int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
       throws DokanOperationException {
     CreationDisposition disposition = CreationDisposition.build(creationDisposition);
 
-    log("[onCreateFile] " + fileName + ",\n\t creationDisposition = " + creationDisposition
-        + ",\n\t desiredAccess = " + FileAccess.toString(desiredAccess) + ",\n\t flags = "
-        + FileFlag.toString(flagsAndAttributes) + ",\n\t attributes = "
-        + FileAttribute.toString(flagsAndAttributes));
+    
+    log("[onCreateFile]\n"
+        + "  file name: %s\n"
+        + "  creation disposition: %s\n"
+        + "  desired access: %s\n"
+        + "  share mode: %s\n"
+        + "  flags: %s\n"
+        + "  attributes: %s",
+        fileName, creationDisposition, AccessMask.fromInt(desiredAccess),
+        ShareMode.fromInt(shareMode), FileFlag.toString(flagsAndAttributes),
+        FileAttribute.toString(flagsAndAttributes));
 
     if (fileName.equals("\\")) {
       switch (disposition) {
