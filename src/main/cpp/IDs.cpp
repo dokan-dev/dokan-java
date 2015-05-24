@@ -328,10 +328,10 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 	if(threadCountID == NULL)
 		throw "Cannot find field threadCount at DokanOperations class";
 
-	// DokanOptions.optionsMode
-	optionsModeID = env->GetFieldID(dokanOptionsClass, "optionsMode", "J");
+	// DokanOptions.options
+	optionsModeID = env->GetFieldID(dokanOptionsClass, "options", "J");
 	if(optionsModeID == NULL)
-		throw "Cannot find field optionsMode at DokanOperations class";
+		throw "Cannot find field options at DokanOperations class";
 
 	// DokanOptions.useStdErr
 	/*
