@@ -274,7 +274,9 @@ public class MemoryFS implements DokanOperations {
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
       throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
-    return fi.toByHandleFileInformation();
+    ByHandleFileInformation fileInformation = fi.toByHandleFileInformation();
+    log("returning :%s", fileInformation);
+    return fileInformation;
   }
 
   public Win32FindData[] onFindFiles(String pathName, DokanFileInfo arg1)
