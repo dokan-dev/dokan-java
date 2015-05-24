@@ -325,12 +325,12 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 		throw "Cannot find field mountPoint at DokanOperations class";
 
 	// DokanOptions.version
-	versionID = env->GetFieldID(dokanOptionsClass, "version", "I");
+	versionID = env->GetFieldID(dokanOptionsClass, "version", "S");
 	if (versionID == NULL)
 		throw "Cannot find field threadCount at DokanOperations class";
 
 	// DokanOptions.threadCount
-	threadCountID = env->GetFieldID(dokanOptionsClass, "threadCount", "I");
+	threadCountID = env->GetFieldID(dokanOptionsClass, "threadCount", "S");
 	if(threadCountID == NULL)
 		throw "Cannot find field threadCount at DokanOperations class";
 

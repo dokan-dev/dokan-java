@@ -45,8 +45,8 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 
 		DOKAN_OPTIONS options;
 		ZeroMemory(&options, sizeof(DOKAN_OPTIONS));
-		options.Version = env->GetIntField(joptions, versionID);
-		options.ThreadCount = env->GetIntField(joptions, threadCountID);
+		options.Version = env->GetShortField(joptions, versionID);
+		options.ThreadCount = env->GetShortField(joptions, threadCountID);
 		options.Options = env->GetIntField(joptions, optionsID);
 		options.GlobalContext = env->GetLongField(joptions, globalContextID);
 		/* mountPoint */

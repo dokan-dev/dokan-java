@@ -26,8 +26,8 @@ import java.util.Set;
 import com.google.common.base.MoreObjects;
 
 public final class DokanOptions {
-  private final int version;
-  private final int threadCount;
+  private final short version;
+  private final short threadCount;
   private final int options;
   private final long globalContext;
   private final String mountPoint;
