@@ -18,6 +18,7 @@
 package com.github.dokandev.dokanjava;
 
 import com.github.dokandev.dokanjava.util.FileAttribute;
+import com.github.dokandev.dokanjava.util.FileTime;
 import com.google.common.base.MoreObjects;
 
 public class ByHandleFileInformation {
@@ -46,9 +47,9 @@ public class ByHandleFileInformation {
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("fileAttributes", FileAttribute.fromInt(fileAttributes))
-        .add("creationTime", FileTimeUtils.toDate(creationTime))
-        .add("lastAccessTime", FileTimeUtils.toDate(lastAccessTime))
-        .add("lastWriteTime", FileTimeUtils.toDate(lastWriteTime))
+        .add("creationTime", FileTime.toDate(creationTime))
+        .add("lastAccessTime", FileTime.toDate(lastAccessTime))
+        .add("lastWriteTime", FileTime.toDate(lastWriteTime))
         .add("volumeSerialNumber", volumeSerialNumber)
         .add("fileSize", fileSize)
         .add("numberOfLinks", numberOfLinks)
