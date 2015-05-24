@@ -21,8 +21,6 @@ package com.github.dokandev.dokanjava;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
-
 import com.google.common.base.MoreObjects;
 
 public final class DokanOptions {
@@ -101,7 +99,7 @@ public final class DokanOptions {
       return this;
     }
 
-    public Builder options(Set<DokanOption> options) {
+    public Builder options(DokanOption... options) {
       this.options = DokanOption.bitFieldFrom(options);
       return this;
     }

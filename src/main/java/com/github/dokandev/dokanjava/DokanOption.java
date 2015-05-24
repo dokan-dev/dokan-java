@@ -18,7 +18,6 @@
  */
 package com.github.dokandev.dokanjava;
 
-import java.util.Set;
 
 public enum DokanOption {
   DEBUG(1), 
@@ -37,7 +36,7 @@ public enum DokanOption {
   /**
    * Translates a set of options into a bit field.
    */
-  public static int bitFieldFrom(Set<DokanOption> options) {
+  public static int bitFieldFrom(DokanOption... options) {
     int bitField = 0;
     for (DokanOption o : options) {
       bitField |= o.mask;
