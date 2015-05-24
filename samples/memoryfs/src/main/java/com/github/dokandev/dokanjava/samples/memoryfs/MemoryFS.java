@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.github.dokandev.dokanjava.ByHandleFileInformation;
-import com.github.dokandev.dokanjava.CreationDisposition;
 import com.github.dokandev.dokanjava.Dokan;
 import com.github.dokandev.dokanjava.DokanDiskFreeSpace;
 import com.github.dokandev.dokanjava.DokanFileInfo;
@@ -50,6 +49,7 @@ import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
 import com.github.dokandev.dokanjava.WinError;
 import com.github.dokandev.dokanjava.util.AccessMask;
+import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.DokanStatus;
 import com.github.dokandev.dokanjava.util.ShareMode;
 
@@ -110,18 +110,18 @@ public class MemoryFS implements DokanOperations {
   public long onCreateFile(String fileName, int desiredAccess, int shareMode,
       int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
       throws DokanOperationException {
-    CreationDisposition disposition = CreationDisposition.build(creationDisposition);
+    CreationDisposition disposition = CreationDisposition.fromInt(creationDisposition);
 
     
     log("[onCreateFile]\n"
         + "  file name: %s\n"
-        + "  creation disposition: %s\n"
         + "  desired access: %s\n"
         + "  share mode: %s\n"
+        + "  creation disposition: %s\n"
         + "  flags: %s\n"
         + "  attributes: %s",
-        fileName, creationDisposition, AccessMask.fromInt(desiredAccess),
-        ShareMode.fromInt(shareMode), FileFlag.toString(flagsAndAttributes),
+        fileName, AccessMask.fromInt(desiredAccess), ShareMode.fromInt(shareMode), disposition,
+        FileFlag.toString(flagsAndAttributes),
         FileAttribute.toString(flagsAndAttributes));
 
     if (fileName.equals("\\")) {
@@ -133,8 +133,6 @@ public class MemoryFS implements DokanOperations {
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
           return nextFileHandleId();
-        case UNDEFINED:
-          assert (false);
       }
     } else if (files.containsKey(fileName)) {
       switch (disposition) {
@@ -148,8 +146,6 @@ public class MemoryFS implements DokanOperations {
           files.get(fileName).content.clear();
           updateParentLastWrite(fileName);
           return nextFileHandleId();
-        case UNDEFINED:
-          assert (false);
       }
     } else {
       switch (disposition) {
@@ -163,8 +159,6 @@ public class MemoryFS implements DokanOperations {
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
           throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
-        case UNDEFINED:
-          assert (false);
       }
     }
     throw new DokanOperationException(WinError.ERROR_INVALID_FUNCTION);
