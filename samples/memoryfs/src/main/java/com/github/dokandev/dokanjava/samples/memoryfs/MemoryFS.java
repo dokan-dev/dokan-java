@@ -26,6 +26,7 @@ package com.github.dokandev.dokanjava.samples.memoryfs;
 import static com.github.dokandev.dokanjava.DokanOption.DEBUG;
 import static com.github.dokandev.dokanjava.DokanOption.KEEP_ALIVE;
 import static com.github.dokandev.dokanjava.DokanOption.REMOVABLE;
+import static com.github.dokandev.dokanjava.util.FileAttribute.*;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -43,14 +44,14 @@ import com.github.dokandev.dokanjava.DokanOperationException;
 import com.github.dokandev.dokanjava.DokanOperations;
 import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
-import com.github.dokandev.dokanjava.FileAttribute;
-import com.github.dokandev.dokanjava.FileFlag;
 import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
 import com.github.dokandev.dokanjava.WinError;
 import com.github.dokandev.dokanjava.util.AccessMask;
 import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.DokanStatus;
+import com.github.dokandev.dokanjava.util.FileAttribute;
+import com.github.dokandev.dokanjava.util.FileFlag;
 import com.github.dokandev.dokanjava.util.ShareMode;
 
 public class MemoryFS implements DokanOperations {
@@ -121,8 +122,7 @@ public class MemoryFS implements DokanOperations {
         + "  flags: %s\n"
         + "  attributes: %s",
         fileName, AccessMask.fromInt(desiredAccess), ShareMode.fromInt(shareMode), disposition,
-        FileFlag.toString(flagsAndAttributes),
-        FileAttribute.toString(flagsAndAttributes));
+        FileFlag.fromInt(flagsAndAttributes), FileAttribute.fromInt(flagsAndAttributes));
 
     if (fileName.equals("\\")) {
       switch (disposition) {
@@ -267,9 +267,7 @@ public class MemoryFS implements DokanOperations {
       throws DokanOperationException {
     log("[onGetFileInformation] " + fileName);
     if (fileName.equals("\\")) {
-      return new ByHandleFileInformation(
-          FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_NORMAL.getValue()
-              | FileAttribute.FileAttributeFlags.FILE_ATTRIBUTE_DIRECTORY.getValue(),
+      return new ByHandleFileInformation(FileAttribute.toInt(FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_DIRECTORY),
           rootCreateTime, rootCreateTime, rootLastWrite, volumeSerialNumber, 0, 1, 1);
     }
     MemFileInfo fi = files.get(fileName);
