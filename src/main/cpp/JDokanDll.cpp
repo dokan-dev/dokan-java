@@ -30,7 +30,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 /*
  * Class:     com_github_dokandev_dokanjava_Dokan
  * Method:    mount
- * Signature: (Lcom/github/sherter/jdokan/DokanOptions;Lcom/github/sherter/jdokan/DokanOperations;)I
+ * Signature: (Lcom/github/dokandev/dokanjava/DokanOptions;Lcom/github/dokandev/dokanjava/DokanOperations;)I
  */
 JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
   (JNIEnv *env, jclass, jobject joptions, jobject joperations)
@@ -45,7 +45,10 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 
 		DOKAN_OPTIONS options;
 		ZeroMemory(&options, sizeof(DOKAN_OPTIONS));
-		options.Version = 600;
+		options.Version = env->GetIntField(joptions, versionID);
+		options.ThreadCount = env->GetIntField(joptions, threadCountID);
+		options.Options = env->GetIntField(joptions, optionsID);
+		options.GlobalContext = env->GetLongField(joptions, globalContextID);
 		/* mountPoint */
 		jstring mountPoint = (jstring) env->GetObjectField(joptions, mountPointID);
 		int len = env->GetStringLength(mountPoint);
@@ -56,8 +59,7 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 		options.MountPoint = wsz;
 		env->ReleaseStringChars(mountPoint, chars);
 		/* end MountPoint */
-		options.ThreadCount = env->GetIntField(joptions, threadCountID);
-		options.Options = env->GetLongField(joptions, optionsModeID);
+		
 
 
 		DOKAN_OPERATIONS operations;

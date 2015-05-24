@@ -20,22 +20,25 @@
 package com.github.dokandev.dokanjava;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Set;
+
 import com.google.common.base.MoreObjects;
 
 public final class DokanOptions {
-  public int version;
-  public int threadCount;
-  public long options;
-  public long globalContext;
-  public String mountPoint;
+  private final int version;
+  private final int threadCount;
+  private final int options;
+  private final long globalContext;
+  private final String mountPoint;
 
-  private DokanOptions(int version, int threadCount, long options, long globalContext,
+  public DokanOptions(short version, short threadCount, int options, long globalContext,
       String mountPoint) {
     this.version = version;
     this.threadCount = threadCount;
     this.options = options;
     this.globalContext = globalContext;
-    this.mountPoint = mountPoint;
+    this.mountPoint = checkNotNull(mountPoint);
   }
 
   public static Builder builder(String mountPoint) {
@@ -54,10 +57,10 @@ public final class DokanOptions {
   }
 
   public static class Builder {
-    private int version;
-    private int threadCount;
-    private long options;
-    private long globalContext;
+    private int version = 0;
+    private int threadCount = 0;
+    private int options = 0;
+    private long globalContext = 0L;
     private final String mountPoint;
 
     Builder(String mountPoint) {
@@ -72,18 +75,34 @@ public final class DokanOptions {
       this.mountPoint = source.mountPoint;
     }
 
+    /**
+     * Set supported Dokan version (e.g. '730' represents version 0.7.3).
+     * 
+     * @throws IllegalArgumentException if {@code version} is not in range [0, 65535]
+     */
     public Builder version(int version) {
+      if (version < 0 || version > 65535) {
+        throw new IllegalArgumentException(version + " is not in range [0, 65535]");
+      }
       this.version = version;
       return this;
     }
 
+    /**
+     * Number of threads to be used (0 for default value).
+     * 
+     * @throws IllegalArgumentException if {@code threadCount} is not in range [0, 65535]
+     */
     public Builder threadCount(int threadCount) {
+      if (version < 0 || version > 65535) {
+        throw new IllegalArgumentException(version + " is not in range [0, 65535]");
+      }
       this.threadCount = threadCount;
       return this;
     }
 
-    public Builder options(long options) {
-      this.options = options;
+    public Builder options(Set<DokanOption> options) {
+      this.options = DokanOption.bitFieldFrom(options);
       return this;
     }
 
@@ -93,8 +112,8 @@ public final class DokanOptions {
     }
 
     public DokanOptions build() {
-      return new DokanOptions(this.version, this.threadCount, this.options, this.globalContext,
-          this.mountPoint);
+      return new DokanOptions((short) this.version, (short) this.threadCount, this.options,
+          this.globalContext, this.mountPoint);
     }
   }
 }
