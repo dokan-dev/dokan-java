@@ -53,9 +53,9 @@ int GetOperationResult(JNIEnv* env)
 
 	int result = ERROR_GEN_FAILURE;
 	jthrowable t = env->ExceptionOccurred();
-	if (env->IsInstanceOf(t, dokanOperationExceptionClass)) {
+	if (env->IsInstanceOf(t, dokanExceptionClass)) {
 		result = -(env->GetIntField(t, errorCodeID));
-		LOG(L"[GetOperationResult] DokanOperationException. ErrorCode = %d\n", -result);
+		LOG(L"[GetOperationResult] dokanException. ErrorCode = %d\n", -result);
 	} else {
 		// TODO More detailed information !!
 		LOG(L"[GetOperationResult] Exception occurred !!!\n");

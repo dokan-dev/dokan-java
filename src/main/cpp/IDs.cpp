@@ -28,7 +28,7 @@ jclass dokanOptionsClass = NULL;
 jclass dokanDokanOperationsClass = NULL;
 jclass byHandleFileInfoClass = NULL;
 jclass dokanDiskFreeSpaceClass = NULL;
-jclass dokanOperationExceptionClass = NULL;
+jclass dokanExceptionClass = NULL;
 //jclass dokanFileInfoClass = NULL;
 jclass dokanVolumeInfoClass = NULL;
 jclass win32FindDataClass = NULL;
@@ -71,7 +71,7 @@ jfieldID ByHandleFileInfo_fileIndexID = NULL;
 
 jmethodID byHandleFileInfoConstID = NULL;
 jmethodID dokanDiskFreeSpaceConstID = NULL;
-jmethodID dokanOperationExceptionConstID = NULL;
+jmethodID dokanExceptionConstID = NULL;
 //jmethodID dokanFileInfoConstID = NULL;
 jmethodID dokanVolumeInfoConstID = NULL;
 jmethodID win32FindDataConstID = NULL;
@@ -133,15 +133,15 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 	if(totalNumberOfFreeBytesID == NULL)
 		throw "Cannot find field totalNumberOfFreeBytes at DokanDiskFreeSpace class";
 
-	// DokanOperationException class
-	dokanOperationExceptionClass = (jclass) env->NewGlobalRef(env->FindClass("com/github/dokandev/dokanjava/DokanOperationException"));
-	if(dokanOperationExceptionClass == NULL) 
-		throw "Cannot find com.github.dokandev.dokanjava.DokanOperationException class";
+	// dokanException class
+	dokanExceptionClass = (jclass) env->NewGlobalRef(env->FindClass("com/github/dokandev/dokanjava/DokanException"));
+	if(dokanExceptionClass == NULL) 
+		throw "Cannot find com.github.dokandev.dokanjava.DokanException class";
 
-	// DokanOperationException.errorCode
-	errorCodeID = env->GetFieldID(dokanOperationExceptionClass, "errorCode", "I");
+	// dokanException.errorCode
+	errorCodeID = env->GetFieldID(dokanExceptionClass, "errorCode", "I");
 	if(errorCodeID == NULL)
-		throw "Cannot find field errorCode at DokanOperationException class";
+		throw "Cannot find field errorCode at dokanException class";
 
 	LOG(L"[InitMethodIDs] 1\n");
 

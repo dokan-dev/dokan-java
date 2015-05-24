@@ -26,7 +26,8 @@ package com.github.dokandev.dokanjava.samples.memoryfs;
 import static com.github.dokandev.dokanjava.DokanOption.DEBUG;
 import static com.github.dokandev.dokanjava.DokanOption.KEEP_ALIVE;
 import static com.github.dokandev.dokanjava.DokanOption.REMOVABLE;
-import static com.github.dokandev.dokanjava.util.FileAttribute.*;
+import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_DIRECTORY;
+import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NORMAL;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -39,20 +40,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.github.dokandev.dokanjava.ByHandleFileInformation;
 import com.github.dokandev.dokanjava.Dokan;
 import com.github.dokandev.dokanjava.DokanDiskFreeSpace;
+import com.github.dokandev.dokanjava.DokanException;
 import com.github.dokandev.dokanjava.DokanFileInfo;
-import com.github.dokandev.dokanjava.DokanOperationException;
 import com.github.dokandev.dokanjava.DokanOperations;
 import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
 import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
-import com.github.dokandev.dokanjava.WinError;
 import com.github.dokandev.dokanjava.util.AccessMask;
 import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.DokanStatus;
 import com.github.dokandev.dokanjava.util.FileAttribute;
 import com.github.dokandev.dokanjava.util.FileFlag;
 import com.github.dokandev.dokanjava.util.ShareMode;
+import com.github.dokandev.dokanjava.util.WinError;
 
 public class MemoryFS implements DokanOperations {
 
@@ -110,7 +111,7 @@ public class MemoryFS implements DokanOperations {
   
   public long onCreateFile(String fileName, int desiredAccess, int shareMode,
       int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
-      throws DokanOperationException {
+      throws DokanException {
     CreationDisposition disposition = CreationDisposition.fromInt(creationDisposition);
 
     
@@ -128,7 +129,7 @@ public class MemoryFS implements DokanOperations {
       switch (disposition) {
         case CREATE_NEW:
         case CREATE_ALWAYS:
-          throw new DokanOperationException(WinError.ERROR_ALREADY_EXISTS);
+          throw new DokanException(WinError.ERROR_ALREADY_EXISTS);
         case OPEN_ALWAYS:
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
@@ -137,7 +138,7 @@ public class MemoryFS implements DokanOperations {
     } else if (files.containsKey(fileName)) {
       switch (disposition) {
         case CREATE_NEW:
-          throw new DokanOperationException(WinError.ERROR_ALREADY_EXISTS);
+          throw new DokanException(WinError.ERROR_ALREADY_EXISTS);
         case OPEN_ALWAYS:
         case OPEN_EXISTING:
           return nextFileHandleId();
@@ -158,13 +159,13 @@ public class MemoryFS implements DokanOperations {
           return nextFileHandleId();
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
-          throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+          throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
       }
     }
-    throw new DokanOperationException(WinError.ERROR_INVALID_FUNCTION);
+    throw new DokanException(WinError.ERROR_INVALID_FUNCTION);
   }
 
-  public long onOpenDirectory(String pathName, DokanFileInfo arg1) throws DokanOperationException {
+  public long onOpenDirectory(String pathName, DokanFileInfo arg1) throws DokanException {
     log("[onOpenDirectory] " + pathName);
     if (pathName.equals("\\"))
       return nextFileHandleId();
@@ -174,34 +175,34 @@ public class MemoryFS implements DokanOperations {
     if (files.containsKey(pathName))
       return nextFileHandleId();
     else
-      throw new DokanOperationException(WinError.ERROR_PATH_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_PATH_NOT_FOUND);
   }
 
-  public void onCreateDirectory(String fileName, DokanFileInfo file) throws DokanOperationException {
+  public void onCreateDirectory(String fileName, DokanFileInfo file) throws DokanException {
     log("[onCreateDirectory] " + fileName);
     fileName = Utils.trimTailBackSlash(fileName);
     if (files.containsKey(fileName) || fileName.length() == 0)
-      throw new DokanOperationException(WinError.ERROR_ALREADY_EXISTS);
+      throw new DokanException(WinError.ERROR_ALREADY_EXISTS);
     MemFileInfo fi = new MemFileInfo(fileName, true);
     files.put(fi.fileName, fi);
     updateParentLastWrite(fileName);
     log("[onCreateDirectory] END");
   }
 
-  public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
+  public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanException {
     log("[onCleanup] " + fileName);
   }
 
-  public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanOperationException {
+  public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanException {
     log("[onCloseFile] " + fileName);
   }
 
   public int onReadFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo arg3)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onReadFile] " + fileName);
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     if (fi.getFileSize() == 0)
       return 0;
     try {
@@ -212,17 +213,17 @@ public class MemoryFS implements DokanOperations {
       return copySize;
     } catch (Exception e) {
       e.printStackTrace();
-      throw new DokanOperationException(WinError.ERROR_READ_FAULT);
+      throw new DokanException(WinError.ERROR_READ_FAULT);
     }
   }
 
   public int onWriteFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo arg3)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onWriteFile] " + fileName);
     MemFileInfo fi = files.get(fileName);
     if (fi == null) {
       log("[onWriteFile] file not found");
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     }
     try {
       int copySize = buffer.capacity();
@@ -238,16 +239,16 @@ public class MemoryFS implements DokanOperations {
       return copySize;
     } catch (Exception e) {
       e.printStackTrace();
-      throw new DokanOperationException(WinError.ERROR_WRITE_FAULT);
+      throw new DokanException(WinError.ERROR_WRITE_FAULT);
     }
   }
 
   public void onSetEndOfFile(String fileName, long length, DokanFileInfo arg2)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onSetEndOfFile] " + fileName);
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     if (fi.getFileSize() == length)
       return;
     if (fi.getFileSize() < length) {
@@ -259,12 +260,12 @@ public class MemoryFS implements DokanOperations {
   }
 
   public void onFlushFileBuffers(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onFlushFileBuffers] " + fileName);
   }
 
   public ByHandleFileInformation onGetFileInformation(String fileName, DokanFileInfo arg1)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onGetFileInformation] " + fileName);
     if (fileName.equals("\\")) {
       return new ByHandleFileInformation(FileAttribute.toInt(FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_DIRECTORY),
@@ -272,12 +273,12 @@ public class MemoryFS implements DokanOperations {
     }
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     return fi.toByHandleFileInformation();
   }
 
   public Win32FindData[] onFindFiles(String pathName, DokanFileInfo arg1)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onFindFiles] " + pathName);
     Collection<MemFileInfo> fis = files.values();
     ArrayList<Win32FindData> files = new ArrayList<Win32FindData>();
@@ -291,60 +292,60 @@ public class MemoryFS implements DokanOperations {
   }
 
   public Win32FindData[] onFindFilesWithPattern(String arg0, String arg1, DokanFileInfo arg2)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onFindFilesWithPattern] ");
     return null;
   }
 
   public void onSetFileAttributes(String fileName, int fileAttributes, DokanFileInfo arg2)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onSetFileAttributes] " + fileName);
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     fi.fileAttribute = fileAttributes;
   }
 
   public void onSetFileTime(String fileName, long creationTime, long lastAccessTime,
-      long lastWriteTime, DokanFileInfo arg4) throws DokanOperationException {
+      long lastWriteTime, DokanFileInfo arg4) throws DokanException {
     log("[onSetFileTime] " + fileName);
     MemFileInfo fi = files.get(fileName);
     if (fi == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     fi.creationTime = creationTime;
     fi.lastAccessTime = lastAccessTime;
     fi.lastWriteTime = lastWriteTime;
   }
 
-  public void onDeleteFile(String fileName, DokanFileInfo arg1) throws DokanOperationException {
+  public void onDeleteFile(String fileName, DokanFileInfo arg1) throws DokanException {
     log("[onDeleteFile] " + fileName);
     MemFileInfo removed = files.remove(fileName);
     if (removed == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     updateParentLastWrite(fileName);
   }
 
-  public void onDeleteDirectory(String fileName, DokanFileInfo arg1) throws DokanOperationException {
+  public void onDeleteDirectory(String fileName, DokanFileInfo arg1) throws DokanException {
     log("[onDeleteDirectory] " + fileName);
     MemFileInfo removed = files.remove(fileName);
     if (removed == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     updateParentLastWrite(fileName);
   }
 
   public void onMoveFile(String existingFileName, String newFileName, boolean replaceExisiting,
-      DokanFileInfo arg3) throws DokanOperationException {
+      DokanFileInfo arg3) throws DokanException {
     log("==> [onMoveFile] " + existingFileName + " -> " + newFileName + ", replaceExisiting = "
         + replaceExisiting);
     MemFileInfo existing = files.get(existingFileName);
     if (existing == null)
-      throw new DokanOperationException(WinError.ERROR_FILE_NOT_FOUND);
+      throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     // TODO Fix this
     if (existing.isDirectory)
-      throw new DokanOperationException(WinError.ERROR_DIRECTORY);
+      throw new DokanException(WinError.ERROR_DIRECTORY);
     MemFileInfo newFile = files.get(newFileName);
     if (newFile != null && !replaceExisiting)
-      throw new DokanOperationException(WinError.ERROR_FILE_EXISTS);
+      throw new DokanException(WinError.ERROR_FILE_EXISTS);
     files.remove(existingFileName);
     existing.fileName = newFileName;
     files.put(newFileName, existing);
@@ -354,18 +355,18 @@ public class MemoryFS implements DokanOperations {
   }
 
   public void onLockFile(String fileName, long arg1, long arg2, DokanFileInfo arg3)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onLockFile] " + fileName);
   }
 
   public void onUnlockFile(String fileName, long arg1, long arg2, DokanFileInfo arg3)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onUnlockFile] " + fileName);
   }
 
 
   public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo fileInfo)
-      throws DokanOperationException {
+      throws DokanException {
     log("[onGetDiskFreeSpace] ");
     DokanDiskFreeSpace free = new DokanDiskFreeSpace();
     // TODO: this is completely wrong, the size is not calculated
@@ -376,7 +377,7 @@ public class MemoryFS implements DokanOperations {
   }
 
   public DokanVolumeInformation onGetVolumeInformation(String arg0, DokanFileInfo arg1)
-      throws DokanOperationException {
+      throws DokanException {
     DokanVolumeInformation info = new DokanVolumeInformation();
     info.fileSystemFlags = SUPPORTED_FLAGS;
     info.maximumComponentLength = 256;
@@ -386,7 +387,7 @@ public class MemoryFS implements DokanOperations {
     return info;
   }
 
-  public void onUnmount(DokanFileInfo arg0) throws DokanOperationException {
+  public void onUnmount(DokanFileInfo arg0) throws DokanException {
     log("[onUnmount]");
   }
 

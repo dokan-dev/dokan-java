@@ -27,7 +27,7 @@ extern jclass dokanOptionsClass;
 extern jclass dokanDokanOperationsClass;
 extern jclass byHandleFileInfoClass;
 extern jclass dokanDiskFreeSpaceClass;
-extern jclass dokanOperationExceptionClass;
+extern jclass dokanExceptionClass;
 //extern jclass dokanFileInfoClass;
 extern jclass dokanVolumeInfoClass;
 extern jclass win32FindDataClass;
@@ -71,7 +71,7 @@ extern jfieldID ByHandleFileInfo_fileIndexID;
 
 extern jmethodID byHandleFileInfoConstID;
 extern jmethodID dokanDiskFreeSpaceConstID;
-extern jmethodID dokanOperationExceptionConstID;
+extern jmethodID dokanExceptionConstID;
 //extern jmethodID dokanFileInfoConstID;
 extern jmethodID dokanVolumeInfoConstID;
 extern jmethodID win32FindDataConstID;

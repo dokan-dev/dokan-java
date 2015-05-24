@@ -32,38 +32,38 @@ public interface DokanOperations {
    */
   public long onCreateFile(String fileName, int desiredAccess, int shareMode,
       int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public long onOpenDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public void onCreateDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
-  public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanOperationException;
+  public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanException;
 
-  public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanOperationException;
+  public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanException;
 
   public int onReadFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public int onWriteFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public void onFlushFileBuffers(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public ByHandleFileInformation onGetFileInformation(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public Win32FindData[] onFindFiles(String pathName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public Win32FindData[] onFindFilesWithPattern(String pathName, String searchPattern,
-      DokanFileInfo fileInfo) throws DokanOperationException;
+      DokanFileInfo fileInfo) throws DokanException;
 
   public void onSetFileAttributes(String fileName, int fileAttributes, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   /**
    * @param creationTime FILETIME
@@ -71,35 +71,35 @@ public interface DokanOperations {
    * @param lastWriteTime FILETIME
    */
   public void onSetFileTime(String fileName, long creationTime, long lastAccessTime,
-      long lastWriteTime, DokanFileInfo fileInfo) throws DokanOperationException;
+      long lastWriteTime, DokanFileInfo fileInfo) throws DokanException;
 
-  public void onDeleteFile(String fileName, DokanFileInfo fileInfo) throws DokanOperationException;
+  public void onDeleteFile(String fileName, DokanFileInfo fileInfo) throws DokanException;
 
   public void onDeleteDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public void onMoveFile(String existingFileName, String newFileName, boolean replaceExisiting,
-      DokanFileInfo fileInfo) throws DokanOperationException;
+      DokanFileInfo fileInfo) throws DokanException;
 
   public void onSetEndOfFile(String fileName, long length, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public void onLockFile(String fileName, long byteOffset, long length, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   public void onUnlockFile(String fileName, long byteOffset, long length, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
   /**
    * Neither GetDiskFreeSpace nor GetVolumeInformation save the DokanFileContext-&gt;Context. Before
    * these methods are called, CreateFile may not be called. (ditto CloseFile and Cleanup)
    */
   public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
 
   public DokanVolumeInformation onGetVolumeInformation(String volumeName, DokanFileInfo fileInfo)
-      throws DokanOperationException;
+      throws DokanException;
 
-  public void onUnmount(DokanFileInfo fileInfo) throws DokanOperationException;
+  public void onUnmount(DokanFileInfo fileInfo) throws DokanException;
 }
