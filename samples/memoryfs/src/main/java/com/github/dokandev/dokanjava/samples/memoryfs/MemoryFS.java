@@ -31,9 +31,9 @@ import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NO
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,13 +45,13 @@ import com.github.dokandev.dokanjava.DokanFileInfo;
 import com.github.dokandev.dokanjava.DokanOperations;
 import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
-import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
 import com.github.dokandev.dokanjava.util.AccessMask;
 import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.DokanStatus;
 import com.github.dokandev.dokanjava.util.FileAttribute;
 import com.github.dokandev.dokanjava.util.FileFlag;
+import com.github.dokandev.dokanjava.util.FileTime;
 import com.github.dokandev.dokanjava.util.ShareMode;
 import com.github.dokandev.dokanjava.util.WinError;
 
@@ -68,7 +68,7 @@ public class MemoryFS implements DokanOperations {
 
   private final ConcurrentHashMap<String, MemFileInfo> files = new ConcurrentHashMap<>();
   private final AtomicLong idGenerator = new AtomicLong();
-  private final long rootCreateTime = FileTimeUtils.toFileTime(new Date());
+  private final long rootCreateTime = FileTime.toFileTime(LocalDateTime.now());
   
   private long rootLastWrite = rootCreateTime;
 
@@ -235,7 +235,7 @@ public class MemoryFS implements DokanOperations {
       int addSize = copySize - overwriteSize;
       if (addSize > 0)
         fi.content.add(tmpBuff, overwriteSize, addSize);
-      fi.lastWriteTime = FileTimeUtils.toFileTime(new Date());
+      fi.lastWriteTime = FileTime.toFileTime(LocalDateTime.now());
       return copySize;
     } catch (Exception e) {
       e.printStackTrace();
@@ -400,12 +400,12 @@ public class MemoryFS implements DokanOperations {
     String parent = new File(fileName).getParent();
     log("[updateParentLastWrite] parent = " + parent);
     if (parent == "\\") {
-      rootLastWrite = FileTimeUtils.toFileTime(new Date());
+      rootLastWrite = FileTime.toFileTime(LocalDateTime.now());
     } else {
       MemFileInfo fi = files.get(parent);
       if (fi == null)
         return;
-      fi.lastWriteTime = FileTimeUtils.toFileTime(new Date());
+      fi.lastWriteTime = FileTime.toFileTime(LocalDateTime.now());
     }
   }
 }

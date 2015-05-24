@@ -24,17 +24,17 @@ THE SOFTWARE.
 
 package com.github.dokandev.dokanjava.samples.memoryfs;
 
+import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_DIRECTORY;
+import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NORMAL;
 import gnu.trove.TByteArrayList;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.apache.commons.io.FilenameUtils;
 
 import com.github.dokandev.dokanjava.ByHandleFileInformation;
-import com.github.dokandev.dokanjava.FileTimeUtils;
 import com.github.dokandev.dokanjava.Win32FindData;
-
-import static com.github.dokandev.dokanjava.util.FileAttribute.*;
+import com.github.dokandev.dokanjava.util.FileTime;
 
 public class MemFileInfo {
 	static long nextFileIndex = 2;
@@ -54,7 +54,7 @@ public class MemFileInfo {
 		fileIndex = getNextFileIndex();
 		if (isDirectory)
 			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY.mask();
-		long fileTime = FileTimeUtils.toFileTime(new Date());
+		long fileTime = FileTime.toFileTime(LocalDateTime.now());
 		creationTime = fileTime;
 		lastAccessTime = fileTime;
 		lastWriteTime = fileTime;
