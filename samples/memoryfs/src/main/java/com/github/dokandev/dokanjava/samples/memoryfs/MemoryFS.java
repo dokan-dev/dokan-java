@@ -23,12 +23,15 @@
 
 package com.github.dokandev.dokanjava.samples.memoryfs;
 
+import static com.github.dokandev.dokanjava.DokanOption.DEBUG;
+import static com.github.dokandev.dokanjava.DokanOption.KEEP_ALIVE;
+import static com.github.dokandev.dokanjava.DokanOption.REMOVABLE;
+
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,7 +42,6 @@ import com.github.dokandev.dokanjava.DokanDiskFreeSpace;
 import com.github.dokandev.dokanjava.DokanFileInfo;
 import com.github.dokandev.dokanjava.DokanOperationException;
 import com.github.dokandev.dokanjava.DokanOperations;
-import com.github.dokandev.dokanjava.DokanOption;
 import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
 import com.github.dokandev.dokanjava.FileAccess;
@@ -78,10 +80,7 @@ public class MemoryFS implements DokanOperations {
         .builder(mountPoint)
         .version(730)
         .threadCount(1)
-        .options(EnumSet.of(
-            DokanOption.REMOVABLE, 
-            DokanOption.KEEP_ALIVE,
-            DokanOption.DEBUG))
+        .options(REMOVABLE, KEEP_ALIVE, DEBUG)
         .globalContext(12345L)
         .build();
     Status status = Status.from(Dokan.mount(dokanOptions, this));
