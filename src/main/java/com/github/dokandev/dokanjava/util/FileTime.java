@@ -18,8 +18,11 @@
 
 package com.github.dokandev.dokanjava.util;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
+import com.google.common.math.LongMath;
 
 /**
  * FILETIME. Contains a 64-bit value representing the number of 100-nanosecond intervals since
@@ -27,19 +30,19 @@ import java.time.ZoneOffset;
  */
 public class FileTime {
 
-  private static final long EPOCH_DIFF = 11644473600000L;
+  static final long EPOCH_DIFF = 11644473600L; // in seconds
 
-  public static long toFileTime(LocalDateTime date) {
-    long milliSecondsSince1970 = date.atZone(ZoneOffset.UTC).toEpochSecond();
-    long milliSecondsSince1601 = milliSecondsSince1970 + EPOCH_DIFF;
-    long hundredNanoSecondsSince1601 = milliSecondsSince1601 * (10 * 1000);
+  public static long toFileTime(ZonedDateTime date) {
+    long secondsSince1970 = date.toEpochSecond();
+    long secondsSince1601 = secondsSince1970 + EPOCH_DIFF;
+    long hundredNanoSecondsSince1601 = secondsSince1601 * (10 * 1000 * 1000);
 	return hundredNanoSecondsSince1601 + (date.getNano() / 100);
 	}
 
-  public static LocalDateTime toDate(long fileTime) {
-    long milliSecondsSince1601 = fileTime / (10 * 1000); // 10 -> µs, 1000 -> ms
-    long milliSecondsSince1970 = milliSecondsSince1601 - EPOCH_DIFF;
-    int nanoSecondsOffset= (int) (milliSecondsSince1601 % (10 * 1000)) * 100;
-    return LocalDateTime.ofEpochSecond(milliSecondsSince1970, nanoSecondsOffset, ZoneOffset.UTC);
+  public static ZonedDateTime toDate(long fileTime) {
+    long secondsSince1601 = Math.floorDiv(fileTime, (10 * 1000 * 1000));
+    long secondsSince1970 = secondsSince1601 - EPOCH_DIFF;
+    int nanoSecondsOffset= LongMath.mod(fileTime, (10 * 1000 * 1000)) * 100;
+    return ZonedDateTime.ofInstant(Instant.ofEpochSecond(secondsSince1970, nanoSecondsOffset), ZoneOffset.UTC);
   }
 }

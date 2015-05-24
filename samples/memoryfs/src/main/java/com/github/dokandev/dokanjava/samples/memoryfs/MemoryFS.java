@@ -32,6 +32,7 @@ import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NO
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +69,7 @@ public class MemoryFS implements DokanOperations {
 
   private final ConcurrentHashMap<String, MemFileInfo> files = new ConcurrentHashMap<>();
   private final AtomicLong idGenerator = new AtomicLong();
-  private final long rootCreateTime = FileTime.toFileTime(LocalDateTime.now());
+  private final long rootCreateTime = FileTime.toFileTime(ZonedDateTime.now());
   
   private long rootLastWrite = rootCreateTime;
 
@@ -235,7 +236,7 @@ public class MemoryFS implements DokanOperations {
       int addSize = copySize - overwriteSize;
       if (addSize > 0)
         fi.content.add(tmpBuff, overwriteSize, addSize);
-      fi.lastWriteTime = FileTime.toFileTime(LocalDateTime.now());
+      fi.lastWriteTime = FileTime.toFileTime(ZonedDateTime.now());
       return copySize;
     } catch (Exception e) {
       e.printStackTrace();
@@ -400,12 +401,12 @@ public class MemoryFS implements DokanOperations {
     String parent = new File(fileName).getParent();
     log("[updateParentLastWrite] parent = " + parent);
     if (parent == "\\") {
-      rootLastWrite = FileTime.toFileTime(LocalDateTime.now());
+      rootLastWrite = FileTime.toFileTime(ZonedDateTime.now());
     } else {
       MemFileInfo fi = files.get(parent);
       if (fi == null)
         return;
-      fi.lastWriteTime = FileTime.toFileTime(LocalDateTime.now());
+      fi.lastWriteTime = FileTime.toFileTime(ZonedDateTime.now());
     }
   }
 }

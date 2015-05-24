@@ -28,7 +28,7 @@ import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_DI
 import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NORMAL;
 import gnu.trove.TByteArrayList;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -54,7 +54,7 @@ public class MemFileInfo {
 		fileIndex = getNextFileIndex();
 		if (isDirectory)
 			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY.mask();
-		long fileTime = FileTime.toFileTime(LocalDateTime.now());
+		long fileTime = FileTime.toFileTime(ZonedDateTime.now());
 		creationTime = fileTime;
 		lastAccessTime = fileTime;
 		lastWriteTime = fileTime;
