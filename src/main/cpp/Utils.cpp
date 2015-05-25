@@ -19,6 +19,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "stdafx.h"
+#include "Utils.h"
 
 DWORD LongLongToHigh(LONGLONG ll) { return (DWORD)(ll >> 32); }
 DWORD LongLongToLow(LONGLONG ll) { return (DWORD)(ll & 0xffffffff); }
@@ -28,7 +29,7 @@ LONGLONG FileTime2LongLong(CONST FILETIME* ft)
 	if (ft == NULL)
 		return 0;
 	else
-		return (((LONGLONG)ft->dwHighDateTime) << 32) | ((LONGLONG)ft->dwLowDateTime);
+		return ToLongLong(ft->dwHighDateTime, ft->dwLowDateTime);
 }
 
 FILETIME LongLong2FileTime(LONGLONG ll) 
@@ -41,6 +42,6 @@ FILETIME LongLong2FileTime(LONGLONG ll)
 
 LONGLONG ToLongLong(DWORD high, DWORD low)
 {
-	return ((LONGLONG)high) << 32 | ((LONGLONG)low);
+	return ((LONGLONG)high) << 32 | ((LONGLONG)low && 0x00000000ffffffff);
 }
 

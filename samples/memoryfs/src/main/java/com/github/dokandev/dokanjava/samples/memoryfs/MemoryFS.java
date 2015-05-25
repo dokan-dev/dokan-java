@@ -31,7 +31,6 @@ import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NO
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,10 +108,9 @@ public class MemoryFS implements DokanOperations {
     return idGenerator.getAndIncrement();
   }
   
-  
-  public long onCreateFile(String fileName, int desiredAccess, int shareMode,
-      int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
-      throws DokanException {
+  @Override
+  public int createFile(String fileName, int desiredAccess, int shareMode,
+      int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo) {
     CreationDisposition disposition = CreationDisposition.fromInt(creationDisposition);
 
     
@@ -122,32 +120,36 @@ public class MemoryFS implements DokanOperations {
         + "  share mode: %s\n"
         + "  creation disposition: %s\n"
         + "  flags: %s\n"
-        + "  attributes: %s",
+        + "  attributes: %s\n"
+        + "  fileInfo: %s",
         fileName, AccessMask.fromInt(desiredAccess), ShareMode.fromInt(shareMode), disposition,
-        FileFlag.fromInt(flagsAndAttributes), FileAttribute.fromInt(flagsAndAttributes));
+        FileFlag.fromInt(flagsAndAttributes), FileAttribute.fromInt(flagsAndAttributes), fileInfo);
 
     if (fileName.equals("\\")) {
       switch (disposition) {
         case CREATE_NEW:
         case CREATE_ALWAYS:
-          throw new DokanException(WinError.ERROR_ALREADY_EXISTS);
+          return WinError.ERROR_ALREADY_EXISTS.code;
         case OPEN_ALWAYS:
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
-          return nextFileHandleId();
+          fileInfo.context = nextFileHandleId();
+          return WinError.ERROR_ALREADY_EXISTS.code;
       }
     } else if (files.containsKey(fileName)) {
       switch (disposition) {
         case CREATE_NEW:
-          throw new DokanException(WinError.ERROR_ALREADY_EXISTS);
+          return WinError.ERROR_ALREADY_EXISTS.code;
         case OPEN_ALWAYS:
         case OPEN_EXISTING:
-          return nextFileHandleId();
+          fileInfo.context = nextFileHandleId();
+          return WinError.ERROR_ALREADY_EXISTS.code;
         case CREATE_ALWAYS:
         case TRUNCATE_EXISTING:
           files.get(fileName).content.clear();
           updateParentLastWrite(fileName);
-          return nextFileHandleId();
+          fileInfo.context = nextFileHandleId();
+          return WinError.ERROR_ALREADY_EXISTS.code;
       }
     } else {
       switch (disposition) {
@@ -157,13 +159,14 @@ public class MemoryFS implements DokanOperations {
           MemFileInfo fi = new MemFileInfo(fileName, false);
           files.put(fi.fileName, fi);
           updateParentLastWrite(fileName);
-          return nextFileHandleId();
+          fileInfo.context = nextFileHandleId();
+          return WinError.ERROR_ALREADY_EXISTS.code;
         case OPEN_EXISTING:
         case TRUNCATE_EXISTING:
-          throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
+          return WinError.ERROR_FILE_NOT_FOUND.code;
       }
     }
-    throw new DokanException(WinError.ERROR_INVALID_FUNCTION);
+    return 0;
   }
 
   public long onOpenDirectory(String pathName, DokanFileInfo arg1) throws DokanException {
@@ -276,7 +279,6 @@ public class MemoryFS implements DokanOperations {
     if (fi == null)
       throw new DokanException(WinError.ERROR_FILE_NOT_FOUND);
     ByHandleFileInformation fileInformation = fi.toByHandleFileInformation();
-    log("returning :%s", fileInformation);
     return fileInformation;
   }
 

@@ -29,7 +29,7 @@ jclass dokanDokanOperationsClass = NULL;
 jclass byHandleFileInfoClass = NULL;
 jclass dokanDiskFreeSpaceClass = NULL;
 jclass dokanExceptionClass = NULL;
-//jclass dokanFileInfoClass = NULL;
+jclass dokanFileInfoClass = NULL;
 jclass dokanVolumeInfoClass = NULL;
 jclass win32FindDataClass = NULL;
 
@@ -49,6 +49,8 @@ jfieldID volumeSerialNumberID = NULL;
 jfieldID maximumComponentLengthID = NULL;
 jfieldID fileSystemFlagsID = NULL;
 jfieldID fileSystemNameID = NULL;
+
+jfieldID dokanFileInfoContext = NULL;
 
 jfieldID Win32FindData_fileAttributesID = NULL;
 jfieldID Win32FindData_creationTimeID = NULL;
@@ -76,7 +78,7 @@ jmethodID dokanExceptionConstID = NULL;
 jmethodID dokanVolumeInfoConstID = NULL;
 jmethodID win32FindDataConstID = NULL;
 
-jmethodID onCreateFileID = NULL;
+jmethodID createFileId = NULL;
 jmethodID onOpenDirectoryID = NULL;
 jmethodID onCreateDirectoryID = NULL;
 jmethodID onCleanupID = NULL;
@@ -146,11 +148,10 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 	LOG(L"[InitMethodIDs] 1\n");
 
 	// DokanFileInfo
-	/*
 	dokanFileInfoClass = env->FindClass("com/github/dokandev/dokanjava/DokanFileInfo");
 	if(dokanFileInfoClass == NULL)
 		throw "Cannot find com.github.dokandev.dokanjava.DokanFileInfo class";
-	*/
+	
 	// DokanFileInfo.<init>
 	/*
 	dokanFileInfoConstID = env->GetMethodID(dokanFileInfoClass, "<init>", "(JIZ)V");
@@ -206,6 +207,11 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 		"(IJJJJIILjava/lang/String;Ljava/lang/String;)V");
 	if(win32FindDataConstID == NULL)
 		throw "Cannot find com.github.dokandev.dokanjava.Win32FindData constructor method";
+
+	// Win32FindData.fileAttributes
+	dokanFileInfoContext = env->GetFieldID(dokanFileInfoClass, "context", "J");;
+	if (dokanFileInfoContext == NULL)
+		throw "Cannot find field context at DokanFileInfo class";
 
 	// Win32FindData.fileAttributes
 	Win32FindData_fileAttributesID = env->GetFieldID(win32FindDataClass, "fileAttributes", "I");
@@ -365,11 +371,11 @@ void InitMethodIDs(JNIEnv *env) throw(...)
 	if(dokanDokanOperationsClass == NULL) 
 		throw "Cannot find com.github.dokandev.dokanjava.DokanOperations class";
 
-	// DokanOperations.onCreateFile
-	onCreateFileID = env->GetMethodID(dokanDokanOperationsClass, "onCreateFile", 
-		"(Ljava/lang/String;IIIILcom/github/dokandev/dokanjava/DokanFileInfo;)J");
-	if(onCreateFileID == NULL)
-		throw "Cannot find DokanOperations.onCreateFile method";
+	// DokanOperations.createFile
+	createFileId = env->GetMethodID(dokanDokanOperationsClass, "createFile", 
+		"(Ljava/lang/String;IIIILcom/github/dokandev/dokanjava/DokanFileInfo;)I");
+	if(createFileId == NULL)
+		throw "Cannot find DokanOperations.createFile method";
 
 	// DokanOperations.onOpenDirectory
 	onOpenDirectoryID = env->GetMethodID(dokanDokanOperationsClass, "onOpenDirectory", 

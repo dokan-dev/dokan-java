@@ -92,15 +92,22 @@ jobject ToDokanFileInfoJavaObject(JNIEnv* env, PDOKAN_FILE_INFO DokanFileInfo) t
 	if (clz == NULL) 
 		return NULL;
 	
-	jmethodID mid = env->GetMethodID(clz, "<init>", "(JIZ)V");
+	jmethodID mid = env->GetMethodID(clz, "<init>", "(JJJIZZZZZZ)V");
 	if (mid == NULL) 
 		return NULL;
 	
 	jobject jdokanFileInfo = env->NewObject(
 		clz, mid,
 		DokanFileInfo->Context,
+		DokanFileInfo->DokanContext,
+		DokanFileInfo->DokanOptions,
 		DokanFileInfo->ProcessId,
-		DokanFileInfo->IsDirectory);
+		DokanFileInfo->IsDirectory,
+		DokanFileInfo->DeleteOnClose,
+		DokanFileInfo->PagingIo,
+		DokanFileInfo->SynchronousIo,
+		DokanFileInfo->Nocache,
+		DokanFileInfo->WriteToEndOfFile);
 	if (jdokanFileInfo == NULL)
 		throw "Failed at NewObject for DokanFileInfo";
 	

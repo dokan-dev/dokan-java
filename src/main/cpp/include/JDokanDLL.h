@@ -22,7 +22,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 void InitMethodIDs(JNIEnv *env);
 
-int DOKAN_CALLBACK OnCreateFile(
+int DOKAN_CALLBACK CreateFile(
 		LPCWSTR,      // FileName
 		DWORD,        // DesiredAccess
 		DWORD,        // ShareMode

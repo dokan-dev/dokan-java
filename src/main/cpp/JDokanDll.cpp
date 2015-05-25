@@ -41,8 +41,8 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 		env->GetJavaVM(&jvm);
 		gOperations =  env->NewGlobalRef(joperations);
 
+		
 		InitMethodIDs(env);
-
 		DOKAN_OPTIONS options;
 		ZeroMemory(&options, sizeof(DOKAN_OPTIONS));
 		options.Version = env->GetShortField(joptions, versionID);
@@ -64,7 +64,7 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 
 		DOKAN_OPERATIONS operations;
 		ZeroMemory(&operations, sizeof(DOKAN_OPERATIONS));
-		operations.CreateFile = OnCreateFile;
+		operations.CreateFile = CreateFile;
 		operations.OpenDirectory = OnOpenDirectory;
 		operations.CreateDirectoryW = OnCreateDirectory;
 		operations.Cleanup = OnCleanup;
@@ -94,39 +94,36 @@ JNIEXPORT jint JNICALL Java_com_github_dokandev_dokanjava_Dokan_mount
 	}
 }
 
-int DOKAN_CALLBACK OnCreateFile(
-		LPCWSTR		FileName,
-		DWORD		DesiredAccess,
-		DWORD		ShareMode,
-		DWORD		CreationDisposition,
-		DWORD		FlagsAndAttributes,
-		//HANDLE,       // TemplateFile
-		PDOKAN_FILE_INFO DokanFileInfo)
+int DOKAN_CALLBACK CreateFile(
+	LPCWSTR		FileName,
+	DWORD		DesiredAccess,
+	DWORD		ShareMode,
+	DWORD		CreationDisposition,
+	DWORD		FlagsAndAttributes,
+	PDOKAN_FILE_INFO DokanFileInfo)
 {
-	LOG(L"[OnCreateFile] FileName = %s\n", FileName);
+	LOG(L"[CreateFile] %s\n", FileName);
 	JNIEnv* env = get_env();
-	//jvm->AttachCurrentThread((void **)&env, NULL);
 
 	int result = -ERROR_GEN_FAILURE;
-	try {
-		jstring jfileName = ToJavaString(env, FileName);
-		jobject jdokanFileInfo = ToDokanFileInfoJavaObject(env, DokanFileInfo);
-		
-		jlong handle = env->CallLongMethod(gOperations, onCreateFileID, 
-			jfileName, DesiredAccess, ShareMode, CreationDisposition,
-			FlagsAndAttributes, jdokanFileInfo);
-		result = GetOperationResult(env);
 
-		if (result == 0) {
-			DokanFileInfo->Context = handle;
-		}
-		LOG(L"[OnCreateFile] result = %d, handle = %d\n", result, handle);
-	} catch(const char* msg) {
-		LOGA("[OnCreateFile] %s\n", msg); 
+	jstring jfileName = ToJavaString(env, FileName);
+	jobject jdokanFileInfo = ToDokanFileInfoJavaObject(env, DokanFileInfo);
+
+	jint returnCode = env->CallIntMethod(gOperations, createFileId,
+		jfileName, DesiredAccess, ShareMode, CreationDisposition,
+		FlagsAndAttributes, jdokanFileInfo);
+	result = GetOperationResult(env);
+	jlong context = env->GetLongField(jdokanFileInfo, dokanFileInfoContext);
+	if (result == 0) {
+		DokanFileInfo->Context = context;
 	}
-
+	else {
+		return result;
+	}
+	LOG(L"[CreateFile] result = %d, returnCode = %d\n", result, returnCode);
 	release_env(env);
-	return result;
+	return returnCode;
 }
 
 int DOKAN_CALLBACK OnOpenDirectory(

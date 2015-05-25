@@ -1,7 +1,9 @@
 /*
- * JDokan : Java library for Dokan
+ * Dokan-Java : Java library for Dokan
  * 
- * Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/ 2009 Caleido AG http://www.wuala.com/
+ * Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/ 
+ *               2009 Caleido AG http://www.wuala.com/
+ *               2015 Simon Herter <sim.herter@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version 3
@@ -19,20 +21,10 @@ package com.github.dokandev.dokanjava;
 
 import java.nio.ByteBuffer;
 
-/**
- * Dokan callbacks.
- */
 public interface DokanOperations {
-  /**
-   * If file is a directory, CreateFile (not OpenDirectory) may be called. In this case, CreateFile
-   * should return 0 when that directory can be opened. You should set TRUE on
-   * DokanFileInfo-&gt;IsDirectory when file is a directory. When CreationDisposition is
-   * CREATE_ALWAYS or OPEN_ALWAYS and a file already exists, you should return
-   * ERROR_ALREADY_EXISTS(183) (not negative value)
-   */
-  public long onCreateFile(String fileName, int desiredAccess, int shareMode,
-      int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo)
-      throws DokanException;
+
+  int createFile(String fileName, int desiredAccess, int shareMode, int creationDisposition,
+      int flagsAndAttributes, DokanFileInfo fileInfo);
 
   public long onOpenDirectory(String fileName, DokanFileInfo fileInfo)
       throws DokanException;
