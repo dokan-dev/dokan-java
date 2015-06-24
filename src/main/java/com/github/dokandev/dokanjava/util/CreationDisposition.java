@@ -18,7 +18,7 @@
 package com.github.dokandev.dokanjava.util;
 
 public enum CreationDisposition {
-  CREATE_NEW(1), OPEN_ALWAYS(2), OPEN_EXISTING(3), CREATE_ALWAYS(4), TRUNCATE_EXISTING(5);
+  CREATE_NEW(1), CREATE_ALWAYS(2), OPEN_EXISTING(3), OPEN_ALWAYS(4), TRUNCATE_EXISTING(5);
 
   private final int value;
 
