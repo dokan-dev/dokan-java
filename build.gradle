@@ -42,6 +42,11 @@ model {
     matching { it.name.contains('LibVisualStudio') }.each { it.enabled = false }
     matching { it.name.contains('StaticLibrary') }.each { it.enabled = false }
   }
+  toolChains {
+    visualCpp(VisualCpp) {
+      installDir = 'C:\\Program Files (x86)\\Microsoft Visual Studio 12.0'
+    }
+  }
 }
 
 repositories {
