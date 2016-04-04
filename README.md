@@ -1,3 +1,5 @@
+_**!!! not maintained !!!**_  please contact @Liryna or @Maxhy if you wan't to bring this project to live again
+
 Dokan-Java [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc/branch/master?svg=true)](https://ci.appveyor.com/project/sherter/jdokan/branch/master)
 ======
 
