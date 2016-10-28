@@ -1,4 +1,8 @@
 /build
+.idea
+*.ipr
+*.iws
+*.iml
 .gradle
 jdokan_jni.h
 

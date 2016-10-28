@@ -1,52 +1,8 @@
 plugins {
   id 'java'
-  id 'cpp'
   id 'visual-studio'
   id 'eclipse'
   id 'maven-publish'
-}
-
-model {
-  repositories {
-    libs(PrebuiltLibraries) {
-      jni.headers.srcDirs "${System.env.JAVA_HOME}/include", "${System.env.JAVA_HOME}/include/win32"
-      dokan {
-        headers.srcDir System.env.DOKAN_HOME
-        binaries.withType(SharedLibraryBinary) {
-          sharedLibraryLinkFile = file("${System.env.DOKAN_HOME}/dokan.lib")
-	}
-      }
-    }
-  }
-  components {     
-    'native'(NativeLibrarySpec) {
-      baseName 'jdokan'
-      binaries.all {
-        cppCompiler.define "UNICODE"
-      }
-      sources.cpp {
-        lib library: 'jni', linkage: 'api'
-        lib library: 'dokan', linkage: 'shared'
-        source {
-          srcDir "src/main/cpp"
-          include "**/*.cpp"
-        }
-        exportedHeaders {
-          srcDir "src/main/cpp/include"
-        }
-      }
-    }
-  }
-  tasks.compileNativeSharedLibraryNativeCpp { dependsOn generateHeader }
-  tasks {
-    matching { it.name.contains('LibVisualStudio') }.each { it.enabled = false }
-    matching { it.name.contains('StaticLibrary') }.each { it.enabled = false }
-  }
-  toolChains {
-    visualCpp(VisualCpp) {
-      installDir = 'C:\\Program Files (x86)\\Microsoft Visual Studio 12.0'
-    }
-  }
 }
 
 repositories {
@@ -57,6 +13,7 @@ dependencies {
   compile 'com.google.guava:guava:18.0'
   compile 'org.slf4j:slf4j-api:1.7.10'
   compile 'ch.qos.logback:logback-classic:1.1.2'
+  compile  'net.java.dev.jna:jna:4.2.2'
   testCompile 'com.google.jimfs:jimfs:1.0'
   testCompile 'junit:junit:4.12'
   testCompile 'com.google.truth:truth:0.25'
@@ -64,22 +21,6 @@ dependencies {
 
 eclipse {
   project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
-}
-
-task generateHeader {
-  dependsOn('classes')
-  def clazz = 'com.github.dokandev.dokanjava.Dokan'
-  def header = "${rootDir}/src/main/cpp/include/jdokan_jni.h"
-  inputs.file "${sourceSets.main.output.classesDir}/${clazz.replaceAll('.', '/')}"
-  outputs.file header
-  doLast {
-    ant.javah(class: clazz, outputFile: header, classpath: sourceSets.main.output.classesDir)
-  }
-}
-
-jar {
-  dependsOn('nativeSharedLibrary')
-  from 'build/binaries/nativeSharedLibrary/jdokan.dll'
 }
 
 // TODO: change this back to true when documentation is added
@@ -113,7 +54,7 @@ publishing {
       url 'https://oss.sonatype.org/content/repositories/snapshots/'
       credentials {
         username System.env.CI_DEPLOY_USERNAME
-	password System.env.CI_DEPLOY_PASSWORD
+        password System.env.CI_DEPLOY_PASSWORD
       }
     }
   }

@@ -1,97 +1,138 @@
-/*
- * Dokan-Java : Java library for Dokan
- * 
- * Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/ 
- *               2009 Caleido AG http://www.wuala.com/
- *               2015 Simon Herter <sim.herter@gmail.com>
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version 3
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.github.dokandev.dokanjava;
 
-import java.nio.ByteBuffer;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
 
-public interface DokanOperations {
+@SuppressWarnings("WeakerAccess")
+public class DokanOperations {
+    public boolean defaultLog = false;
 
-  int createFile(String fileName, int desiredAccess, int shareMode, int creationDisposition,
-      int flagsAndAttributes, DokanFileInfo fileInfo);
+    public void mounted() {
+        if (defaultLog) System.out.println("DokanOperations.mounted");
+    }
 
-  public long onOpenDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanException;
+    public void unmounted() {
+        if (defaultLog) System.out.println("DokanOperations.unmounted");
+    }
 
-  public void onCreateDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanException;
+    public void createFile(String rawFileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.createFile: rawFileName = [" + rawFileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "]");
+    }
 
-  public void onCleanup(String fileName, DokanFileInfo fileInfo) throws DokanException;
+    public void cleanup(String rawFileName, DokanFileInfo rawFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.cleanup: " + rawFileName);
+    }
 
-  public void onCloseFile(String fileName, DokanFileInfo fileInfo) throws DokanException;
+    public void closeFile(String rawFileName, DokanFileInfo rawFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.closeFile: " + rawFileName);
+    }
 
-  public int onReadFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo fileInfo)
-      throws DokanException;
+    public String getVolumeName() {
+        return "VOLUME";
+    }
 
-  public int onWriteFile(String fileName, ByteBuffer buffer, long offset, DokanFileInfo fileInfo)
-      throws DokanException;
+    public String getFileSystemName() {
+        return "DOKAN";
+    }
 
-  public void onFlushFileBuffers(String fileName, DokanFileInfo fileInfo)
-      throws DokanException;
+    public int getSerialNumber() {
+        //return 0x12345678;
+        return 0x00000000;
+    }
 
-  public ByHandleFileInformation onGetFileInformation(String fileName, DokanFileInfo fileInfo)
-      throws DokanException;
+    public int getFileSystemFeatures() {
+        return FileSystemFeatures.CasePreservedNames;
+    }
 
-  public Win32FindData[] onFindFiles(String pathName, DokanFileInfo fileInfo)
-      throws DokanException;
+    public void getFileInformation(String rawFileName, BY_HANDLE_FILE_INFORMATION handleFileInfo) {
+        handleFileInfo.setFileAttributes(FileAttribute.DIRECTORY);
+        handleFileInfo.setFileSize(1024L);
+        //handleFileInfo.nFileSizeHigh
+        System.out.println(rawFileName);
+    }
 
-  public Win32FindData[] onFindFilesWithPattern(String pathName, String searchPattern,
-      DokanFileInfo fileInfo) throws DokanException;
+    public DOKAN_OPERATIONS toStruct() {
+        DOKAN_OPERATIONS ops = new DOKAN_OPERATIONS();
+        ops.Mounted = new DOKAN_OPERATIONS.MountedDelegate() {
+            @Override
+            public long callback(DokanFileInfo rawFileInfo) {
+                try {
+                    DokanOperations.this.mounted();
+                    return NtStatus.Success;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return NtStatus.Unsuccessful;
+                }
+            }
+        };
+        ops.Unmounted = new DOKAN_OPERATIONS.UnmountedDelegate() {
+            @Override
+            public long callback(DokanFileInfo rawFileInfo) {
+                try {
+                    DokanOperations.this.unmounted();
+                    return NtStatus.Success;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return NtStatus.Unsuccessful;
+                }
+            }
+        };
+        ops.ZwCreateFile = new DOKAN_OPERATIONS.ZwCreateFileDelegate() {
+            @Override
+            public long callback(WString rawFileName, IntByReference securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+                try {
+                    DokanOperations.this.createFile(rawFileName.toString(), securityContext.getValue(), rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo);
+                    return NtStatus.Success;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return NtStatus.Unsuccessful;
+                }
+            }
+        };
+        ops.Cleanup = new DOKAN_OPERATIONS.CleanupDelegate() {
+            @Override
+            public void callback(WString rawFileName, DokanFileInfo rawFileInfo) {
+                DokanOperations.this.cleanup(rawFileName.toString(), rawFileInfo);
+            }
+        };
+        ops.CloseFile = new DOKAN_OPERATIONS.CloseFileDelegate() {
+            @Override
+            public void callback(WString rawFileName, DokanFileInfo rawFileInfo) {
+                DokanOperations.this.closeFile(rawFileName.toString(), rawFileInfo);
+            }
+        };
+        ops.GetVolumeInformation = new DOKAN_OPERATIONS.GetVolumeInformationDelegate() {
+            @Override
+            public long callback(
+                    Pointer rawVolumeNameBuffer, int rawVolumeNameSize,
+                    IntByReference rawVolumeSerialNumber,
+                    IntByReference rawMaximumComponentLength,
+                    IntByReference rawFileSystemFlags,
+                    Pointer rawFileSystemNameBuffer, int rawFileSystemNameSize,
+                    DokanFileInfo rawFileInfo
+            ) {
+                rawVolumeNameBuffer.setWideString(0L, limitStringSize(DokanOperations.this.getVolumeName(), rawVolumeNameSize));
+                rawFileSystemNameBuffer.setWideString(0L, limitStringSize(DokanOperations.this.getFileSystemName(), rawFileSystemNameSize));
+                rawVolumeSerialNumber.setValue(DokanOperations.this.getSerialNumber());
+                rawMaximumComponentLength.setValue(DokanOperations.this.getFileSystemFeatures());
+                rawFileSystemFlags.setValue(FileSystemFeatures.CasePreservedNames);
 
-  public void onSetFileAttributes(String fileName, int fileAttributes, DokanFileInfo fileInfo)
-      throws DokanException;
+                System.out.println("rawVolumeNameBuffer = [" + rawVolumeNameBuffer + "], rawVolumeNameSize = [" + rawVolumeNameSize + "], rawVolumeSerialNumber = [" + rawVolumeSerialNumber + "], rawMaximumComponentLength = [" + rawMaximumComponentLength + "], rawFileSystemFlags = [" + rawFileSystemFlags + "], rawFileSystemNameBuffer = [" + rawFileSystemNameBuffer + "], rawFileSystemNameSize = [" + rawFileSystemNameSize + "], rawFileInfo = [" + rawFileInfo + "]");
+                return NtStatus.Success;
+            }
+        };
+        ops.GetFileInformation = new DOKAN_OPERATIONS.GetFileInformationDelegate() {
+            @Override
+            public long callback(WString fileName, BY_HANDLE_FILE_INFORMATION handleFileInfo, DokanFileInfo fileInfo) {
+                DokanOperations.this.getFileInformation(fileName.toString(), handleFileInfo);
+                return NtStatus.Success;
+            }
+        };
+        return ops;
+    }
 
-  /**
-   * @param creationTime FILETIME
-   * @param lastAccessTime FILETIME
-   * @param lastWriteTime FILETIME
-   */
-  public void onSetFileTime(String fileName, long creationTime, long lastAccessTime,
-      long lastWriteTime, DokanFileInfo fileInfo) throws DokanException;
-
-  public void onDeleteFile(String fileName, DokanFileInfo fileInfo) throws DokanException;
-
-  public void onDeleteDirectory(String fileName, DokanFileInfo fileInfo)
-      throws DokanException;
-
-  public void onMoveFile(String existingFileName, String newFileName, boolean replaceExisiting,
-      DokanFileInfo fileInfo) throws DokanException;
-
-  public void onSetEndOfFile(String fileName, long length, DokanFileInfo fileInfo)
-      throws DokanException;
-
-  public void onLockFile(String fileName, long byteOffset, long length, DokanFileInfo fileInfo)
-      throws DokanException;
-
-  public void onUnlockFile(String fileName, long byteOffset, long length, DokanFileInfo fileInfo)
-      throws DokanException;
-
-  /**
-   * Neither GetDiskFreeSpace nor GetVolumeInformation save the DokanFileContext-&gt;Context. Before
-   * these methods are called, CreateFile may not be called. (ditto CloseFile and Cleanup)
-   */
-  public DokanDiskFreeSpace onGetDiskFreeSpace(DokanFileInfo fileInfo)
-      throws DokanException;
-
-
-  public DokanVolumeInformation onGetVolumeInformation(String volumeName, DokanFileInfo fileInfo)
-      throws DokanException;
-
-  public void onUnmount(DokanFileInfo fileInfo) throws DokanException;
+    static private String limitStringSize(String str, int len) {
+        return str.substring(0, Math.min(str.length(), len));
+    }
 }

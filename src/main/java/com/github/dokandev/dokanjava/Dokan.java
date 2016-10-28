@@ -1,44 +1,58 @@
-/*
- * JDokan : Java library for Dokan
- * 
- * Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/
- * 
- * http://decas-dev.net/en
- * 
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version 3
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.github.dokandev.dokanjava;
 
-import com.github.dokandev.dokanjava.util.LibraryLoader;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
 
-public final class Dokan {
+public class Dokan {
+    static public final int LIBRARY_VERSION = 100;
 
-  static {
-    LibraryLoader.load("jdokan");
-  }
+    static public DOKAN_OPTIONS createOptions(int options, String mountPoint, int timeout) {
+        DOKAN_OPTIONS opts = new DOKAN_OPTIONS();
+        opts.Version = LIBRARY_VERSION;
+        opts.ThreadCount = 1;
+        opts.Options = options;
+        opts.GlobalContext = 0L; // context
+        opts.MountPoint = new WString(mountPoint);
+        opts.UNCName = null;
+        opts.Timeout = timeout;
+        opts.AllocationUnitSize = 4096;
+        opts.SectorSize = 4096;
+        return opts;
+    }
 
-  private Dokan() {}
+    static public int DokanMain(int options, String mountPoint, int timeout, DokanOperations operations) {
+        return DokanMain(createOptions(options, mountPoint, timeout), operations.toStruct());
+    }
 
-  public static native int mount(DokanOptions options, DokanOperations operations);
+    static public int DokanMain(DOKAN_OPTIONS options, DOKAN_OPERATIONS operations) {
+        return DokanNativeMethods.INSTANCE.DokanMain(options, operations);
+    }
 
-  public static native boolean unmount(char driveLetter);
+    static public boolean DokanUnmount(char driveLetter) {
+        return DokanNativeMethods.INSTANCE.DokanUnmount(driveLetter);
+    }
 
-  public static native boolean removeMountPoint(String mountPoint);
+    static public int DokanVersion() {
+        return DokanNativeMethods.INSTANCE.DokanVersion();
+    }
 
-  public static native boolean isNameInExpression(String expression, String name, boolean ignoreCase);
+    static public int DokanDriverVersion() {
+        return DokanNativeMethods.INSTANCE.DokanDriverVersion();
+    }
 
-  public static native int version();
+    static public boolean DokanRemoveMountPoint(String mountPoint) {
+        return DokanNativeMethods.INSTANCE.DokanRemoveMountPoint(new WString(mountPoint));
+    }
 
-  public static native int driverVersion();
+    static public boolean DokanResetTimeout(int timeout, DokanFileInfo rawFileInfo) {
+        return DokanNativeMethods.INSTANCE.DokanResetTimeout(timeout, rawFileInfo);
+    }
 
+    static public IntByReference DokanOpenRequestorToken(DokanFileInfo rawFileInfo) {
+        return DokanNativeMethods.INSTANCE.DokanOpenRequestorToken(rawFileInfo);
+    }
+
+    static public void DokanMapKernelToUserCreateFileFlags(int fileAttributes, int createOptions, int createDisposition, IntByReference outFileAttributesAndFlags, IntByReference outCreationDisposition) {
+        DokanNativeMethods.INSTANCE.DokanMapKernelToUserCreateFileFlags(fileAttributes, createOptions, createDisposition, outFileAttributesAndFlags, outCreationDisposition);
+    }
 }
