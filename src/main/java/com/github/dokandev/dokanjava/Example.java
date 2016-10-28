@@ -1,13 +1,19 @@
 package com.github.dokandev.dokanjava;
 
 import com.github.dokandev.dokanjava.util.FileAttribute;
+import com.github.dokandev.dokanjava.util.FileInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
 
 @SuppressWarnings("unused")
 public class Example {
-    static public void main(String[] args) {
+    static public void main(String[] args) throws Throwable {
         System.out.println("hello");
         System.out.println(Dokan.version());
         System.out.println(Dokan.driverVersion());
@@ -26,59 +32,97 @@ public class Example {
                 //throw new FileAlreadyExistsException("exists");
                 //throw new FileNotFoundException();
                 //throw new DokanException(NtStatus.UserExists);
-                if (fileName.equals("\\")) {
-
-                } else {
-                    throw new FileNotFoundException();
-                }
+                root.find(fileName, false);
             }
 
             @Override
-            public void getFileInformation(String fileName, ByHandleFileInformation handleFileInfo, DokanFileInfo fileInfo) throws IOException {
-                if (fileName.equals("\\")) {
-                    handleFileInfo.setFileAttributes(FileAttribute.FILE_ATTRIBUTE_DIRECTORY);
-                    handleFileInfo.setFileSize(1024L);
-                    //handleFileInfo.nFileSizeHigh
-                    System.out.println(fileName);
-                } else if (fileName.equals("\\HELLO.TXT")) {
-                    handleFileInfo.setFileAttributes(FileAttribute.FILE_ATTRIBUTE_NORMAL);
-                    handleFileInfo.setFileSize(3L);
-                } else {
-                    throw new FileNotFoundException();
-                }
+            public FileInfo getFileInformation(String fileName, DokanFileInfo fileInfo) throws IOException {
+                return root.find(fileName, false).toFileInfo();
             }
 
             @Override
-            public void findFiles(String fileName, FileEmitter emitter) {
-                if (fileName.equals("\\")) {
-                    emitter.emit(Win32FindData.file("HELLO.TXT", 1024L));
-                    emitter.emit(Win32FindData.file("HELLO2.TXT", 1024L));
-                    emitter.emit(Win32FindData.file("HELLO3.TXT", 1024L));
-                    emitter.emit(Win32FindData.directory("demo"));
-                } else if (fileName.equals("\\demo")) {
-                    emitter.emit(Win32FindData.file("HELLO.TXT", 1024L));
-                } else {
-
+            public void findFiles(String fileName, FileEmitter emitter) throws IOException {
+                Node node = root.find(fileName, false);
+                for (Node child : node.children.values()){
+                    emitter.emit(child.toFileInfo());
                 }
             }
 
             @Override
             public int readFile(String fileName, long fileOffset, byte[] data, int dataLength, DokanFileInfo fileInfo) throws IOException {
-                //System.out.println("Example.readFile");
-                //System.out.println("fileName = [" + fileName + "], fileOffset = [" + fileOffset + "], data = [" + data + "], dataLength = [" + dataLength + "], fileInfo = [" + fileInfo + "]");
-                if (fileOffset != 0L) return 0;
-                data[0] = 'H';
-                data[1] = 'E';
-                data[2] = 'L';
-                return 3;
+                Node node = root.find(fileName, false);
+                return node.read(fileOffset, data, dataLength);
             }
 
             @Override
             public long getUsedBytes() {
                 return 256L * 1024 * 1024;
             }
+
+            Node root = new Node();
+            {
+                root.find("HELLO.TXT", true).set(new byte[] { 'H', 'E', 'L' });
+                root.find("demo\\HELLO.TXT", true).set("OTHER".getBytes("UTF-8"));
+            }
         });
+
+
         //System.out.println(NativeMethods.INSTANCE.DokanRemoveMountPoint(new WString("M")));
         //DokanNative.INSTANCE.printf("hello %s", "world");
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static class Node {
+        public long inode;
+        public String name;
+        public Node parent;
+        public boolean isDirectory = true;
+        public LinkedHashMap<String, Node> children = new LinkedHashMap<String, Node>();
+        public byte[] data = null;
+        public Date date = new Date();
+
+        public Node createChild(String name) {
+            Node child = new Node();
+            child.parent = this;
+            child.name = name;
+            this.children.put(name, child);
+            return child;
+        }
+
+        public Node find(String path, boolean create) throws IOException {
+            String normalized = path.replace('\\', '/');
+            int index = normalized.indexOf('/');
+            if (index < 0) {
+                return child(path, create);
+            } else {
+                return child(normalized.substring(0, index), create).find(normalized.substring(index + 1), create);
+            }
+        }
+
+        public Node child(String childName, boolean create) throws IOException {
+            if (childName.equals("..")) return this.parent;
+            if (childName.equals(".")) return this;
+            if (childName.equals("")) return this;
+            if (children.containsKey(childName)) return children.get(childName);
+            if (!create) throw new FileNotFoundException();
+            return createChild(childName);
+        }
+
+        public int read(long loffset, byte[] out, int len) {
+            int offset = (int) loffset;
+            if (data == null) throw new DokanException(ErrorCodes.ERROR_READ_FAULT);
+            int readlen = Math.min(len, data.length - offset);
+            System.arraycopy(this.data, offset, out, 0, readlen);
+            return readlen;
+        }
+
+        public void set(byte[] bytes) {
+            isDirectory =false;
+            this.data = Arrays.copyOf(bytes, bytes.length);
+        }
+
+        public FileInfo toFileInfo() {
+            return new FileInfo(inode, name, (data != null) ? data.length : 0L, isDirectory ? FileAttribute.FILE_ATTRIBUTE_DIRECTORY : FileAttribute.FILE_ATTRIBUTE_NORMAL, date, date, date);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.github.dokandev.dokanjava;
 
-import com.github.dokandev.dokanjava.util.FileAttribute;
+import com.github.dokandev.dokanjava.util.FileInfo;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
@@ -53,11 +53,12 @@ public class DokanFilesystem {
         return FileSystemFeatures.CasePreservedNames;
     }
 
-    public void getFileInformation(String fileName, ByHandleFileInformation handleFileInfo, DokanFileInfo fileInfo) throws IOException {
-        handleFileInfo.setFileAttributes(FileAttribute.FILE_ATTRIBUTE_DIRECTORY);
-        handleFileInfo.setFileSize(1024L);
+    public FileInfo getFileInformation(String fileName, DokanFileInfo fileInfo) throws IOException {
+        //handleFileInfo.setFileAttributes(FileAttribute.FILE_ATTRIBUTE_DIRECTORY);
+        //handleFileInfo.setFileSize(1024L);
         //handleFileInfo.nFileSizeHigh
-        System.out.println(fileName);
+        //System.out.println(fileName);
+        return new FileInfo(fileName, 0L);
     }
 
     public long getUsedBytes() {
@@ -152,7 +153,7 @@ public class DokanFilesystem {
             @Override
             public long callback(WString fileName, ByHandleFileInformation handleFileInfo, DokanFileInfo fileInfo) {
                 try {
-                    DokanFilesystem.this.getFileInformation(fileName.toString(), handleFileInfo, fileInfo);
+                    handleFileInfo.setInfo(DokanFilesystem.this.getFileInformation(fileName.toString(), fileInfo));
                     return NtStatus.Success;
                 } catch (Throwable t) {
                     return exceptionToErrorCode(t);
@@ -175,8 +176,8 @@ public class DokanFilesystem {
                 try {
                     DokanFilesystem.this.findFiles(fileName.toString(), new FileEmitter() {
                         @Override
-                        public void emit(Win32FindData file) {
-                            rawFillFindData.callback(file, rawFileInfo);
+                        public void emit(FileInfo file) {
+                            rawFillFindData.callback(file.toWin32FindData(), rawFileInfo);
                         }
                     });
 
@@ -192,8 +193,8 @@ public class DokanFilesystem {
                 try {
                     DokanFilesystem.this.findFiles(fileName.toString(), fnmatchToPattern(searchPattern.toString()), new FileEmitter() {
                         @Override
-                        public void emit(Win32FindData file) {
-                            rawFillFindData.callback(file, rawFileInfo);
+                        public void emit(FileInfo file) {
+                            rawFillFindData.callback(file.toWin32FindData(), rawFileInfo);
                         }
                     });
 
@@ -213,7 +214,12 @@ public class DokanFilesystem {
                     rawReadLength.setValue(read);
                     return NtStatus.Success;
                 } catch (Throwable t) {
-                    return exceptionToErrorCode(t);
+                    long out = exceptionToErrorCode(t);
+                    if (out == NtStatus.Unsuccessful) {
+                        return ErrorCodes.ERROR_READ_FAULT;
+                    } else {
+                        return out;
+                    }
                 }
             }
         };
@@ -224,18 +230,17 @@ public class DokanFilesystem {
         throw new FileNotFoundException();
     }
 
-    public void findFiles(String fileName, FileEmitter emitter) {
+    public void findFiles(String fileName, FileEmitter emitter) throws IOException {
         //emitter.emit(new Win32FindData("HELLO.TXT", 1024L));
         //emitter.emit(new Win32FindData("HELLO2.TXT", 1024L));
         //emitter.emit(new Win32FindData("HELLO3.TXT", 1024L));
     }
 
-    public void findFiles(String fileName, final Pattern searchPattern, final FileEmitter emitter) {
-
+    public void findFiles(String fileName, final Pattern searchPattern, final FileEmitter emitter) throws IOException {
         findFiles(fileName, new FileEmitter() {
             @Override
-            public void emit(Win32FindData file) {
-                if (searchPattern.matcher(file.getFileName()).matches()) {
+            public void emit(FileInfo file) {
+                if (searchPattern.matcher(file.fileName).matches()) {
                     emitter.emit(file);
                 }
             }
@@ -243,7 +248,7 @@ public class DokanFilesystem {
     }
 
     interface FileEmitter {
-        void emit(Win32FindData file);
+        void emit(FileInfo file);
     }
 
     static public long exceptionToErrorCode(Throwable t) {

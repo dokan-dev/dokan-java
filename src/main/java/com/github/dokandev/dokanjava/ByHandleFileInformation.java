@@ -1,5 +1,6 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.FileInfo;
 import com.github.dokandev.dokanjava.util.FileTime;
 import com.sun.jna.Structure;
 
@@ -82,5 +83,10 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
                 "nFileIndexHigh",
                 "nFileIndexLow"
         );
+    }
+
+
+    public void setInfo(FileInfo fileInformation) {
+        fileInformation.setByHandleFileInfo(this);
     }
 }
