@@ -28,7 +28,8 @@ import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_DI
 import static com.github.dokandev.dokanjava.util.FileAttribute.FILE_ATTRIBUTE_NORMAL;
 import gnu.trove.TByteArrayList;
 
-import java.time.ZonedDateTime;
+import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -41,8 +42,8 @@ public class MemFileInfo {
 
 	String fileName;
 	final boolean isDirectory;
-	final TByteArrayList content = new TByteArrayList();
-	int fileAttribute = FILE_ATTRIBUTE_NORMAL.mask();
+	final ByteArrayOutputStream content = new ByteArrayOutputStream();
+	int fileAttribute = FILE_ATTRIBUTE_NORMAL;
 	long creationTime = 0;
 	long lastAccessTime = 0;
 	long lastWriteTime = 0;
@@ -53,8 +54,8 @@ public class MemFileInfo {
 		this.isDirectory = isDirectory;
 		fileIndex = getNextFileIndex();
 		if (isDirectory)
-			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY.mask();
-		long fileTime = FileTime.toFileTime(ZonedDateTime.now());
+			fileAttribute |= FILE_ATTRIBUTE_DIRECTORY;
+		long fileTime = FileTime.toFileTime(new Date());
 		creationTime = fileTime;
 		lastAccessTime = fileTime;
 		lastWriteTime = fileTime;
@@ -62,7 +63,7 @@ public class MemFileInfo {
 
 	Win32FindData toWin32FindData() {
 		return new Win32FindData(fileAttribute, creationTime, lastAccessTime, lastWriteTime,
-				getFileSize(), 0, 0, FilenameUtils.getName(fileName), Utils.toShortName(fileName));
+				getFileSize(), 0, 0, Utils.toShortName(fileName), Utils.toShortName(fileName));
 	}
 
 	ByHandleFileInformation toByHandleFileInformation() {

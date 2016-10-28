@@ -1,5 +1,6 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.FileTime;
 import com.sun.jna.Structure;
 
 import java.util.Arrays;
@@ -7,17 +8,28 @@ import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings("PointlessBitwiseExpression")
-public class BY_HANDLE_FILE_INFORMATION extends Structure implements Structure.ByReference {
+public class ByHandleFileInformation extends Structure implements Structure.ByReference {
     public int dwFileAttributes;
-    public FILETIME.VAL ftCreationTime;
-    public FILETIME.VAL ftLastAccessTime;
-    public FILETIME.VAL ftLastWriteTime;
+    public FileTime.VAL ftCreationTime;
+    public FileTime.VAL ftLastAccessTime;
+    public FileTime.VAL ftLastWriteTime;
     public int dwVolumeSerialNumber;
     public int nFileSizeHigh;
     public int nFileSizeLow;
     public int dwNumberOfLinks;
     public int nFileIndexHigh;
     public int nFileIndexLow;
+
+    public ByHandleFileInformation(int fileAttribute, long creationTime, long lastAccessTime, long lastWriteTime, int volumeSerialNumber, long fileSize, int numberOfLinks, long fileIndex) {
+        this.dwFileAttributes = fileAttribute;
+        this.ftCreationTime = new FileTime.VAL(creationTime);
+        this.ftLastAccessTime = new FileTime.VAL(lastAccessTime);
+        this.ftLastWriteTime = new FileTime.VAL(lastWriteTime);
+        this.dwVolumeSerialNumber = volumeSerialNumber;
+        this.setFileSize(fileSize);
+        this.dwNumberOfLinks = numberOfLinks;
+        this.setFileIndex(fileIndex);
+    }
 
     public void setFileAttributes(int /*FileAttribute*/ attributes) {
         dwFileAttributes = attributes;

@@ -20,39 +20,39 @@ public class Dokan {
         return opts;
     }
 
-    static public int DokanMain(int options, String mountPoint, int timeout, DokanOperations operations) {
-        return DokanMain(createOptions(options, mountPoint, timeout), operations.toStruct());
+    static public int main(int options, String mountPoint, int timeout, DokanOperations operations) {
+        return main(createOptions(options, mountPoint, timeout), operations.toStruct());
     }
 
-    static public int DokanMain(DOKAN_OPTIONS options, DOKAN_OPERATIONS operations) {
+    static public int main(DOKAN_OPTIONS options, DOKAN_OPERATIONS operations) {
         return DokanNativeMethods.INSTANCE.DokanMain(options, operations);
     }
 
-    static public boolean DokanUnmount(char driveLetter) {
+    static public boolean unmount(char driveLetter) {
         return DokanNativeMethods.INSTANCE.DokanUnmount(driveLetter);
     }
 
-    static public int DokanVersion() {
+    static public int version() {
         return DokanNativeMethods.INSTANCE.DokanVersion();
     }
 
-    static public int DokanDriverVersion() {
+    static public int driverVersion() {
         return DokanNativeMethods.INSTANCE.DokanDriverVersion();
     }
 
-    static public boolean DokanRemoveMountPoint(String mountPoint) {
+    static public boolean removeMountPoint(String mountPoint) {
         return DokanNativeMethods.INSTANCE.DokanRemoveMountPoint(new WString(mountPoint));
     }
 
-    static public boolean DokanResetTimeout(int timeout, DokanFileInfo rawFileInfo) {
+    static public boolean resetTimeout(int timeout, DokanFileInfo rawFileInfo) {
         return DokanNativeMethods.INSTANCE.DokanResetTimeout(timeout, rawFileInfo);
     }
 
-    static public IntByReference DokanOpenRequestorToken(DokanFileInfo rawFileInfo) {
+    static public IntByReference openRequestorToken(DokanFileInfo rawFileInfo) {
         return DokanNativeMethods.INSTANCE.DokanOpenRequestorToken(rawFileInfo);
     }
 
-    static public void DokanMapKernelToUserCreateFileFlags(int fileAttributes, int createOptions, int createDisposition, IntByReference outFileAttributesAndFlags, IntByReference outCreationDisposition) {
+    static public void mapKernelToUserCreateFileFlags(int fileAttributes, int createOptions, int createDisposition, IntByReference outFileAttributesAndFlags, IntByReference outCreationDisposition) {
         DokanNativeMethods.INSTANCE.DokanMapKernelToUserCreateFileFlags(fileAttributes, createOptions, createDisposition, outFileAttributesAndFlags, outCreationDisposition);
     }
 }

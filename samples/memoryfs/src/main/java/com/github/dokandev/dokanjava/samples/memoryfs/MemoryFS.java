@@ -37,13 +37,9 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.github.dokandev.dokanjava.ByHandleFileInformation;
-import com.github.dokandev.dokanjava.Dokan;
+import com.github.dokandev.dokanjava.*;
 import com.github.dokandev.dokanjava.DokanDiskFreeSpace;
 import com.github.dokandev.dokanjava.DokanException;
-import com.github.dokandev.dokanjava.DokanFileInfo;
-import com.github.dokandev.dokanjava.DokanOperations;
-import com.github.dokandev.dokanjava.DokanOptions;
 import com.github.dokandev.dokanjava.DokanVolumeInformation;
 import com.github.dokandev.dokanjava.Win32FindData;
 import com.github.dokandev.dokanjava.util.AccessMask;
@@ -55,7 +51,7 @@ import com.github.dokandev.dokanjava.util.FileTime;
 import com.github.dokandev.dokanjava.util.ShareMode;
 import com.github.dokandev.dokanjava.util.WinError;
 
-public class MemoryFS implements DokanOperations {
+public class MemoryFS extends DokanOperations {
 
   public static final int FILE_CASE_PRESERVED_NAMES = 0x00000002;
   public static final int FILE_FILE_COMPRESSION = 0x00000010;
@@ -77,7 +73,8 @@ public class MemoryFS implements DokanOperations {
     new MemoryFS().mount(driveLetter);
   }
 
-  void mount(String mountPoint) {
+  @Override
+  public void mount(String mountPoint) {
     showVersions();
     DokanOptions dokanOptions = DokanOptions
         .builder(mountPoint)
@@ -110,8 +107,7 @@ public class MemoryFS implements DokanOperations {
   
   @Override
   public int createFile(String fileName, int desiredAccess, int shareMode,
-      int creationDisposition, int flagsAndAttributes, DokanFileInfo fileInfo) {
-    CreationDisposition disposition = CreationDisposition.fromInt(creationDisposition);
+      int disposition, int flagsAndAttributes, DokanFileInfo fileInfo) {
 
     
     log("[onCreateFile]\n"
@@ -127,25 +123,25 @@ public class MemoryFS implements DokanOperations {
 
     if (fileName.equals("\\")) {
       switch (disposition) {
-        case CREATE_NEW:
-        case CREATE_ALWAYS:
+        case CreationDisposition.CREATE_NEW:
+        case CreationDisposition.CREATE_ALWAYS:
           return WinError.ERROR_ALREADY_EXISTS.code;
-        case OPEN_ALWAYS:
-        case OPEN_EXISTING:
-        case TRUNCATE_EXISTING:
+        case CreationDisposition.OPEN_ALWAYS:
+        case CreationDisposition.OPEN_EXISTING:
+        case CreationDisposition.TRUNCATE_EXISTING:
           fileInfo.context = nextFileHandleId();
           return WinError.ERROR_ALREADY_EXISTS.code;
       }
     } else if (files.containsKey(fileName)) {
       switch (disposition) {
-        case CREATE_NEW:
+        case CreationDisposition.CREATE_NEW:
           return WinError.ERROR_ALREADY_EXISTS.code;
-        case OPEN_ALWAYS:
-        case OPEN_EXISTING:
+        case CreationDisposition.OPEN_ALWAYS:
+        case CreationDisposition.OPEN_EXISTING:
           fileInfo.context = nextFileHandleId();
           return WinError.ERROR_ALREADY_EXISTS.code;
-        case CREATE_ALWAYS:
-        case TRUNCATE_EXISTING:
+        case CreationDisposition.CREATE_ALWAYS:
+        case CreationDisposition.TRUNCATE_EXISTING:
           files.get(fileName).content.clear();
           updateParentLastWrite(fileName);
           fileInfo.context = nextFileHandleId();
@@ -153,23 +149,23 @@ public class MemoryFS implements DokanOperations {
       }
     } else {
       switch (disposition) {
-        case CREATE_NEW:
-        case CREATE_ALWAYS:
-        case OPEN_ALWAYS:
+        case CreationDisposition.CREATE_NEW:
+        case CreationDisposition.CREATE_ALWAYS:
+        case CreationDisposition.OPEN_ALWAYS:
           MemFileInfo fi = new MemFileInfo(fileName, false);
           files.put(fi.fileName, fi);
           updateParentLastWrite(fileName);
           fileInfo.context = nextFileHandleId();
           return WinError.ERROR_ALREADY_EXISTS.code;
-        case OPEN_EXISTING:
-        case TRUNCATE_EXISTING:
+        case CreationDisposition.OPEN_EXISTING:
+        case CreationDisposition.TRUNCATE_EXISTING:
           return WinError.ERROR_FILE_NOT_FOUND.code;
       }
     }
     return 0;
   }
 
-  public long onOpenDirectory(String pathName, DokanFileInfo arg1) throws DokanException {
+  public long onOpenDirectory(String pathName, DokanFileInfo arg1) {
     log("[onOpenDirectory] " + pathName);
     if (pathName.equals("\\"))
       return nextFileHandleId();
@@ -179,7 +175,7 @@ public class MemoryFS implements DokanOperations {
     if (files.containsKey(pathName))
       return nextFileHandleId();
     else
-      throw new DokanException(WinError.ERROR_PATH_NOT_FOUND);
+      return NtStatus.ObjectPathNotFound;
   }
 
   public void onCreateDirectory(String fileName, DokanFileInfo file) throws DokanException {

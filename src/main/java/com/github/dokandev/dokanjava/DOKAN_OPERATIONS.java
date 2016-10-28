@@ -1,5 +1,6 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.FileTime;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -123,7 +124,7 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
     interface GetFileInformationDelegate extends Callback {
         long /*NtStatus*/ callback(
                 WString fileName,
-                BY_HANDLE_FILE_INFORMATION handleFileInfo,
+                ByHandleFileInformation handleFileInfo,
                 DokanFileInfo fileInfo
         );
     }
@@ -148,9 +149,9 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
     interface SetFileTimeDelegate extends Callback {
         long /*NtStatus*/ callback(
                 WString rawFileName,
-                FILETIME.REF rawCreationTime,
-                FILETIME.REF rawLastAccessTime,
-                FILETIME.REF rawLastWriteTime,
+                FileTime.REF rawCreationTime,
+                FileTime.REF rawLastAccessTime,
+                FileTime.REF rawLastWriteTime,
                 DokanFileInfo rawFileInfo
         );
     }

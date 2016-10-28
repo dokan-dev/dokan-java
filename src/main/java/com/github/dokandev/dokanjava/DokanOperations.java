@@ -1,8 +1,10 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.FileAttribute;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 
 @SuppressWarnings("WeakerAccess")
 public class DokanOperations {
@@ -16,16 +18,16 @@ public class DokanOperations {
         if (defaultLog) System.out.println("DokanOperations.unmounted");
     }
 
-    public void createFile(String rawFileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
-        if (defaultLog) System.out.println("DokanOperations.createFile: rawFileName = [" + rawFileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "]");
+    public void createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.createFile: fileName = [" + fileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "]");
     }
 
-    public void cleanup(String rawFileName, DokanFileInfo rawFileInfo) {
-        if (defaultLog) System.out.println("DokanOperations.cleanup: " + rawFileName);
+    public void cleanup(String fileName, DokanFileInfo rawFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.cleanup: " + fileName);
     }
 
-    public void closeFile(String rawFileName, DokanFileInfo rawFileInfo) {
-        if (defaultLog) System.out.println("DokanOperations.closeFile: " + rawFileName);
+    public void closeFile(String fileName, DokanFileInfo rawFileInfo) {
+        if (defaultLog) System.out.println("DokanOperations.closeFile: " + fileName);
     }
 
     public String getVolumeName() {
@@ -45,11 +47,31 @@ public class DokanOperations {
         return FileSystemFeatures.CasePreservedNames;
     }
 
-    public void getFileInformation(String rawFileName, BY_HANDLE_FILE_INFORMATION handleFileInfo) {
-        handleFileInfo.setFileAttributes(FileAttribute.DIRECTORY);
+    public void getFileInformation(String fileName, ByHandleFileInformation handleFileInfo) {
+        handleFileInfo.setFileAttributes(FileAttribute.FILE_ATTRIBUTE_DIRECTORY);
         handleFileInfo.setFileSize(1024L);
         //handleFileInfo.nFileSizeHigh
-        System.out.println(rawFileName);
+        System.out.println(fileName);
+    }
+
+    public long getUsedBytes() {
+        return 0L;
+    }
+
+    public long getFreeBytesAvailable() {
+        return getTotalBytesAvailable() - getUsedBytes();
+    }
+
+    public long getTotalBytesAvailable() {
+        return 1024L * 1024 * 1024;
+    }
+
+    public long getTotalFreeBytesAvailable() {
+        return getFreeBytesAvailable();
+    }
+
+    public int getMaxComponentLength() {
+        return 256;
     }
 
     public DOKAN_OPERATIONS toStruct() {
@@ -98,35 +120,46 @@ public class DokanOperations {
         };
         ops.CloseFile = new DOKAN_OPERATIONS.CloseFileDelegate() {
             @Override
-            public void callback(WString rawFileName, DokanFileInfo rawFileInfo) {
-                DokanOperations.this.closeFile(rawFileName.toString(), rawFileInfo);
+            public void callback(WString fileName, DokanFileInfo rawFileInfo) {
+                DokanOperations.this.closeFile(fileName.toString(), rawFileInfo);
             }
         };
         ops.GetVolumeInformation = new DOKAN_OPERATIONS.GetVolumeInformationDelegate() {
             @Override
             public long callback(
-                    Pointer rawVolumeNameBuffer, int rawVolumeNameSize,
+                    Pointer volumeNameBuffer, int volumeNameSize,
                     IntByReference rawVolumeSerialNumber,
                     IntByReference rawMaximumComponentLength,
                     IntByReference rawFileSystemFlags,
                     Pointer rawFileSystemNameBuffer, int rawFileSystemNameSize,
                     DokanFileInfo rawFileInfo
             ) {
-                rawVolumeNameBuffer.setWideString(0L, limitStringSize(DokanOperations.this.getVolumeName(), rawVolumeNameSize));
+                volumeNameBuffer.setWideString(0L, limitStringSize(DokanOperations.this.getVolumeName(), volumeNameSize));
                 rawFileSystemNameBuffer.setWideString(0L, limitStringSize(DokanOperations.this.getFileSystemName(), rawFileSystemNameSize));
                 rawVolumeSerialNumber.setValue(DokanOperations.this.getSerialNumber());
-                rawMaximumComponentLength.setValue(DokanOperations.this.getFileSystemFeatures());
-                rawFileSystemFlags.setValue(FileSystemFeatures.CasePreservedNames);
+                rawMaximumComponentLength.setValue(DokanOperations.this.getMaxComponentLength());
+                rawFileSystemFlags.setValue(DokanOperations.this.getFileSystemFeatures());
 
-                System.out.println("rawVolumeNameBuffer = [" + rawVolumeNameBuffer + "], rawVolumeNameSize = [" + rawVolumeNameSize + "], rawVolumeSerialNumber = [" + rawVolumeSerialNumber + "], rawMaximumComponentLength = [" + rawMaximumComponentLength + "], rawFileSystemFlags = [" + rawFileSystemFlags + "], rawFileSystemNameBuffer = [" + rawFileSystemNameBuffer + "], rawFileSystemNameSize = [" + rawFileSystemNameSize + "], rawFileInfo = [" + rawFileInfo + "]");
+                System.out.println("volumeNameBuffer = [" + volumeNameBuffer + "], volumeNameSize = [" + volumeNameSize + "], rawVolumeSerialNumber = [" + rawVolumeSerialNumber + "], rawMaximumComponentLength = [" + rawMaximumComponentLength + "], rawFileSystemFlags = [" + rawFileSystemFlags + "], rawFileSystemNameBuffer = [" + rawFileSystemNameBuffer + "], rawFileSystemNameSize = [" + rawFileSystemNameSize + "], rawFileInfo = [" + rawFileInfo + "]");
                 return NtStatus.Success;
             }
         };
+        /*
         ops.GetFileInformation = new DOKAN_OPERATIONS.GetFileInformationDelegate() {
             @Override
-            public long callback(WString fileName, BY_HANDLE_FILE_INFORMATION handleFileInfo, DokanFileInfo fileInfo) {
+            public long callback(WString fileName, ByHandleFileInformation handleFileInfo, DokanFileInfo fileInfo) {
                 DokanOperations.this.getFileInformation(fileName.toString(), handleFileInfo);
                 return NtStatus.Success;
+            }
+        };
+        */
+        ops.GetDiskFreeSpace = new DOKAN_OPERATIONS.GetDiskFreeSpaceDelegate() {
+            @Override
+            public long callback(LongByReference rawFreeBytesAvailable, LongByReference rawTotalNumberOfBytes, LongByReference rawTotalNumberOfFreeBytes, DokanFileInfo rawFileInfo) {
+                rawFreeBytesAvailable.setValue(DokanOperations.this.getFreeBytesAvailable());
+                rawTotalNumberOfBytes.setValue(DokanOperations.this.getTotalBytesAvailable());
+                rawTotalNumberOfFreeBytes.setValue(getTotalFreeBytesAvailable());
+                return 0;
             }
         };
         return ops;
