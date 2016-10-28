@@ -20,7 +20,7 @@ public class Dokan {
         return opts;
     }
 
-    static public int main(int options, String mountPoint, int timeout, DokanOperations operations) {
+    static public int main(int options, String mountPoint, int timeout, DokanFilesystem operations) {
         return main(createOptions(options, mountPoint, timeout), operations.toStruct());
     }
 

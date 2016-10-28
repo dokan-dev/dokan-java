@@ -21,6 +21,10 @@ abstract public class FileTime extends Structure {
         setValue(l);
     }
 
+    public FileTime(Date date) {
+        setDate(date);
+    }
+
     public static Date toDate(final int high, final int low) {
         final long filetime = (long) high << 32 | low & 0xffffffffL;
         final long ms_since_16010101 = filetime / (1000 * 10);
@@ -55,6 +59,10 @@ abstract public class FileTime extends Structure {
         public VAL(long l) {
             super(l);
         }
+
+        public VAL(Date date) {
+            super(date);
+        }
     }
 
     static public class REF extends FileTime implements Structure.ByReference {
@@ -63,6 +71,10 @@ abstract public class FileTime extends Structure {
 
         public REF(long l) {
             super(l);
+        }
+
+        public REF(Date date) {
+            super(date);
         }
     }
 }

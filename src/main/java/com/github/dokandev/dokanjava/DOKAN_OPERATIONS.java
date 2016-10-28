@@ -94,7 +94,7 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
     interface ReadFileDelegate extends Callback {
         long /*NtStatus*/ callback(
                 WString rawFileName,
-                byte[] rawBuffer,
+                Pointer rawBuffer,
                 int rawBufferLength,
                 IntByReference rawReadLength,
                 long rawOffset,
@@ -130,14 +130,18 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
     }
 
     interface FindFilesDelegate extends Callback {
-        long /*NtStatus*/ callback(WString rawFileName, IntByReference rawFillFindData, DokanFileInfo rawFileInfo);
+        long /*NtStatus*/ callback(WString rawFileName, FillWin32FindData rawFillFindData, DokanFileInfo rawFileInfo);
+    }
+
+    interface FillWin32FindData extends Callback {
+        void callback(Win32FindData rawFillFindData, DokanFileInfo rawFileInfo);
     }
 
     interface FindFilesWithPatternDelegate extends Callback {
         long /*NtStatus*/ callback(
-                WString rawFileName,
-                WString rawSearchPattern,
-                IntByReference rawFillFindData,
+                WString fileName,
+                WString searchPattern,
+                DOKAN_OPERATIONS.FillWin32FindData rawFillFindData,
                 DokanFileInfo rawFileInfo
         );
     }

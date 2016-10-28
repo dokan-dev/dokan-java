@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-@SuppressWarnings("PointlessBitwiseExpression")
+@SuppressWarnings({"PointlessBitwiseExpression", "unused"})
 public class ByHandleFileInformation extends Structure implements Structure.ByReference {
     public int dwFileAttributes;
     public FileTime.VAL ftCreationTime;
@@ -19,6 +19,9 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     public int dwNumberOfLinks;
     public int nFileIndexHigh;
     public int nFileIndexLow;
+
+    public ByHandleFileInformation() {
+    }
 
     public ByHandleFileInformation(int fileAttribute, long creationTime, long lastAccessTime, long lastWriteTime, int volumeSerialNumber, long fileSize, int numberOfLinks, long fileIndex) {
         this.dwFileAttributes = fileAttribute;
