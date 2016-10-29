@@ -1,10 +1,12 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.FileAttribute;
 import com.github.dokandev.dokanjava.util.FileInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -29,27 +31,48 @@ public class Example {
 
             @Override
             protected NodeFileHandle createHandle(String fileName) throws IOException {
-                return new NodeFileHandle(fileName, root.find(fileName, false));
+                return new NodeFileHandle(fileName, root.findExistant(fileName));
             }
 
             @Override
-            public NodeFileHandle createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions) throws IOException {
+            public OpenFileResult createFile(String fileName, int securityContext, int desiredAccess, int fileAttributes, int shareAccess, int createDisposition, int createOptions) throws IOException {
                 //CreationDisposition.CREATE_NEW
-                //super.createFile(fileName, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo);
+                //super.createFile(fileName, securityContext, desiredAccess, fileAttributes, shareAccess, createDisposition, createOptions, dokanFileInfo);
                 //throw new DokanException(NtStatus.NoSuchFile);
                 //throw new DokanException(NtStatus.CrmProtocolAlreadyExists);
                 //throw new FileAlreadyExistsException("exists");
                 //throw new FileNotFoundException();
                 //throw new DokanException(NtStatus.UserExists);
-                root.find(fileName, false);
-                return createHandle(fileName);
+
+                boolean exists = true;
+
+                switch (createDisposition) {
+                    case CreationDisposition.CREATE_ALWAYS:
+                        root.createFile(fileName);
+                        break;
+                    case CreationDisposition.CREATE_NEW:
+                        if (root.exists(fileName)) throw new FileAlreadyExistsException("");
+                        root.createFile(fileName);
+                        break;
+                    case CreationDisposition.OPEN_ALWAYS:
+                        root.createFile(fileName);
+                        break;
+                    case CreationDisposition.OPEN_EXISTING:
+                        root.findExistant(fileName);
+                        break;
+                    case CreationDisposition.TRUNCATE_EXISTING:
+                        root.findExistant(fileName).set(new byte[0]);
+                        break;
+                }
+
+                return new OpenFileResult(exists, createHandle(fileName));
             }
 
             @Override
             //public FileInfo getFileInformation(NodeFileHandle file) throws IOException {
             public FileInfo getFileInformation(String fileName) throws IOException {
                 //return file.node.toFileInfo();
-                return root.find(fileName, false).toFileInfo();
+                return root.findExistant(fileName).toFileInfo();
             }
 
             @Override
@@ -61,17 +84,17 @@ public class Example {
 
             @Override
             public void deleteFile(String fileName) throws IOException {
-                root.find(fileName, false).delete();
+                root.findExistant(fileName).delete();
             }
 
             @Override
             public void deleteDirectory(String fileName) throws IOException {
-                root.find(fileName, false).delete();
+                root.findExistant(fileName).delete();
             }
 
             @Override
             public void moveFile(String oldFileName, String newFileName, boolean replaceIfExisting) throws IOException {
-                root.find(newFileName, true).replaceWith(root.find(oldFileName, false));
+                root.createFile(newFileName).replaceWith(root.findExistant(oldFileName));
             }
 
             @Override
@@ -92,8 +115,8 @@ public class Example {
             Node root = new Node();
 
             {
-                root.find("HELLO.TXT", true).set(new byte[]{'H', 'E', 'L'});
-                root.find("demo\\HELLO.TXT", true).set("OTHER".getBytes("UTF-8"));
+                root.createFile("HELLO.TXT").set(new byte[]{'H', 'E', 'L'});
+                root.createFile("demo\\HELLO.TXT").set("OTHER".getBytes("UTF-8"));
             }
         });
 
@@ -121,10 +144,11 @@ public class Example {
         public byte[] data = null;
         public Date date = new Date();
 
-        public Node createChild(String name) {
+        public Node createChild(String name, boolean createFile) {
             Node child = new Node();
             child.parent = this;
             child.name = name;
+            this.isDirectory = !createFile;
             this.children.put(name, child);
             return child;
         }
@@ -135,23 +159,44 @@ public class Example {
             }
         }
 
-        public Node find(String path, boolean create) throws IOException {
-            String normalized = path.replace('\\', '/');
-            int index = normalized.indexOf('/');
-            if (index < 0) {
-                return child(path, create);
-            } else {
-                return child(normalized.substring(0, index), create).find(normalized.substring(index + 1), create);
+        public boolean exists(String path) {
+            try {
+                find(path, false, false);
+                return true;
+            } catch (IOException e) {
+                return false;
             }
         }
 
-        public Node child(String childName, boolean create) throws IOException {
+        public Node createFile(String path) throws IOException {
+            return find(path, true, true);
+        }
+
+        public Node createDirectory(String path) throws IOException {
+            return find(path, true, false);
+        }
+
+        public Node findExistant(String path) throws IOException {
+            return find(path, false, false);
+        }
+
+        public Node find(String path, boolean create, boolean createFile) throws IOException {
+            String normalized = path.replace('\\', '/');
+            int index = normalized.indexOf('/');
+            if (index < 0) {
+                return child(path, create, createFile);
+            } else {
+                return child(normalized.substring(0, index), create, false).find(normalized.substring(index + 1), create, createFile);
+            }
+        }
+
+        public Node child(String childName, boolean create, boolean createFile) throws IOException {
             if (childName.equals("..")) return this.parent;
             if (childName.equals(".")) return this;
             if (childName.equals("")) return this;
             if (children.containsKey(childName)) return children.get(childName);
             if (!create) throw new FileNotFoundException();
-            return createChild(childName);
+            return createChild(childName, createFile);
         }
 
         public int read(long loffset, byte[] out, int len) {

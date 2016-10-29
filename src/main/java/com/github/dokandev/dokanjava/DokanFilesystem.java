@@ -11,6 +11,16 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class DokanFilesystem<TFileHandle extends DokanFileHandle> {
+    class OpenFileResult {
+        public boolean exists;
+        public TFileHandle handle;
+
+        public OpenFileResult(boolean exists, TFileHandle handle) {
+            this.exists = exists;
+            this.handle = handle;
+        }
+    }
+
     public boolean getDefaultLog() {
         return getDebug();
     }
@@ -43,11 +53,11 @@ public abstract class DokanFilesystem<TFileHandle extends DokanFileHandle> {
         if (getDefaultLog()) System.out.println("DokanOperations.unmounted");
     }
 
-    public TFileHandle createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions) throws IOException {
+    public OpenFileResult createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions) throws IOException {
         if (getDefaultLog())
             System.out.println("DokanOperations.createFile: fileName = [" + fileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "]");
 
-        return createHandle(fileName);
+        return new OpenFileResult(false, createHandle(fileName));
     }
 
     abstract protected TFileHandle createHandle(String fileName) throws IOException;

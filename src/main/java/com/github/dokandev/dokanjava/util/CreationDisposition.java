@@ -6,4 +6,8 @@ public class CreationDisposition {
     static public final int OPEN_EXISTING = 3;
     static public final int OPEN_ALWAYS = 4;
     static public final int TRUNCATE_EXISTING = 5;
+
+    static public boolean isReadonly(int disposition) {
+        return disposition == OPEN_EXISTING || disposition == OPEN_ALWAYS;
+    }
 }

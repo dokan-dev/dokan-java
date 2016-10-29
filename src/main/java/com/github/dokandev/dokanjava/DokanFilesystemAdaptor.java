@@ -1,5 +1,6 @@
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.CreationDisposition;
 import com.github.dokandev.dokanjava.util.FileInfo;
 import com.github.dokandev.dokanjava.util.FileTime;
 import com.github.dokandev.dokanjava.util.StreamInfo;
@@ -42,11 +43,15 @@ public class DokanFilesystemAdaptor {
             public long callback(WString rawFileName, IntByReference securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
                 try {
                     System.out.println("%%%%%%%%%%%%%% CREATEFILE: " + rawFileName.toString());
-                    dokanFileInfo._context = fs.allocateFileHandle(
-                            fs.createFile(rawFileName.toString(), securityContext.getValue(), rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions)
-                    );
+                    DokanFilesystem<TFileHandle>.OpenFileResult result = fs.createFile(rawFileName.toString(), securityContext.getValue(), rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions);
+                    dokanFileInfo._context = fs.allocateFileHandle(result.handle);
                     dokanFileInfo.write();
-                    return NtStatus.Success;
+                    //long resultCode = NtStatus.Success;
+                    //switch (rawCreateDisposition) {
+                    //    case CreationDisposition.CREATE_NEW:
+                    //        break;
+                    //}
+                    return result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
                 } catch (Throwable t) {
                     return exceptionToErrorCode(t);
                 }
@@ -259,7 +264,7 @@ public class DokanFilesystemAdaptor {
                     return exceptionToErrorCode(t);
                 }
             }
-        }
+        };
         ops.DeleteFile = new DOKAN_OPERATIONS.DeleteFileDelegate() {
             @Override
             public long callback(WString fileName, DokanFileInfo rawFileInfo) {
