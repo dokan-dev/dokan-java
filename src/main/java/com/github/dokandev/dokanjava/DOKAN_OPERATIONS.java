@@ -105,7 +105,7 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
     interface WriteFileDelegate extends Callback {
         long /*NtStatus*/ callback(
                 WString rawFileName,
-                byte[] rawBuffer,
+                Pointer rawBuffer,
                 int rawNumberOfBytesToWrite,
                 IntByReference rawNumberOfBytesWritten,
                 long rawOffset,
@@ -133,8 +133,23 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
         long /*NtStatus*/ callback(WString rawFileName, FillWin32FindData rawFillFindData, DokanFileInfo rawFileInfo);
     }
 
-    interface FillWin32FindData extends Callback {
+    public interface FillWin32FindData extends Callback {
         void callback(Win32FindData rawFillFindData, DokanFileInfo rawFileInfo);
+    }
+
+    public interface FillWin32FindStreamData extends Callback {
+        void callback(Win32FindStreamData rawFillFindData, DokanFileInfo rawFileInfo);
+    }
+
+    static public class Win32FindStreamData extends Structure {
+        static public final int MAX_PATH = 260;
+        public long length;
+        public char[] cFileName = new char[MAX_PATH + 36];
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("length", "cFileName");
+        }
     }
 
     interface FindFilesWithPatternDelegate extends Callback {
@@ -237,7 +252,7 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
         long /*NtStatus*/ callback(
                 WString rawFileName,
                 int /*SECURITY_INFORMATION*/ rawRequestedInformation,
-                IntByReference rawSecurityDescriptor,
+                Pointer rawSecurityDescriptor,
                 int rawSecurityDescriptorLength,
                 IntByReference rawSecurityDescriptorLengthNeeded,
                 DokanFileInfo rawFileInfo
@@ -248,14 +263,14 @@ public class DOKAN_OPERATIONS extends Structure implements Structure.ByReference
         long /*NtStatus*/ callback(
                 WString rawFileName,
                 int rawSecurityInformation, // @TODO: This is a pointer??
-                IntByReference rawSecurityDescriptor,
+                Pointer rawSecurityDescriptor,
                 int rawSecurityDescriptorLength,
                 DokanFileInfo rawFileInfo
         );
     }
 
     interface FindStreamsDelegate extends Callback {
-        long /*NtStatus*/ callback(WString rawFileName, IntByReference rawFillFindData, DokanFileInfo rawFileInfo);
+        long /*NtStatus*/ callback(WString rawFileName, FillWin32FindStreamData rawFillFindData, DokanFileInfo rawFileInfo);
     }
 
     interface MountedDelegate extends Callback {

@@ -47,6 +47,10 @@ abstract public class FileTime extends Structure {
         setValue(toFileTime(date));
     }
 
+    public Date getDate() {
+        return toDate(dwHighDateTime, dwLowDateTime);
+    }
+
     @Override
     protected List getFieldOrder() {
         return Arrays.asList("dwHighDateTime", "dwLowDateTime");

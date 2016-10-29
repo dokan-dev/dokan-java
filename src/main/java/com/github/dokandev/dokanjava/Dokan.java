@@ -20,8 +20,14 @@ public class Dokan {
         return opts;
     }
 
-    static public int main(int options, String mountPoint, int timeout, DokanFilesystem operations) {
-        return main(createOptions(options, mountPoint, timeout), operations.toStruct());
+    static public int main(String mountPoint, DokanFilesystem fs) {
+        DOKAN_OPTIONS opts = createOptions(0, mountPoint, fs.getTimeout());
+        if (fs.getDebug()) opts.Options |= DokanOptions.DebugMode;
+        if (fs.getDebugStderrOutput()) opts.Options |= DokanOptions.StderrOutput;
+        opts.AllocationUnitSize = fs.getAllocationUnitSize();
+        opts.SectorSize = fs.getSectorSize();
+        opts.Timeout = fs.getTimeout();
+        return main(opts, DokanFilesystemAdaptor.toStruct(fs));
     }
 
     static public int main(DOKAN_OPTIONS options, DOKAN_OPERATIONS operations) {

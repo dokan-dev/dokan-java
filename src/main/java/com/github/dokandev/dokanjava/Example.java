@@ -5,8 +5,6 @@ import com.github.dokandev.dokanjava.util.FileInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -18,13 +16,24 @@ public class Example {
         System.out.println(Dokan.version());
         System.out.println(Dokan.driverVersion());
         Dokan.unmount('M');
-        Dokan.main(DokanOptions.DebugMode | DokanOptions.StderrOutput, "M:\\", 10000, new DokanFilesystem() {
-            {
-                defaultLog = true;
+        Dokan.main("M:\\", new DokanFilesystem<NodeFileHandle>() {
+            @Override
+            public boolean getDebug() {
+                return true;
             }
 
             @Override
-            public void createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) throws IOException {
+            public boolean getDebugStderrOutput() {
+                return true;
+            }
+
+            @Override
+            protected NodeFileHandle createHandle(String fileName) throws IOException {
+                return new NodeFileHandle(fileName, root.find(fileName, false));
+            }
+
+            @Override
+            public NodeFileHandle createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions) throws IOException {
                 //CreationDisposition.CREATE_NEW
                 //super.createFile(fileName, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo);
                 //throw new DokanException(NtStatus.NoSuchFile);
@@ -33,25 +42,46 @@ public class Example {
                 //throw new FileNotFoundException();
                 //throw new DokanException(NtStatus.UserExists);
                 root.find(fileName, false);
+                return createHandle(fileName);
             }
 
             @Override
-            public FileInfo getFileInformation(String fileName, DokanFileInfo fileInfo) throws IOException {
+            //public FileInfo getFileInformation(NodeFileHandle file) throws IOException {
+            public FileInfo getFileInformation(String fileName) throws IOException {
+                //return file.node.toFileInfo();
                 return root.find(fileName, false).toFileInfo();
             }
 
             @Override
-            public void findFiles(String fileName, FileEmitter emitter) throws IOException {
-                Node node = root.find(fileName, false);
-                for (Node child : node.children.values()){
+            public void findFiles(NodeFileHandle file, FileEmitter emitter) throws IOException {
+                for (Node child : file.node.children.values()) {
                     emitter.emit(child.toFileInfo());
                 }
             }
 
             @Override
-            public int readFile(String fileName, long fileOffset, byte[] data, int dataLength, DokanFileInfo fileInfo) throws IOException {
-                Node node = root.find(fileName, false);
-                return node.read(fileOffset, data, dataLength);
+            public void deleteFile(String fileName) throws IOException {
+                root.find(fileName, false).delete();
+            }
+
+            @Override
+            public void deleteDirectory(String fileName) throws IOException {
+                root.find(fileName, false).delete();
+            }
+
+            @Override
+            public void moveFile(String oldFileName, String newFileName, boolean replaceIfExisting) throws IOException {
+                root.find(newFileName, true).replaceWith(root.find(oldFileName, false));
+            }
+
+            @Override
+            public int readFile(NodeFileHandle file, long fileOffset, byte[] data, int dataLength) throws IOException {
+                return file.node.read(fileOffset, data, dataLength);
+            }
+
+            @Override
+            public int writeFile(NodeFileHandle file, long fileOffset, byte[] data, int dataLength) throws IOException {
+                return file.node.write(fileOffset, data, dataLength);
             }
 
             @Override
@@ -60,8 +90,9 @@ public class Example {
             }
 
             Node root = new Node();
+
             {
-                root.find("HELLO.TXT", true).set(new byte[] { 'H', 'E', 'L' });
+                root.find("HELLO.TXT", true).set(new byte[]{'H', 'E', 'L'});
                 root.find("demo\\HELLO.TXT", true).set("OTHER".getBytes("UTF-8"));
             }
         });
@@ -69,6 +100,15 @@ public class Example {
 
         //System.out.println(NativeMethods.INSTANCE.DokanRemoveMountPoint(new WString("M")));
         //DokanNative.INSTANCE.printf("hello %s", "world");
+    }
+
+    static class NodeFileHandle extends DokanFileHandle {
+        public final Node node;
+
+        public NodeFileHandle(String fileName, Node node) {
+            super(fileName);
+            this.node = node;
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -87,6 +127,12 @@ public class Example {
             child.name = name;
             this.children.put(name, child);
             return child;
+        }
+
+        public void delete() {
+            if (this.parent != null) {
+                this.parent.children.remove(this.name);
+            }
         }
 
         public Node find(String path, boolean create) throws IOException {
@@ -117,12 +163,27 @@ public class Example {
         }
 
         public void set(byte[] bytes) {
-            isDirectory =false;
+            isDirectory = false;
             this.data = Arrays.copyOf(bytes, bytes.length);
         }
 
         public FileInfo toFileInfo() {
             return new FileInfo(inode, name, (data != null) ? data.length : 0L, isDirectory ? FileAttribute.FILE_ATTRIBUTE_DIRECTORY : FileAttribute.FILE_ATTRIBUTE_NORMAL, date, date, date);
+        }
+
+        public void replaceWith(Node node) {
+            node.delete();
+            this.delete();
+            node.name = this.name;
+            this.parent.children.put(node.name, node);
+        }
+
+        public int write(long loffset, byte[] data, int dataLength) {
+            int offset = (int) loffset;
+            if (this.data == null) this.data = new byte[0];
+            this.data = Arrays.copyOf(this.data, Math.max(this.data.length, offset + dataLength));
+            System.arraycopy(data, 0, this.data, offset, data.length);
+            return dataLength;
         }
     }
 }
