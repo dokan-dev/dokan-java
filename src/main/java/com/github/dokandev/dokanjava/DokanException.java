@@ -18,6 +18,8 @@
 
 package com.github.dokandev.dokanjava;
 
+import com.github.dokandev.dokanjava.util.WinError;
+
 public class DokanException extends RuntimeException {
     public final int errorCode;
 
@@ -26,5 +28,9 @@ public class DokanException extends RuntimeException {
             throw new IllegalArgumentException("error code is not in range [0, 4294967295]");
         }
         this.errorCode = (int) errorCode;
+    }
+
+    public DokanException(WinError errorCode) {
+        this(errorCode.code);
     }
 }

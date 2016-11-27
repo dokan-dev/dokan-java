@@ -11,13 +11,21 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class DokanFilesystem<TFileHandle extends DokanFileHandle> {
-    class OpenFileResult {
+    public class OpenFileResult {
         public boolean exists;
         public TFileHandle handle;
 
         public OpenFileResult(boolean exists, TFileHandle handle) {
             this.exists = exists;
             this.handle = handle;
+        }
+
+        @Override
+        public String toString() {
+            return "OpenFileResult{" +
+                    "exists=" + exists +
+                    ", handle=" + handle +
+                    '}';
         }
     }
 
@@ -53,9 +61,9 @@ public abstract class DokanFilesystem<TFileHandle extends DokanFileHandle> {
         if (getDefaultLog()) System.out.println("DokanOperations.unmounted");
     }
 
-    public OpenFileResult createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions) throws IOException {
+    public OpenFileResult createFile(String fileName, int securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, boolean isDirectory) throws IOException {
         if (getDefaultLog())
-            System.out.println("DokanOperations.createFile: fileName = [" + fileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "]");
+            System.out.println("DokanOperations.createFile: fileName = [" + fileName + "], securityContext = [" + securityContext + "], rawDesiredAccess = [" + rawDesiredAccess + "], rawFileAttributes = [" + rawFileAttributes + "], rawShareAccess = [" + rawShareAccess + "], rawCreateDisposition = [" + rawCreateDisposition + "], rawCreateOptions = [" + rawCreateOptions + "], isDirectory = [" + isDirectory + "]");
 
         return new OpenFileResult(false, createHandle(fileName));
     }
@@ -221,11 +229,11 @@ public abstract class DokanFilesystem<TFileHandle extends DokanFileHandle> {
     public void setFileSecurity(TFileHandle fileHandle, int kind, byte[] data) {
     }
 
-    interface FileEmitter {
+    public interface FileEmitter {
         void emit(FileInfo file);
     }
 
-    interface StreamEmitter {
+    public interface StreamEmitter {
         void emit(StreamInfo stream);
     }
 }

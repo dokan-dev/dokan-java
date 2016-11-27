@@ -2,6 +2,7 @@ package com.github.dokandev.dokanjava;
 
 import com.github.dokandev.dokanjava.util.FileAttribute;
 import com.github.dokandev.dokanjava.util.FileTime;
+import com.github.dokandev.dokanjava.util.Utils;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
 
@@ -23,8 +24,8 @@ public class Win32FindData extends Structure implements Structure.ByReference {
     public char[] cFileName = new char[MAX_PATH];
     public char[] cAlternateFileName = new char[14];
 
-    public Win32FindData() {
-
+    public Win32FindData(int attributes, long creationTime, long lastAccessTime, long lastWriteTime, int size, int i1, int i2, String name, String shortName) {
+        this(name, shortName, size, attributes, creationTime, lastAccessTime, lastWriteTime);
     }
 
     static public Win32FindData file(String name, long size, Date time) {
@@ -52,7 +53,11 @@ public class Win32FindData extends Structure implements Structure.ByReference {
     }
 
     public Win32FindData(String name, long size, int attributes, Date creationTime, Date lastAccessTime, Date lastWriteTime) {
-        this.setFileName(name);
+        this(name, Utils.toShortName(name), size, attributes, FileTime.toFileTime(creationTime), FileTime.toFileTime(lastAccessTime), FileTime.toFileTime(lastWriteTime));
+    }
+
+    public Win32FindData(String name, String shortName, long size, int attributes, long creationTime, long lastAccessTime, long lastWriteTime) {
+        this.setFileName(name, shortName);
         this.dwFileAttributes = attributes;
         this.ftCreationTime = new FileTime.VAL(creationTime);
         this.ftLastAccessTime = new FileTime.VAL(lastAccessTime);
@@ -65,8 +70,10 @@ public class Win32FindData extends Structure implements Structure.ByReference {
         this.nFileSizeLow = (int) ((size >> 0L) & 0xFFFFFFFFL);
     }
 
-    public void setFileName(String name) {
+    public void setFileName(String name, String shortName) {
         name.getChars(0, name.length(), cFileName, 0);
+        //Utils.toShortName(name).getChars(0, shortName.length(), cAlternateFileName, 0);
+
     }
 
     public String getFileName() {

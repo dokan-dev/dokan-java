@@ -21,6 +21,13 @@ public class Dokan {
     }
 
     static public int main(String mountPoint, DokanFilesystem fs) {
+        //Runtime.getRuntime().addShutdownHook(new Thread() {
+        //    @Override
+        //    public void run() {
+        //        Dokan.unmount('M');
+        //        Dokan.removeMountPoint(mountPoint);
+        //    }
+        //});
         DOKAN_OPTIONS opts = createOptions(0, mountPoint, fs.getTimeout());
         if (fs.getDebug()) opts.Options |= DokanOptions.DebugMode;
         if (fs.getDebugStderrOutput()) opts.Options |= DokanOptions.StderrOutput;

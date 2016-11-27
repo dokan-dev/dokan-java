@@ -22,4 +22,20 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     protected List getFieldOrder() {
         return Arrays.asList("_context", "_dokanContext", "_dokanOptions", "_processId", "_isDirectory", "_deleteOnClose", "_pagingIo", "_synchronousIo", "_noCache", "_writeToEndOfFile");
     }
+
+    @Override
+    public String toString() {
+        return "DokanFileInfo{" +
+                "_context=" + _context +
+                ", _dokanContext=" + _dokanContext +
+                ", _dokanOptions=" + _dokanOptions +
+                ", _processId=" + _processId +
+                ", _isDirectory=" + _isDirectory +
+                ", _deleteOnClose=" + _deleteOnClose +
+                ", _pagingIo=" + _pagingIo +
+                ", _synchronousIo=" + _synchronousIo +
+                ", _noCache=" + _noCache +
+                ", _writeToEndOfFile=" + _writeToEndOfFile +
+                '}';
+    }
 }

@@ -7,4 +7,12 @@ public class DokanFileHandle {
     public DokanFileHandle(String fileName) {
         this.fileName = fileName;
     }
+
+    @Override
+    public String toString() {
+        return "DokanFileHandle{" +
+                "fileName='" + fileName + '\'' +
+                ", info=" + info +
+                '}';
+    }
 }

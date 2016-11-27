@@ -6,4 +6,5 @@ public class ErrorCodes {
     static public final int ERROR_WRITE_FAULT = 29;
     static public final int ERROR_READ_FAULT = 30;
     static public final int ERROR_ALREADY_EXISTS = 183;
+    static public final int ERROR_FILE_EXISTS = 80;
 }

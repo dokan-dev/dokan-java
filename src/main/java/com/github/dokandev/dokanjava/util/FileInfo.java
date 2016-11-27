@@ -49,4 +49,19 @@ public class FileInfo {
         info.ftLastWriteTime.setDate(this.lastWriteTime);
         info.dwVolumeSerialNumber = volumeSerialNumber;
     }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "attributes=" + attributes +
+                ", creationTime=" + creationTime +
+                ", lastAccessTime=" + lastAccessTime +
+                ", lastWriteTime=" + lastWriteTime +
+                ", fileSize=" + fileSize +
+                ", fileName='" + fileName + '\'' +
+                ", fileIndex=" + fileIndex +
+                ", numberOfLinks=" + numberOfLinks +
+                ", volumeSerialNumber=" + volumeSerialNumber +
+                '}';
+    }
 }

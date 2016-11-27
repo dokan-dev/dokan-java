@@ -19,6 +19,7 @@ public class DokanFilesystemAdaptor {
         ops.Mounted = new DOKAN_OPERATIONS.MountedDelegate() {
             @Override
             public long callback(DokanFileInfo rawFileInfo) {
+                System.out.println("Mounted");
                 try {
                     fs.mounted();
                     return NtStatus.Success;
@@ -30,6 +31,7 @@ public class DokanFilesystemAdaptor {
         ops.Unmounted = new DOKAN_OPERATIONS.UnmountedDelegate() {
             @Override
             public long callback(DokanFileInfo rawFileInfo) {
+                System.out.println("Unmounted");
                 try {
                     fs.unmounted();
                     return NtStatus.Success;
@@ -41,9 +43,14 @@ public class DokanFilesystemAdaptor {
         ops.ZwCreateFile = new DOKAN_OPERATIONS.ZwCreateFileDelegate() {
             @Override
             public long callback(WString rawFileName, IntByReference securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+                long res = -1;
+                boolean isDirectory = dokanFileInfo._isDirectory != 0;
+                System.out.println("--------------------------------------------");
                 try {
-                    System.out.println("%%%%%%%%%%%%%% CREATEFILE: " + rawFileName.toString());
-                    DokanFilesystem<TFileHandle>.OpenFileResult result = fs.createFile(rawFileName.toString(), securityContext.getValue(), rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions);
+                    System.out.println("%%%%%%%%%%%%%% CREATEFILE: rawFileName=" + rawFileName.toString() + " : rawDesiredAccess=" + rawDesiredAccess + " : rawFileAttributes=" + rawFileAttributes + " : rawShareAccess=" + rawShareAccess + " : rawCreateDisposition=" + rawCreateDisposition + " : rawCreateOptions=" + rawCreateOptions + " : isDirectory=" + isDirectory);
+                    DokanFilesystem<TFileHandle>.OpenFileResult result = fs.createFile(rawFileName.toString(), securityContext.getValue(), rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, isDirectory);
+                    System.out.println("result: " + result);
+                    System.out.println("dokanFileInfo: " + dokanFileInfo);
                     dokanFileInfo._context = fs.allocateFileHandle(result.handle);
                     dokanFileInfo.write();
                     //long resultCode = NtStatus.Success;
@@ -51,15 +58,30 @@ public class DokanFilesystemAdaptor {
                     //    case CreationDisposition.CREATE_NEW:
                     //        break;
                     //}
-                    return result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                    //if (rawCreateDisposition == CreationDisposition.CREATE_NEW) {
+                    //    res = 0;
+                    //} else {
+                    if (isDirectory) {
+                        res = result.exists ? ErrorCodes.ERROR_SUCCESS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                    } else {
+                        if (rawCreateDisposition == CreationDisposition.CREATE_NEW) {
+                            res = result.exists ? ErrorCodes.ERROR_FILE_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                        } else {
+                            res = result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                        }
+                    }
+                    //}
                 } catch (Throwable t) {
-                    return exceptionToErrorCode(t);
+                    res = exceptionToErrorCode(t);
                 }
+                System.out.println(" CREATEFILE -> " + res);
+                return res;
             }
         };
         ops.Cleanup = new DOKAN_OPERATIONS.CleanupDelegate() {
             @Override
             public void callback(WString fileName, DokanFileInfo rawFileInfo) {
+                System.out.println("Cleanup");
                 try {
                     //fs.cleanup(fs.getFileHandle(rawFileInfo));
                     fs.cleanup(fileName.toString());
@@ -71,8 +93,10 @@ public class DokanFilesystemAdaptor {
         ops.CloseFile = new DOKAN_OPERATIONS.CloseFileDelegate() {
             @Override
             public void callback(WString fileName, DokanFileInfo rawFileInfo) {
+                System.out.println("CloseFile");
                 try {
                     fs.closeFile(fs.getFileHandle(fileName, rawFileInfo));
+                } catch (FileNotFoundException e) {
                 } catch (Throwable t) {
                     t.printStackTrace();
                 } finally {
@@ -90,6 +114,7 @@ public class DokanFilesystemAdaptor {
                     Pointer rawFileSystemNameBuffer, int rawFileSystemNameSize,
                     DokanFileInfo rawFileInfo
             ) {
+                System.out.println("GetVolumeInformation");
                 try {
                     volumeNameBuffer.setWideString(0L, limitStringSize(fs.getVolumeName(), volumeNameSize));
                     rawFileSystemNameBuffer.setWideString(0L, limitStringSize(fs.getFileSystemName(), rawFileSystemNameSize));
@@ -108,19 +133,26 @@ public class DokanFilesystemAdaptor {
         ops.GetFileInformation = new DOKAN_OPERATIONS.GetFileInformationDelegate() {
             @Override
             public long callback(WString fileName, ByHandleFileInformation handleFileInfo, DokanFileInfo fileInfo) {
+                System.out.println("GetFileInformation");
+                long result = -1;
+                FileInfo info = null;
                 try {
                     //handleFileInfo.setInfo(fs.getFileInformation(fs.getFileHandle(fileInfo)));
-                    handleFileInfo.setInfo(fs.getFileInformation(fileName.toString()));
-                    return NtStatus.Success;
+                    info = fs.getFileInformation(fileName.toString());
+                    handleFileInfo.setInfo(info);
+                    result = NtStatus.Success;
                 } catch (Throwable t) {
-                    return exceptionToErrorCode(t);
+                    result = exceptionToErrorCode(t);
                 }
+                System.out.println("GetFileInformation: " + fileName.toString() + " -> " + result + " | " + info);
+                return result;
             }
         };
 
         ops.GetDiskFreeSpace = new DOKAN_OPERATIONS.GetDiskFreeSpaceDelegate() {
             @Override
             public long callback(LongByReference rawFreeBytesAvailable, LongByReference rawTotalNumberOfBytes, LongByReference rawTotalNumberOfFreeBytes, DokanFileInfo rawFileInfo) {
+                System.out.println("GetDiskFreeSpace");
                 rawFreeBytesAvailable.setValue(fs.getFreeBytesAvailable());
                 rawTotalNumberOfBytes.setValue(fs.getTotalBytesAvailable());
                 rawTotalNumberOfFreeBytes.setValue(fs.getTotalFreeBytesAvailable());
@@ -130,6 +162,7 @@ public class DokanFilesystemAdaptor {
         ops.FindFiles = new DOKAN_OPERATIONS.FindFilesDelegate() {
             @Override
             public long callback(final WString fileName, final DOKAN_OPERATIONS.FillWin32FindData rawFillFindData, final DokanFileInfo rawFileInfo) {
+                System.out.println("FindFiles");
                 try {
                     fs.findFiles(fs.getFileHandle(fileName, rawFileInfo), new DokanFilesystem.FileEmitter() {
                         @Override
@@ -147,6 +180,7 @@ public class DokanFilesystemAdaptor {
         ops.FindFilesWithPattern = new DOKAN_OPERATIONS.FindFilesWithPatternDelegate() {
             @Override
             public long callback(final WString fileName, final WString searchPattern, final DOKAN_OPERATIONS.FillWin32FindData rawFillFindData, final DokanFileInfo rawFileInfo) {
+                System.out.println("FindFilesWithPattern");
                 try {
                     fs.findFiles(fs.getFileHandle(fileName, rawFileInfo), fnmatchToPattern(searchPattern.toString()), new DokanFilesystem.FileEmitter() {
                         @Override
@@ -163,6 +197,7 @@ public class DokanFilesystemAdaptor {
         ops.ReadFile = new DOKAN_OPERATIONS.ReadFileDelegate() {
             @Override
             public long callback(WString fileName, Pointer buffer, int bufferLength, IntByReference readLength, long offset, DokanFileInfo fileInfo) {
+                System.out.println("ReadFile");
                 try {
                     byte[] data = new byte[bufferLength];
                     int read = fs.readFile(fs.getFileHandle(fileName, fileInfo), offset, data, bufferLength);
@@ -177,6 +212,7 @@ public class DokanFilesystemAdaptor {
         ops.WriteFile = new DOKAN_OPERATIONS.WriteFileDelegate() {
             @Override
             public long callback(WString fileName, Pointer buffer, int numberOfBytesToWrite, IntByReference numberOfBytesWritten, long offset, DokanFileInfo fileInfo) {
+                System.out.println("WriteFile");
                 try {
                     byte[] data = new byte[numberOfBytesToWrite];
                     buffer.read(0L, data, 0, numberOfBytesToWrite);
@@ -191,6 +227,7 @@ public class DokanFilesystemAdaptor {
         ops.FlushFileBuffers = new DOKAN_OPERATIONS.FlushFileBuffersDelegate() {
             @Override
             public long callback(WString fileName, DokanFileInfo fileInfo) {
+                System.out.println("FlushFileBuffers");
                 try {
                     fs.flushFileBuffers(fs.getFileHandle(fileName, fileInfo));
                     return NtStatus.Success;
@@ -202,6 +239,7 @@ public class DokanFilesystemAdaptor {
         ops.SetFileAttributes = new DOKAN_OPERATIONS.SetFileAttributesDelegate() {
             @Override
             public long callback(WString fileName, int attributes, DokanFileInfo fileInfo) {
+                System.out.println("SetFileAttributes");
                 try {
                     fs.setFileAttributes(fs.getFileHandle(fileName, fileInfo), attributes);
                     return NtStatus.Success;
@@ -213,6 +251,7 @@ public class DokanFilesystemAdaptor {
         ops.SetFileTime = new DOKAN_OPERATIONS.SetFileTimeDelegate() {
             @Override
             public long callback(WString fileName, FileTime.REF creationTime, FileTime.REF lastAccessTime, FileTime.REF lastWriteTime, DokanFileInfo fileInfo) {
+                System.out.println("SetFileTime");
                 try {
                     fs.setFileTime(fs.getFileHandle(fileName, fileInfo), creationTime.getDate(), lastAccessTime.getDate(), lastWriteTime.getDate());
                     return NtStatus.Success;
@@ -224,6 +263,7 @@ public class DokanFilesystemAdaptor {
         ops.FindStreams = new DOKAN_OPERATIONS.FindStreamsDelegate() {
             @Override
             public long callback(WString fileName, final DOKAN_OPERATIONS.FillWin32FindStreamData fill, final DokanFileInfo fileInfo) {
+                System.out.println("FindStreams");
                 try {
                     fs.findStreams(fs.getFileHandle(fileName, fileInfo), new DokanFilesystem.StreamEmitter() {
                         @Override
@@ -241,6 +281,7 @@ public class DokanFilesystemAdaptor {
         ops.GetFileSecurity = new DOKAN_OPERATIONS.GetFileSecurityDelegate() {
             @Override
             public long callback(WString fileName, int rawRequestedInformation, Pointer rawSecurityDescriptor, int rawSecurityDescriptorLength, IntByReference rawSecurityDescriptorLengthNeeded, DokanFileInfo fileInfo) {
+                System.out.println("GetFileSecurity");
                 try {
                     byte[] out = new byte[rawSecurityDescriptorLength];
                     int expectedLength = fs.getFileSecurity(fs.getFileHandle(fileName, fileInfo), rawRequestedInformation, out);
@@ -255,6 +296,7 @@ public class DokanFilesystemAdaptor {
         ops.SetFileSecurity = new DOKAN_OPERATIONS.SetFileSecurityDelegate() {
             @Override
             public long callback(WString fileName, int rawSecurityInformation, Pointer rawSecurityDescriptor, int rawSecurityDescriptorLength, DokanFileInfo fileInfo) {
+                System.out.println("SetFileSecurity");
                 try {
                     byte[] data = new byte[rawSecurityDescriptorLength];
                     rawSecurityDescriptor.read(0L, data, 0, rawSecurityDescriptorLength);
@@ -268,6 +310,7 @@ public class DokanFilesystemAdaptor {
         ops.DeleteFile = new DOKAN_OPERATIONS.DeleteFileDelegate() {
             @Override
             public long callback(WString fileName, DokanFileInfo rawFileInfo) {
+                System.out.println("DeleteFile");
                 try {
                     fs.deleteFile(fileName.toString());
                     return NtStatus.Success;
@@ -279,6 +322,7 @@ public class DokanFilesystemAdaptor {
         ops.DeleteDirectory = new DOKAN_OPERATIONS.DeleteDirectoryDelegate() {
             @Override
             public long callback(WString fileName, DokanFileInfo rawFileInfo) {
+                System.out.println("DeleteDirectory");
                 try {
                     fs.deleteDirectory(fileName.toString());
                     return NtStatus.Success;
@@ -290,6 +334,7 @@ public class DokanFilesystemAdaptor {
         ops.MoveFile = new DOKAN_OPERATIONS.MoveFileDelegate() {
             @Override
             public long callback(WString oldFileName, WString newFileName, boolean replaceIfExisting, DokanFileInfo rawFileInfo) {
+                System.out.println("MoveFile");
                 try {
                     fs.moveFile(oldFileName.toString(), newFileName.toString(), replaceIfExisting);
                     return NtStatus.Success;
@@ -301,6 +346,7 @@ public class DokanFilesystemAdaptor {
         ops.SetEndOfFile = new DOKAN_OPERATIONS.SetEndOfFileDelegate() {
             @Override
             public long callback(WString fileName, long byteOffset, DokanFileInfo rawFileInfo) {
+                System.out.println("SetEndOfFile");
                 try {
                     fs.setEndOfFile(fs.getFileHandle(fileName, rawFileInfo), byteOffset);
                     return NtStatus.Success;
@@ -312,6 +358,7 @@ public class DokanFilesystemAdaptor {
         ops.SetAllocationSize = new DOKAN_OPERATIONS.SetAllocationSizeDelegate() {
             @Override
             public long callback(WString fileName, long length, DokanFileInfo rawFileInfo) {
+                System.out.println("SetAllocationSize");
                 try {
                     fs.setAllocationSize(fs.getFileHandle(fileName, rawFileInfo), length);
                     return NtStatus.Success;
@@ -323,6 +370,7 @@ public class DokanFilesystemAdaptor {
         ops.LockFile = new DOKAN_OPERATIONS.LockFileDelegate() {
             @Override
             public long callback(WString fileName, long byteOffset, long length, DokanFileInfo rawFileInfo) {
+                System.out.println("LockFile");
                 try {
                     fs.lockFile(fs.getFileHandle(fileName, rawFileInfo), byteOffset, length);
                     return NtStatus.Success;
@@ -334,6 +382,7 @@ public class DokanFilesystemAdaptor {
         ops.UnlockFile = new DOKAN_OPERATIONS.UnlockFileDelegate() {
             @Override
             public long callback(WString fileName, long byteOffset, long length, DokanFileInfo rawFileInfo) {
+                System.out.println("UnlockFile");
                 try {
                     fs.unlockFile(fs.getFileHandle(fileName, rawFileInfo), byteOffset, length);
                     return NtStatus.Success;

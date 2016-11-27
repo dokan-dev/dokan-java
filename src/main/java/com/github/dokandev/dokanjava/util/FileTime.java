@@ -43,6 +43,10 @@ abstract public class FileTime extends Structure {
         dwLowDateTime = (int) ((l >> 0L) & 0xFFFFFFFFL);
     }
 
+    public long getValue() {
+        return ((long)dwLowDateTime & 0xFFFFFFFFL) | ((long)dwHighDateTime << 32L);
+    }
+
     public void setDate(Date date) {
         setValue(toFileTime(date));
     }
