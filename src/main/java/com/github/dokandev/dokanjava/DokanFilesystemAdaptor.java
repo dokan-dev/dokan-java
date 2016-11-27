@@ -65,14 +65,28 @@ public class DokanFilesystemAdaptor {
                         res = result.exists ? ErrorCodes.ERROR_SUCCESS : ErrorCodes.ERROR_FILE_NOT_FOUND;
                     } else {
                         if (rawCreateDisposition == CreationDisposition.CREATE_NEW) {
-                            res = result.exists ? ErrorCodes.ERROR_FILE_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                            //res = result.exists ? ErrorCodes.ERROR_FILE_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                            res = result.exists ? ErrorCodes.ObjectNameCollision : ErrorCodes.ERROR_SUCCESS;
+                            //res = result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                        } else if (rawCreateDisposition == CreationDisposition.TRUNCATE_EXISTING) {
+                            //res = result.exists ? ErrorCodes.ERROR_FILE_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
+                            res = result.exists ? ErrorCodes.ObjectNameCollision : ErrorCodes.ERROR_SUCCESS;
+                            //res = result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
                         } else {
                             res = result.exists ? ErrorCodes.ERROR_ALREADY_EXISTS : ErrorCodes.ERROR_FILE_NOT_FOUND;
                         }
                     }
                     //}
+                } catch (FileAlreadyExistsException t) {
+                    if (rawCreateDisposition == CreationDisposition.CREATE_NEW) {
+                        res = ErrorCodes.ObjectNameCollision;
+                    }
+                    res = ErrorCodes.ERROR_SUCCESS;
                 } catch (Throwable t) {
                     res = exceptionToErrorCode(t);
+                }
+                if (res < 0) {
+                    System.out.println("TEST");
                 }
                 System.out.println(" CREATEFILE -> " + res);
                 return res;
@@ -81,7 +95,7 @@ public class DokanFilesystemAdaptor {
         ops.Cleanup = new DOKAN_OPERATIONS.CleanupDelegate() {
             @Override
             public void callback(WString fileName, DokanFileInfo rawFileInfo) {
-                System.out.println("Cleanup");
+                System.out.println("Cleanup: " + fileName + " : " + rawFileInfo);
                 try {
                     //fs.cleanup(fs.getFileHandle(rawFileInfo));
                     fs.cleanup(fileName.toString());
@@ -140,6 +154,7 @@ public class DokanFilesystemAdaptor {
                     //handleFileInfo.setInfo(fs.getFileInformation(fs.getFileHandle(fileInfo)));
                     info = fs.getFileInformation(fileName.toString());
                     handleFileInfo.setInfo(info);
+                    handleFileInfo.write();
                     result = NtStatus.Success;
                 } catch (Throwable t) {
                     result = exceptionToErrorCode(t);
@@ -185,6 +200,7 @@ public class DokanFilesystemAdaptor {
                     fs.findFiles(fs.getFileHandle(fileName, rawFileInfo), fnmatchToPattern(searchPattern.toString()), new DokanFilesystem.FileEmitter() {
                         @Override
                         public void emit(FileInfo file) {
+                            System.out.println("EMIT: " + file.fileName);
                             rawFillFindData.callback(file.toWin32FindData(), rawFileInfo);
                         }
                     });

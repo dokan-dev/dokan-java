@@ -60,28 +60,24 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     }
 
     public void setFileSize(long size) {
-        nFileSizeHigh = (int)((size >> 32L) & 0xFFFFFFFFL);
-        nFileSizeLow = (int)((size >> 0L) & 0xFFFFFFFFL);
+        nFileSizeHigh = (int) ((size >> 32L) & 0xFFFFFFFFL);
+        nFileSizeLow = (int) ((size >> 0L) & 0xFFFFFFFFL);
     }
 
     public void setFileIndex(long index) {
-        nFileIndexHigh = (int)((index >> 32L) & 0xFFFFFFFFL);
-        nFileIndexLow = (int)((index >> 0L) & 0xFFFFFFFFL);
+        nFileIndexHigh = (int) ((index >> 32L) & 0xFFFFFFFFL);
+        nFileIndexLow = (int) ((index >> 0L) & 0xFFFFFFFFL);
     }
 
     @Override
     protected List getFieldOrder() {
         return Arrays.asList(
                 "dwFileAttributes",
-                "ftCreationTime",
-                "ftLastAccessTime",
-                "ftLastWriteTime",
+                "ftCreationTime", "ftLastAccessTime", "ftLastWriteTime",
                 "dwVolumeSerialNumber",
-                "nFileSizeHigh",
-                "nFileSizeLow",
+                "nFileSizeHigh", "nFileSizeLow",
                 "dwNumberOfLinks",
-                "nFileIndexHigh",
-                "nFileIndexLow"
+                "nFileIndexHigh", "nFileIndexLow"
         );
     }
 

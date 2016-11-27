@@ -57,7 +57,9 @@ public class Example {
                         break;
                     case CreationDisposition.CREATE_NEW: {
                         System.out.println("CREATE_NEW:");
-                        if (root.exists(fileName)) throw new FileAlreadyExistsException("");
+                        if (root.exists(fileName)) {
+                            throw new FileAlreadyExistsException(fileName);
+                        }
                         Node n = root.createFile(fileName);
                         if (!isDirectory) {
                             n.set(new byte[0]);
@@ -71,12 +73,13 @@ public class Example {
                     case CreationDisposition.OPEN_EXISTING:
                         System.out.println("OPEN_EXISTING:");
                         root.findExistant(fileName);
-                        exists = false;
                         break;
                     case CreationDisposition.TRUNCATE_EXISTING:
                         System.out.println("TRUNCATE_EXISTING:");
-                        root.findExistant(fileName).set(new byte[0]);
-                        exists = false;
+                        root.findExistant(fileName);
+                        if (!isDirectory) {
+                            root.find(fileName, true).set(new byte[0]);
+                        }
                         break;
                 }
 
