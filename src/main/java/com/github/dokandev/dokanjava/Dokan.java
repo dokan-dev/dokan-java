@@ -20,7 +20,7 @@ public class Dokan {
         return opts;
     }
 
-    static public int main(String mountPoint, DokanFilesystem<DokanFileHandle> fs) {
+    static public int main(String mountPoint, DokanFilesystem<? extends DokanFileHandle> fs) {
         //Runtime.getRuntime().addShutdownHook(new Thread() {
         //    @Override
         //    public void run() {
