@@ -1,6 +1,5 @@
 plugins {
   id 'java'
-  id 'visual-studio'
   id 'eclipse'
   id 'maven-publish'
 }
@@ -9,8 +8,8 @@ repositories {
   jcenter()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
   compile 'com.google.guava:guava:18.0'
@@ -42,9 +41,9 @@ task sourcesJar(type: Jar) {
 publishing {
   publications {
     maven(MavenPublication) {
-      groupId 'com.github.dokan-dev.dokan-java'
-      artifactId 'dokan-java'
-      version '0.1-SNAPSHOT'
+      groupId 'com.dokany'
+      artifactId 'dokany-java'
+      version '0.1'
 
       from components.java
       artifact sourcesJar { classifier 'sources' }
