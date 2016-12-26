@@ -2,11 +2,11 @@ package com.dokany.java.structure;
 
 public class ByHandleFileInformation extends FileInfo {
 
-	ByHandleFileInformation(final Builder builder, final int volumeSerialNumber, final int numberOfLinks) {
+	ByHandleFileInformation(final Builder builder, final int numberOfLinks, final int volumeSerialNumber) {
 		super(builder);
 
-		dwVolumeSerialNumber = volumeSerialNumber;
 		dwNumberOfLinks = numberOfLinks;
+		dwVolumeSerialNumber = volumeSerialNumber;
 	}
 
 	public ByHandleFileInformation() {
