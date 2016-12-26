@@ -1,24 +1,6 @@
-/*
- * Dokan-Java : Java library for Dokan
- *
- * Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.dokany.java.constants;
 
 public enum WinError {
-	ERROR_SUCCESS(0),
 	ERROR_INVALID_FUNCTION(1),
 	ERROR_FILE_NOT_FOUND(2),
 	ERROR_PATH_NOT_FOUND(3),
@@ -28,15 +10,12 @@ public enum WinError {
 	ERROR_INVALID_ACCESS(12),
 	ERROR_INVALID_DATA(13),
 	ERROR_INVALID_DRIVE(15),
-	ERROR_WRITE_FAULT(29),
-	ERROR_READ_FAULT(30),
 	ERROR_GEN_FAILURE(31),
 	ERROR_SHARING_VIOLATION(32),
 	ERROR_LOCK_VIOLATION(33),
 	ERROR_HANDLE_EOF(38),
 	ERROR_HANDLE_DISK_FULL(39),
 	ERROR_NOT_SUPPORTED(50),
-	ERROR_FILE_EXISTS(80),
 	ERROR_CANNOT_MAKE(82),
 	ERROR_INVALID_PARAMETER(87),
 	ERROR_DRIVE_LOCKED(108),
