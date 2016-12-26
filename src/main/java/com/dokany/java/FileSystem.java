@@ -10,7 +10,6 @@ import java.util.Date;
 import com.dokany.java.structure.FileInfo;
 import com.sun.jna.WString;
 
-//@SuppressWarnings("WeakerAccess")
 public interface FileSystem<TItem> {
 
 	FileHandleStore fileHandles = new FileHandleStore();

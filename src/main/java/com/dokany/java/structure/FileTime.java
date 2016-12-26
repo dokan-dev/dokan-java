@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.sun.jna.Structure;
 
-//@SuppressWarnings({ "PointlessBitwiseExpression", "WeakerAccess" })
 public class FileTime extends Structure {
 	private static final long EPOCH_DIFF = 11644473600000L;
 

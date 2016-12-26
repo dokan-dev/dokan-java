@@ -1,6 +1,5 @@
 package com.dokany.java.constants;
 
-//@SuppressWarnings({"unused", "WeakerAccess"})
 public enum NtStatus {
 	Success(0x00000000),
 	Wait1(0x00000001),

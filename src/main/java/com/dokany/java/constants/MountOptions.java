@@ -1,7 +1,6 @@
 package com.dokany.java.constants;
 
 public enum MountOptions {
-
 	FIXED_DRIVE(0),
 	DEBUG_MODE(1),
 	STD_ERR_OUTPUT(2),
