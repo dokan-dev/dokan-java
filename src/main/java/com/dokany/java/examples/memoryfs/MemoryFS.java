@@ -1,6 +1,10 @@
 package com.dokany.java.examples.memoryfs;
 
+import static com.dokany.java.constants.CreationDisposition.CREATE_ALWAYS;
+import static com.dokany.java.constants.FileAttribute.FILE_ATTRIBUTE_NORMAL;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import com.dokany.java.FileHandle;
@@ -16,16 +20,17 @@ public class MemoryFS implements FileSystem<Node> {
 	private final Node root;
 
 	public MemoryFS() throws IOException {
-		// root = new Node();
-		root = null;
+		root = new Node();
+		createHandle("Root", root);
+		// root = null;
 
-		// final Node item1 = root.createFile("1.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
-		// item1.setData(new byte[] { 'H', 'E', 'L', 'L', 'O' });
+		final Node item1 = root.createFile("1.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		item1.setData(new byte[] { 'H', 'E', 'L', 'L', 'O' });
 
-		// final Node item2 = root.createFile("2.txt", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		root.createFile("2.txt", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
 
-		// final Node item3 = root.createFile("testFolder\\3.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
-		// item3.setData("File within test folder".getBytes(StandardCharsets.UTF_8));
+		final Node item3 = root.createFile("testFolder\\3.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		item3.setData("File within test folder".getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**
