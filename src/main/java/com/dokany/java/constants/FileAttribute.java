@@ -31,6 +31,14 @@ public enum FileAttribute {
 				return current;
 			}
 		}
-		throw new IllegalArgumentException("Invalid int value for disposition");
+		throw new IllegalArgumentException("Invalid int value for FileAttribute");
+	}
+
+	public static FileAttribute fromAttributes(final FileAttribute... attributes) {
+		int toReturn = 0;
+		for (final FileAttribute current : attributes) {
+			toReturn |= current.val;
+		}
+		return fromInt(toReturn);
 	}
 }
