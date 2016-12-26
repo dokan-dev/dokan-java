@@ -3,8 +3,6 @@ package com.dokany.java;
 import static com.dokany.java.constants.FileSystemFeatures.CasePreservedNames;
 
 import java.io.IOException;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.util.Date;
 
 import com.dokany.java.constants.CreationDisposition;
@@ -95,9 +93,11 @@ public interface FileSystem<TItem> {
 		return "DOKANY";
 	}
 
-	public default int getFileSecurity(final FileHandle<TItem> handle, final int kind, final byte[] out) {
+	public default int getSecurity(final FileHandle<TItem> handle, final int kind, final byte[] out) {
 		return 0;
 	}
+
+	public void setSecurity(final FileHandle<TItem> handleHandle, final int kind, final byte[] data);
 
 	/**
 	 * Default is FileSystemFeatures.CasePreservedNames
@@ -109,12 +109,12 @@ public interface FileSystem<TItem> {
 	}
 
 	public default FileHandle<TItem> getFileHandle(final WString fileName, final long id) throws IOException {
-		return getFileHandle(fileName.toString(), id);
+		return getHandle(fileName.toString(), id);
 	}
 
 	public FileInfo getFileInformation(final FileHandle<TItem> handle) throws IOException;
 
-	public FileHandle<TItem> getFileHandle(final String fileName, final long id) throws IOException;
+	public FileHandle<TItem> getHandle(final String fileName, final long id) throws IOException;
 
 	public FileHandle<TItem> createHandle(final String fileName) throws IOException;
 
@@ -129,49 +129,47 @@ public interface FileSystem<TItem> {
 
 	public void cleanup(final FileHandle<TItem> handle);
 
-	public void closeFile(final FileHandle<TItem> handle);
+	public void close(final FileHandle<TItem> handle);
 
 	public void mounted();
 
 	public void unmounted();
 
-	public void unlockFile(final FileHandle<TItem> handle, final long byteOffset, final long length);
+	/**
+	 * Only used if dokan option UserModeLock is enabled
+	 */
+	public void unlock(final FileHandle<TItem> handle, final long byteOffset, final long length);
 
-	public void lockFile(final FileHandle<TItem> handle, final long byteOffset, final long length);
+	/**
+	 * Only used if dokan option UserModeLock is enabled
+	 */
+	public void lock(final FileHandle<TItem> handle, final long byteOffset, final long length);
 
 	public void setAllocationSize(final FileHandle<TItem> handle, final long length);
 
 	public void setEndOfFile(final FileHandle<TItem> handle, final long byteOffset);
 
-	public void moveFile(final FileHandle<TItem> oldHandle, final FileHandle<TItem> newHandle, final boolean replaceIfExisting) throws IOException;
+	public void move(final FileHandle<TItem> oldHandle, final FileHandle<TItem> newHandle, final boolean replaceIfExisting) throws IOException;
 
 	public void deleteFile(final FileHandle<TItem> handle) throws IOException;
 
 	public void deleteDirectory(final FileHandle<TItem> handle) throws IOException;
 
-	public int readFile(final FileHandle<TItem> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException;
+	public int read(final FileHandle<TItem> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException;
 
-	public int writeFile(final FileHandle<TItem> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException;
+	public int write(final FileHandle<TItem> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException;
+
+	public long truncate(final FileHandle<TItem> handle) throws IOException;
 
 	public void findFiles(final FileHandle<TItem> handle, final FileEmitter emitter) throws IOException;
 
-	public default void findFiles(final FileHandle<TItem> handle, final PathMatcher pathMatcher, final FileEmitter emitter) throws IOException {
-		findFiles(handle, file -> {
-			if (pathMatcher.matches(Paths.get(file.fileName))) {
-				emitter.emit(file);
-			}
-		});
-	}
+	public void findStreams(final FileHandle<TItem> handle, final StreamEmitter emitter) throws IOException;
 
 	public void flushFileBuffers(final FileHandle<TItem> handle);
 
-	public void setFileAttributes(final FileHandle<TItem> handle, final int attributes);
+	public void setAttributes(final FileHandle<TItem> handle, final int attributes);
 
-	public void setFileTime(final FileHandle<TItem> handle, final Date creation, final Date access, final Date modification);
-
-	public void findStreams(final FileHandle<TItem> handle, final StreamEmitter emitter);
-
-	public void setFileSecurity(final FileHandle<TItem> handleHandle, final int kind, final byte[] data);
+	public void setTime(final FileHandle<TItem> handle, final Date creation, final Date access, final Date modification);
 
 	public interface FileEmitter {
 		void emit(FileInfo info);
