@@ -6,11 +6,12 @@ import java.util.List;
 
 import com.dokany.java.constants.FileAttribute;
 import com.sun.jna.Structure;
+import com.sun.jna.WString;
 
 public class FileInfo extends Structure implements Structure.ByReference {
 	public int dwFileAttributes;
 
-	public int dwNumberOfLinks;
+	public int dwNumberOfLinks = 1;
 	public int dwVolumeSerialNumber;
 
 	public long fileIndex;
@@ -64,7 +65,14 @@ public class FileInfo extends Structure implements Structure.ByReference {
 		return builder.buildWin32FindData();
 	}
 
-	public void setByHandleFileInfo(final ByHandleFileInformation info) {
+	public ByHandleFileInformation toByHandleFileInformation(final int numberOfLinks, final int volumeSerialNumber) {
+		if (builder == null) {
+			throw new IllegalStateException("Builder cannot be null");
+		}
+		return builder.buildByHandleFileInformation(numberOfLinks, volumeSerialNumber);
+	}
+
+	public void copyTo(final ByHandleFileInformation info) {
 		info.index(fileIndex);
 		info.size(fileSize);
 		info.dwNumberOfLinks = dwNumberOfLinks;
@@ -124,6 +132,10 @@ public class FileInfo extends Structure implements Structure.ByReference {
 		private long size;
 		private long index;
 
+		public Builder(final WString name) {
+			this(name.toString());
+		}
+
 		public Builder(final String name) {
 			this.name = name;
 		}
@@ -136,8 +148,8 @@ public class FileInfo extends Structure implements Structure.ByReference {
 			return new Win32FindData(this);
 		}
 
-		public ByHandleFileInformation buildByHandleFileInformation(final int volumeSerialNumber, final int numberOfLinks) {
-			return new ByHandleFileInformation(this, volumeSerialNumber, numberOfLinks);
+		public ByHandleFileInformation buildByHandleFileInformation(final int numberOfLinks, final int volumeSerialNumber) {
+			return new ByHandleFileInformation(this, numberOfLinks, volumeSerialNumber);
 		}
 
 		public Builder size(final long size) {
@@ -145,8 +157,8 @@ public class FileInfo extends Structure implements Structure.ByReference {
 			return this;
 		}
 
-		public Builder attributes(final FileAttribute attributes) {
-			this.attributes = attributes;
+		public Builder attributes(final FileAttribute... attributes) {
+			this.attributes = FileAttribute.fromAttributes(attributes);
 			return this;
 		}
 
