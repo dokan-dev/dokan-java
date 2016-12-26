@@ -14,9 +14,7 @@ import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
-//@SuppressWarnings({"unused", "WeakerAccess"})
 public class Operations extends Structure implements Structure.ByReference {
-
 	interface ZwCreateFileDelegate extends Callback {
 		long callback(
 		        WString rawFileName,
@@ -30,11 +28,13 @@ public class Operations extends Structure implements Structure.ByReference {
 	}
 
 	interface CleanupDelegate extends Callback {
-		void callback(WString rawFileName, FileInfoRaw rawFileInfo);
+		void callback(WString rawFileName,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface CloseFileDelegate extends Callback {
-		void callback(WString rawFileName, FileInfoRaw rawFileInfo);
+		void callback(WString rawFileName,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface ReadFileDelegate extends Callback {
@@ -72,15 +72,19 @@ public class Operations extends Structure implements Structure.ByReference {
 	}
 
 	interface FindFilesDelegate extends Callback {
-		long callback(WString rawFileName, FillWin32FindData rawFillFindData, FileInfoRaw rawFileInfo);
+		long callback(WString rawFileName,
+		        FillWin32FindData rawFillFindData,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface FillWin32FindData extends Callback {
-		void callback(Win32FindData rawFillFindData, FileInfoRaw rawFileInfo);
+		void callback(Win32FindData rawFillFindData,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface FillWin32FindStreamData extends Callback {
-		void callback(Win32FindStreamData rawFillFindData, FileInfoRaw rawFileInfo);
+		void callback(Win32FindStreamData rawFillFindData,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface FindFilesWithPatternDelegate extends Callback {
@@ -92,7 +96,9 @@ public class Operations extends Structure implements Structure.ByReference {
 	}
 
 	interface SetFileAttributesDelegate extends Callback {
-		long callback(WString rawFileName, int rawAttributes, FileInfoRaw rawFileInfo);
+		long callback(WString rawFileName,
+		        int rawAttributes,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface SetFileTimeDelegate extends Callback {
@@ -126,31 +132,39 @@ public class Operations extends Structure implements Structure.ByReference {
 
 	interface SetEndOfFileDelegate extends Callback {
 		long callback(
-		        WString rawFileName, long rawByteOffset,
+		        WString rawFileName,
+		        long rawByteOffset,
 		        FileInfoRaw rawFileInfo);
 	}
 
 	interface SetAllocationSizeDelegate extends Callback {
 		long callback(
-		        WString rawFileName, long rawLength,
+		        WString rawFileName,
+		        long rawLength,
 		        FileInfoRaw rawFileInfo);
 	}
 
 	interface LockFileDelegate extends Callback {
 		long callback(
-		        WString rawFileName, long rawByteOffset, long rawLength,
+		        WString rawFileName,
+		        long rawByteOffset,
+		        long rawLength,
 		        FileInfoRaw rawFileInfo);
 	}
 
 	interface UnlockFileDelegate extends Callback {
 		long callback(
-		        WString rawFileName, long rawByteOffset, long rawLength,
+		        WString rawFileName,
+		        long rawByteOffset,
+		        long rawLength,
 		        FileInfoRaw rawFileInfo);
 	}
 
 	interface GetDiskFreeSpaceDelegate extends Callback {
 		long callback(
-		        LongByReference rawFreeBytesAvailable, LongByReference rawTotalNumberOfBytes, LongByReference rawTotalNumberOfFreeBytes,
+		        LongByReference rawFreeBytesAvailable,
+		        LongByReference rawTotalNumberOfBytes,
+		        LongByReference rawTotalNumberOfFreeBytes,
 		        FileInfoRaw rawFileInfo);
 	}
 
@@ -186,7 +200,9 @@ public class Operations extends Structure implements Structure.ByReference {
 	}
 
 	interface FindStreamsDelegate extends Callback {
-		long callback(WString rawFileName, FillWin32FindStreamData rawFillFindData, FileInfoRaw rawFileInfo);
+		long callback(WString rawFileName,
+		        FillWin32FindStreamData rawFillFindData,
+		        FileInfoRaw rawFileInfo);
 	}
 
 	interface MountedDelegate extends Callback {
