@@ -23,4 +23,13 @@ public enum FileSystemFeatures {
 	private FileSystemFeatures(final int val) {
 		this.val = val;
 	}
+
+	public static FileSystemFeatures fromInt(final int value) {
+		for (final FileSystemFeatures current : values()) {
+			if (current.val == value) {
+				return current;
+			}
+		}
+		throw new IllegalArgumentException("Invalid int value for FileSystemFeatures");
+	}
 }
