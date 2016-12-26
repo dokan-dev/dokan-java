@@ -20,12 +20,17 @@ public class FileHandleStore {
 			id = availableIds.remove();
 		}
 		handles.put(id, handle);
-		System.out.println("&&&&&&&&& ALLOCATE: " + id);
+		handle.setID(id);
 		return id;
 	}
 
+	/**
+	 * Returns the handle that was removed
+	 *
+	 * @param id
+	 * @return
+	 */
 	public final <TItem> FileHandle<TItem> removeFileHandle(final long id) {
-		System.out.println("&&&&&&&&& REMOVE: " + id);
 		final FileHandle<TItem> handle = handles.remove(id);
 		availableIds.add(id);
 		return handle;
@@ -33,10 +38,9 @@ public class FileHandleStore {
 
 	public final <TItem> FileHandle<TItem> getFileHandle(final String fileName, final long id) throws IOException {
 		if (id == 0) {
-			System.out.println("*");
+			System.out.println("ID == 0; will return null");
 			return null;
 		}
-		System.out.println("&&&&&&&&& GET: " + id);
 		return handles.get(id);
 	}
 }
