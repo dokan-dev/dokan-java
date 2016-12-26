@@ -70,4 +70,24 @@ public class Utils {
 	public static String trimStrToSize(final String str, final int len) {
 		return str.substring(0, Math.min(str.length(), len));
 	}
+
+	/**
+	 * Test whether object is null
+	 *
+	 * @param obj
+	 * @return
+	 */
+	public static boolean isNull(final Object obj) {
+		return obj == null;
+	}
+
+	/**
+	 * Test whether object is null
+	 *
+	 * @param obj
+	 * @return
+	 */
+	public static boolean isNotNull(final Object obj) {
+		return !isNull(obj);
+	}
 }
