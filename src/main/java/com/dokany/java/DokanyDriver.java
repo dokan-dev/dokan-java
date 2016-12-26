@@ -29,6 +29,9 @@ public class DokanyDriver<TItem> {
 		driverOptions.Timeout = fs.getTimeout();
 		driverOptions.AllocationUnitSize = fs.getAllocationUnitSize();
 		driverOptions.SectorSize = fs.getSectorSize();
+
+		System.out.println("Dokany version: " + getVersion());
+		System.out.println("Dokany driver version: " + getDriverVersion());
 	}
 
 	public long getDriverVersion() {
@@ -44,9 +47,6 @@ public class DokanyDriver<TItem> {
 	}
 
 	public void start() {
-		System.out.println("Dokany version: " + getVersion());
-		System.out.println("Dokany driver version: " + getDriverVersion());
-
 		NativeMethods.DokanMain(driverOptions, new OperationsImpl<TItem>(fs) {
 		});
 
