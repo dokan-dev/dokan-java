@@ -1,31 +1,31 @@
-package com.dokany.java.examples;
-
-import static com.dokany.java.constants.FileAttribute.FILE_ATTRIBUTE_NORMAL;
+package com.dokany.java.examples.memoryfs;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import com.dokany.java.FileHandle;
 import com.dokany.java.FileSystem;
 import com.dokany.java.constants.CreationDisposition;
+import com.dokany.java.constants.ErrorCodes;
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.structure.FileInfo;
+import com.dokany.java.structure.FileTime;
 
-public class ExampleFS implements FileSystem<Node> {
+public class MemoryFS implements FileSystem<Node> {
 
 	private final Node root;
 
-	public ExampleFS() throws IOException {
-		root = new Node();
+	public MemoryFS() throws IOException {
+		// root = new Node();
+		root = null;
 
-		final Node item1 = root.createFile("1.TXT", CreationDisposition.CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
-		item1.setData(new byte[] { 'H', 'E', 'L', 'L', 'O' });
+		// final Node item1 = root.createFile("1.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		// item1.setData(new byte[] { 'H', 'E', 'L', 'L', 'O' });
 
-		final Node item2 = root.createFile("2.txt", CreationDisposition.CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		// final Node item2 = root.createFile("2.txt", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
 
-		final Node item3 = root.createFile("testFolder\\3.TXT", CreationDisposition.CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
-		item3.setData("File within test folder".getBytes(StandardCharsets.UTF_8));
+		// final Node item3 = root.createFile("testFolder\\3.TXT", CREATE_ALWAYS, 0, false, FILE_ATTRIBUTE_NORMAL);
+		// item3.setData("File within test folder".getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public FileHandle<Node> getFileHandle(final String fileName, final long id) throws IOException {
+	public FileHandle<Node> getHandle(final String fileName, final long id) throws IOException {
 		FileHandle<Node> handle = fileHandles.getFileHandle(fileName, id);
 		if (handle == null) {
 			handle = createHandle(fileName);
@@ -96,6 +96,11 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
+	public void findStreams(final FileHandle<Node> handle, final StreamEmitter emitter) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public void deleteFile(final FileHandle<Node> handle) throws IOException {
 		root.findExisting(handle.getFileName()).delete();
 	}
@@ -106,7 +111,7 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public void moveFile(final FileHandle<Node> oldHandle, final FileHandle<Node> newHandle, final boolean replaceIfExisting) throws IOException {
+	public void move(final FileHandle<Node> oldHandle, final FileHandle<Node> newHandle, final boolean replaceIfExisting) throws IOException {
 		root.findExisting(newHandle.getFileName()).replaceWith(root.findExisting(oldHandle.getFileName()));
 
 		// was originally findOrCreateNew, but this seemed wrong
@@ -114,12 +119,12 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public int readFile(final FileHandle<Node> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException {
+	public int read(final FileHandle<Node> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException {
 		return handle.getItem().read(fileOffset, data, dataLength);
 	}
 
 	@Override
-	public int writeFile(final FileHandle<Node> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException {
+	public int write(final FileHandle<Node> handle, final long fileOffset, final byte[] data, final int dataLength) throws IOException {
 		return handle.getItem().write(fileOffset, data, dataLength);
 	}
 
@@ -129,12 +134,12 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public void unlockFile(final FileHandle<Node> handle, final long byteOffset, final long length) {
+	public void unlock(final FileHandle<Node> handle, final long byteOffset, final long length) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void lockFile(final FileHandle<Node> handle, final long byteOffset, final long length) {
+	public void lock(final FileHandle<Node> handle, final long byteOffset, final long length) {
 		// TODO Auto-generated method stub
 	}
 
@@ -154,22 +159,17 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public void setFileAttributes(final FileHandle<Node> handle, final int attributes) {
+	public void setAttributes(final FileHandle<Node> handle, final int attributes) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void setFileTime(final FileHandle<Node> handle, final Date creation, final Date access, final Date modification) {
+	public void setTime(final FileHandle<Node> handle, final Date creation, final Date access, final Date modification) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void findStreams(final FileHandle<Node> handle, final StreamEmitter emitter) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setFileSecurity(final FileHandle<Node> handle, final int kind, final byte[] data) {
+	public void setSecurity(final FileHandle<Node> handle, final int kind, final byte[] data) {
 		// TODO Auto-generated method stub
 	}
 
@@ -179,7 +179,7 @@ public class ExampleFS implements FileSystem<Node> {
 	}
 
 	@Override
-	public void closeFile(final FileHandle<Node> handle) {
+	public void close(final FileHandle<Node> handle) {
 		// TODO Auto-generated method stub
 	}
 
@@ -191,16 +191,27 @@ public class ExampleFS implements FileSystem<Node> {
 	@Override
 	public void unmounted() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes) throws IOException {
+	public Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes)
+	        throws IOException {
 		return root.createFile(fileName, disposition, options, isDirectory, attributes);
 	}
 
 	@Override
 	public Node findExisting(final String fileName, final boolean isDirectory) throws IOException {
 		return root.findExisting(fileName);
+	}
+
+	@Override
+	public long truncate(final FileHandle<Node> handle) throws IOException {
+		handle.getItem().setData(new byte[0]);
+		final FileTime.VAL now = new FileTime.VAL();
+		handle.getFileInfo().ftLastAccessTime = now;
+		handle.getFileInfo().ftLastWriteTime = now;
+		// TODO: Update parent times??
+		// handle.getFileInfo().fileIndex = nextFileHandleId();
+		return ErrorCodes.ERROR_ALREADY_EXISTS.val;
 	}
 }

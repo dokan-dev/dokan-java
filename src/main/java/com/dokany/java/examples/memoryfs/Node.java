@@ -1,4 +1,4 @@
-package com.dokany.java.examples;
+package com.dokany.java.examples.memoryfs;
 
 import static com.dokany.java.constants.ErrorCodes.ERROR_READ_FAULT;
 
@@ -19,6 +19,11 @@ class Node {
 	private final LinkedHashMap<String, Node> children = new LinkedHashMap<String, Node>();
 	private byte[] data = null;
 	public Date date = new Date();
+
+	// constructor
+	Node() {
+
+	}
 
 	Node createChild(final String name) {
 		final Node child = new Node();
@@ -50,7 +55,8 @@ class Node {
 		return find(path, false);
 	}
 
-	Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes) throws IOException {
+	Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes)
+	        throws IOException {
 		// TODO: Add other parameters
 		return find(fileName, true);
 	}

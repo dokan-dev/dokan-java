@@ -1,4 +1,4 @@
-package com.dokany.java.examples;
+package com.dokany.java.examples.memoryfs;
 
 import static com.dokany.java.constants.FileAttribute.FILE_ATTRIBUTE_DIRECTORY;
 import static com.dokany.java.constants.FileAttribute.FILE_ATTRIBUTE_NORMAL;
