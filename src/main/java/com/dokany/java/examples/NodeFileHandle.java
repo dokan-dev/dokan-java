@@ -21,6 +21,6 @@ class NodeFileHandle extends FileHandle<Node> {
 
 	@Override
 	public FileInfo getFileInfo() {
-		return NodeFileHandle.getFileInfo(item);
+		return NodeFileHandle.getFileInfo(getItem());
 	}
 }
