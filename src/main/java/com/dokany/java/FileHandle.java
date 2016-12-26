@@ -12,4 +12,9 @@ public abstract class FileHandle<TItem> {
 	}
 
 	public abstract FileInfo getFileInfo();
+
+	@Override
+	public String toString() {
+		return fileName;
+	}
 }
