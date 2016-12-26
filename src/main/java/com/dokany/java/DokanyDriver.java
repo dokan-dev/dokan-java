@@ -29,7 +29,7 @@ public class DokanyDriver<TItem> {
 			options |= STD_ERR_OUTPUT.val;
 		}
 
-		final short threadCount = 5;
+		final short threadCount = 1;
 		driverOptions = new DeviceOptions(mountPoint, threadCount, options, null, fs.getTimeout(), fs.getAllocationUnitSize(), fs.getSectorSize());
 
 		System.out.println("Dokany version: " + getVersion());
