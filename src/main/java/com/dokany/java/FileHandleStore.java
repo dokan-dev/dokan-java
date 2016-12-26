@@ -8,7 +8,7 @@ import java.util.Queue;
 
 public class FileHandleStore {
 
-	private long lastAvailableId = 1;
+	private long lastAvailableId = 0;
 	private final Queue<Long> availableIds = new LinkedList<Long>();
 	final Map<Long, FileHandle> handles = new HashMap<>();
 
@@ -37,10 +37,6 @@ public class FileHandleStore {
 	}
 
 	public final <TItem> FileHandle<TItem> getFileHandle(final String fileName, final long id) throws IOException {
-		if (id == 0) {
-			System.out.println("ID == 0; will return null");
-			return null;
-		}
 		return handles.get(id);
 	}
 }
