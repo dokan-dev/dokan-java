@@ -127,6 +127,10 @@ class Node {
 		return name;
 	}
 
+	Node getParent() {
+		return parent;
+	}
+
 	LinkedHashMap<String, Node> getChildren() {
 		return children;
 	}

@@ -206,11 +206,21 @@ public class MemoryFS implements FileSystem<Node> {
 
 	@Override
 	public long truncate(final FileHandle<Node> handle) throws IOException {
-		handle.getItem().setData(new byte[0]);
+		final Node item = handle.getItem();
+		final Node parent = item.getParent();
+
+		item.setData(new byte[0]);
+
+		final FileInfo fileInfo = handle.getFileInfo();
+		final FileInfo parentFileInfo = createHandle(parent.getName(), parent).getFileInfo();
+
 		final FileTime.VAL now = new FileTime.VAL();
-		handle.getFileInfo().ftLastAccessTime = now;
-		handle.getFileInfo().ftLastWriteTime = now;
-		// TODO: Update parent times??
+
+		fileInfo.ftLastAccessTime = now;
+		parentFileInfo.ftLastAccessTime = now;
+		fileInfo.ftLastWriteTime = now;
+		parentFileInfo.ftLastWriteTime = now;
+
 		// handle.getFileInfo().fileIndex = nextFileHandleId();
 		return ErrorCodes.ERROR_ALREADY_EXISTS.val;
 	}
