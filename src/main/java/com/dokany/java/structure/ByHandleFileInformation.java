@@ -1,5 +1,9 @@
 package com.dokany.java.structure;
 
+/**
+ * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363788%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">BY_HANDLE_FILE_INFORMATION structure (MSDN)</a>
+ *
+ */
 public class ByHandleFileInformation extends FileInfo {
 
 	ByHandleFileInformation(final Builder builder, final int numberOfLinks, final int volumeSerialNumber) {
@@ -11,13 +15,4 @@ public class ByHandleFileInformation extends FileInfo {
 
 	public ByHandleFileInformation() {
 	}
-
-	// public ByHandleFileInformation(final int fileAttribute, final long
-	// creationTime, final long lastAccessTime, final long lastWriteTime, final
-	// int volumeSerialNumber, final long fileSize, final int numberOfLinks,
-	// final long fileIndex) {
-	// super(null, fileSize, FileAttribute.fromInt(fileAttribute), new
-	// FileTime(creationTime), new FileTime(lastAccessTime), new
-	// FileTime(lastWriteTime), fileIndex);
-	// }
 }
