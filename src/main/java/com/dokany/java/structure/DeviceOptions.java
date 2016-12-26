@@ -16,42 +16,42 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Version of the dokan features requested (version "123" is equal to Dokan version 1.2.3). Currently is 100.
 	 */
-	public final short Version = 100;
+	public short Version = 100;
 
 	/**
 	 * Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.
 	 */
-	public final short ThreadCount;
+	public short ThreadCount;
 
 	/**
 	 * Features enable for the mount. See DokanOptions
 	 */
-	public final int Options;
+	public int Options;
 
 	/**
 	 * FileSystem can store anything here
 	 */
-	public final long GlobalContext = 0L;
+	public long GlobalContext = 0L;
 
 	/**
 	 * Mount point. Can be M:\\ (drive letter) or C:\\mount\\dokan (path in NTFS).
 	 */
-	public final WString MountPoint;
+	public WString MountPoint;
 
 	/**
 	 * UNC name used for network volume.
 	 */
-	public final WString UNCName;
+	public WString UNCName;
 
 	/**
 	 * Max timeout in milliseconds of each request before Dokan give up.
 	 */
-	public final long Timeout;
+	public long Timeout;
 
 	/**
 	 * Allocation Unit Size of the volume.
 	 */
-	public final long AllocationUnitSize;
+	public long AllocationUnitSize;
 
 	/**
 	 * Sector Size of the volume.
