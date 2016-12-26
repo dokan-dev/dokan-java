@@ -61,6 +61,7 @@ public class FileTime extends Structure {
 
 	public static class VAL extends FileTime implements Structure.ByValue {
 		public VAL() {
+			super();
 		}
 
 		public VAL(final long l) {
@@ -74,6 +75,7 @@ public class FileTime extends Structure {
 
 	public static class REF extends FileTime implements Structure.ByReference {
 		public REF() {
+			super();
 		}
 
 		public REF(final long l) {
