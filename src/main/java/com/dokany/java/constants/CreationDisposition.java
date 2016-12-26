@@ -23,6 +23,6 @@ public enum CreationDisposition {
 				return current;
 			}
 		}
-		throw new IllegalArgumentException("Invalid int value for disposition");
+		throw new IllegalArgumentException("Invalid int value for CreationDisposition");
 	}
 }
