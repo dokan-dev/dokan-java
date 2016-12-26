@@ -26,6 +26,10 @@ public interface FileSystem<TItem> {
 		return false;
 	}
 
+	public default Date getRootCreateDate() {
+		return new Date();
+	}
+
 	public default int getMaxComponentLength() {
 		return 256;
 	}
@@ -108,11 +112,11 @@ public interface FileSystem<TItem> {
 		return CasePreservedNames.val;
 	}
 
-	public default FileHandle<TItem> getFileHandle(final WString fileName, final long id) throws IOException {
+	public FileInfo getFileInformation(final FileHandle<TItem> handle) throws IOException;
+
+	public default FileHandle<TItem> getHandle(final WString fileName, final long id) throws IOException {
 		return getHandle(fileName.toString(), id);
 	}
-
-	public FileInfo getFileInformation(final FileHandle<TItem> handle) throws IOException;
 
 	public FileHandle<TItem> getHandle(final String fileName, final long id) throws IOException;
 
