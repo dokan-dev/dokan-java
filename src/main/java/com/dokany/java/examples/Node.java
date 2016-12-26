@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 
 import com.dokany.java.DokanyException;
 import com.dokany.java.Utils;
+import com.dokany.java.constants.CreationDisposition;
+import com.dokany.java.constants.FileAttribute;
 
 class Node {
 	private String name;
@@ -44,30 +46,22 @@ class Node {
 		}
 	}
 
-	boolean exists(final String path) {
-		try {
-			find(path, false);
-			return true;
-		} catch (final IOException e) {
-			return false;
-		}
-	}
-
-	Node findExistant(final String path) throws IOException {
+	Node findExisting(final String path) throws IOException {
 		return find(path, false);
 	}
 
-	Node findOrCreateNew(final String path) throws IOException {
-		return find(path, true);
+	Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes) throws IOException {
+		// TODO: Add other parameters
+		return find(fileName, true);
 	}
 
+	// TODO: Add other parameters from createFile
 	private Node find(final String path, final boolean create) throws IOException {
 		final String[] parts = Utils.getPathParts(path);
 		Node cur = this;
 		for (int i = 0; (cur != null) && (i < parts.length); i++) {
 			// final boolean last = i == (parts.length - 1);
-			final String part = parts[i];
-			cur = cur.child(part, true);
+			cur = cur.child(parts[i], true);
 		}
 
 		return cur;
