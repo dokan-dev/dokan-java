@@ -34,11 +34,11 @@ public enum FileAttribute {
 		throw new IllegalArgumentException("Invalid int value for FileAttribute");
 	}
 
-	public static FileAttribute fromAttributes(final FileAttribute... attributes) {
+	public static int fromAttributes(final FileAttribute... attributes) {
 		int toReturn = 0;
 		for (final FileAttribute current : attributes) {
 			toReturn |= current.val;
 		}
-		return fromInt(toReturn);
+		return toReturn;
 	}
 }
