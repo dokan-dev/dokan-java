@@ -22,7 +22,7 @@ class Node {
 
 	// constructor
 	Node() {
-
+		name = "Root";
 	}
 
 	Node createChild(final String name) {
@@ -117,6 +117,9 @@ class Node {
 	}
 
 	void replaceWith(final Node node) {
+		if (node.name.equals("Root")) {
+			throw new IllegalArgumentException("Cannot replace root node");
+		}
 		node.delete();
 		delete();
 		node.name = name;
