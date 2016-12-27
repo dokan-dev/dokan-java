@@ -1,11 +1,14 @@
 package com.dokany.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Files;
 
 public class Utils {
-
 	public static final String BACKSLASH = "\\";
 	public static final String FORWARDSLASH = "/";
+	private final static Logger logger = LoggerFactory.getLogger(Utils.class);
 
 	public static String trimTailBackSlash(final String path) {
 		final String toReturn = path;
@@ -17,7 +20,7 @@ public class Utils {
 
 	public static String toUnixStylePath(final String path) {
 		final String unixPath = path.replace(BACKSLASH, FORWARDSLASH);
-		System.out.println("path:" + unixPath);
+		logger.debug("path: {}", unixPath);
 		return unixPath;
 	}
 
