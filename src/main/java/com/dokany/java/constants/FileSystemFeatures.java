@@ -24,7 +24,7 @@ public enum FileSystemFeatures {
 		this.val = val;
 	}
 
-	public static FileSystemFeatures fromInt(final int value) {
+	public final static FileSystemFeatures fromInt(final int value) {
 		for (final FileSystemFeatures current : values()) {
 			if (current.val == value) {
 				return current;

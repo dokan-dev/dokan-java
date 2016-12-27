@@ -17,7 +17,7 @@ public enum CreationDisposition {
 		isReadonly = ((val == 3) || (val == 4));
 	}
 
-	public static CreationDisposition fromInt(final int value) {
+	public final static CreationDisposition fromInt(final int value) {
 		for (final CreationDisposition current : values()) {
 			if (current.val == value) {
 				return current;

@@ -26,7 +26,7 @@ public enum MountError {
 		this.name = name;
 	}
 
-	public static MountError fromInt(final int value) {
+	public final static MountError fromInt(final int value) {
 		for (final MountError current : values()) {
 			if (current.val == value) {
 				return current;

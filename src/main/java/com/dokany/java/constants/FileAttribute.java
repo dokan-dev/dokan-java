@@ -25,7 +25,7 @@ public enum FileAttribute {
 		val = i;
 	}
 
-	public static FileAttribute fromInt(final int value) {
+	public final static FileAttribute fromInt(final int value) {
 		for (final FileAttribute current : values()) {
 			if (current.val == value) {
 				return current;
@@ -34,7 +34,7 @@ public enum FileAttribute {
 		throw new IllegalArgumentException("Invalid int value for FileAttribute");
 	}
 
-	public static int fromAttributes(final FileAttribute... attributes) {
+	public final static int fromAttributes(final FileAttribute... attributes) {
 		int toReturn = 0;
 		for (final FileAttribute current : attributes) {
 			toReturn |= current.val;
