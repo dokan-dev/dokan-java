@@ -3,6 +3,9 @@ package com.dokany.java;
 import static com.dokany.java.constants.MountOptions.DEBUG_MODE;
 import static com.dokany.java.constants.MountOptions.STD_ERR_OUTPUT;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dokany.java.constants.MountError;
 import com.dokany.java.structure.DeviceOptions;
 import com.sun.jna.WString;
@@ -12,10 +15,11 @@ import com.sun.jna.WString;
  *
  * @param <TItem> This is used in {@link com.dokany.java.FileHandle}
  */
-public class DokanyDriver<TItem> {
+public final class DokanyDriver<TItem> {
 
 	private final FileSystem<TItem> fs;
 	private final DeviceOptions driverOptions;
+	private final static Logger logger = LoggerFactory.getLogger(DokanyDriver.class);
 
 	public DokanyDriver(final String mountPoint, final FileSystem<TItem> fs) {
 		this.fs = fs;
@@ -32,8 +36,8 @@ public class DokanyDriver<TItem> {
 		final short threadCount = 1;
 		driverOptions = new DeviceOptions(mountPoint, threadCount, options, null, fs.getTimeout(), fs.getAllocationUnitSize(), fs.getSectorSize());
 
-		System.out.println("Dokany version: " + getVersion());
-		System.out.println("Dokany driver version: " + getDriverVersion());
+		logger.info("Dokany version: {}", getVersion());
+		logger.info("Dokany driver version: {}", getDriverVersion());
 	}
 
 	/**
@@ -43,7 +47,7 @@ public class DokanyDriver<TItem> {
 	 *
 	 * @return
 	 */
-	public long getDriverVersion() {
+	public final long getDriverVersion() {
 		return NativeMethods.DokanDriverVersion();
 	}
 
@@ -53,7 +57,7 @@ public class DokanyDriver<TItem> {
 	 * @see {@link com.dokany.java.NativeMethods#DokanVersion()}
 	 * @return
 	 */
-	public long getVersion() {
+	public final long getVersion() {
 		return NativeMethods.DokanVersion();
 	}
 
@@ -62,14 +66,14 @@ public class DokanyDriver<TItem> {
 	 *
 	 * @return
 	 */
-	public FileSystem<TItem> getFileSystem() {
+	public final FileSystem<TItem> getFileSystem() {
 		return fs;
 	}
 
 	/**
 	 * Calls {@link com.dokany.java.NativeMethods#DokanMain(DeviceOptions, Operations)}. Has {@link java.lang.Runtime#addShutdownHook(Thread)} which calls {@link #shutdown()}
 	 */
-	public void start() {
+	public final void start() {
 		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl<TItem>(fs) {
 		});
 
@@ -88,7 +92,7 @@ public class DokanyDriver<TItem> {
 	/**
 	 * Calls {@link #stop(String)}.
 	 */
-	public void shutdown() {
+	public final void shutdown() {
 		stop(driverOptions.MountPoint.toString());
 	}
 
@@ -97,7 +101,7 @@ public class DokanyDriver<TItem> {
 	 *
 	 * @param mountPoint
 	 */
-	public static void stop(final String mountPoint) {
+	public final static void stop(final String mountPoint) {
 		System.out.println("Unmount and shutdown: " + mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));
