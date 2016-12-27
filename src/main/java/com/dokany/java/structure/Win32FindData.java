@@ -43,11 +43,11 @@ public class Win32FindData extends FileInfo {
 		setFileName(builder.name, Utils.toShortName(builder.name));
 	}
 
-	public String getFileName() {
+	public final String getFileName() {
 		return Native.toString(cFileName);
 	}
 
-	private void setFileName(final String name, final String shortName) {
+	private final void setFileName(final String name, final String shortName) {
 		name.getChars(0, name.length(), cFileName, 0);
 		shortName.getChars(0, shortName.length(), cAlternateFileName, 0);
 	}

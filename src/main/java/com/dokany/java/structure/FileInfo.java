@@ -89,17 +89,6 @@ public class FileInfo extends Structure implements Structure.ByReference {
 		this.builder = builder;
 		setVariables(builder.name, builder.size, builder.attributes, builder.creationTime, builder.lastAccessTime, builder.lastWriteTime, builder.index);
 	}
-/*
-	FileInfo(
-	        final String name,
-	        final long size,
-	        final FileAttribute attributes,
-	        final FileTime.VAL creationTime,
-	        final FileTime.VAL lastAccessTime,
-	        final FileTime.VAL lastWriteTime,
-	        final long index) {
-		this(new Builder(name));
-	}*/
 
 	private void setVariables(final String name, final long size, final int attributes, final FileTime.VAL creationTime, final FileTime.VAL lastAccessTime,
 	        final FileTime.VAL lastWriteTime, final long index) {
