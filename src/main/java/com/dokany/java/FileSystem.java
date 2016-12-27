@@ -10,6 +10,11 @@ import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.structure.FileInfo;
 import com.sun.jna.WString;
 
+/**
+ * This should be extended by file system providers.
+ *
+ * @param <TItem>
+ */
 public interface FileSystem<TItem> {
 
 	final FileHandleStore fileHandles = new FileHandleStore();

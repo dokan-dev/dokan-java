@@ -2,6 +2,12 @@ package com.dokany.java;
 
 import com.dokany.java.structure.FileInfo;
 
+/**
+ *
+ * This should be extended by file system providers.
+ *
+ * @param <TItem>
+ */
 public abstract class FileHandle<TItem> {
 	private final String fileName;
 	private final TItem item;
@@ -12,11 +18,11 @@ public abstract class FileHandle<TItem> {
 		this.item = item;
 	}
 
-	public String getFileName() {
+	public final String getFileName() {
 		return fileName;
 	}
 
-	public TItem getItem() {
+	public final TItem getItem() {
 		return item;
 	}
 
@@ -24,7 +30,7 @@ public abstract class FileHandle<TItem> {
 		this.id = id;
 	}
 
-	public long getID() {
+	public final long getID() {
 		return id;
 	}
 
@@ -32,6 +38,7 @@ public abstract class FileHandle<TItem> {
 
 	@Override
 	public String toString() {
+		// TODO: add id
 		return fileName;
 	}
 }
