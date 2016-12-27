@@ -8,72 +8,60 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dokany.java.DokanyException;
 import com.dokany.java.Utils;
 import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.FileAttribute;
 
-class Node {
+final class Node {
 	private String name;
-	private Node parent;
+	private final Node parent;
 	private final LinkedHashMap<String, Node> children = new LinkedHashMap<String, Node>();
 	private byte[] data = null;
 	public Date date = new Date();
+	private final static Logger logger = LoggerFactory.getLogger(Mount.class);
 
 	// constructor
-	Node() {
-		name = "Root";
-	}
-
-	Node createChild(final String name) {
-		final Node child = new Node();
-		child.parent = this;
-		child.name = (name == null) ? Utils.BACKSLASH : this.name;
-		children.put(name, child);
-		return child;
-	}
-
-	boolean isDirectory() {
-		return data == null;
-	}
-
-	long getSize() {
-		final long size = 0L;
-		if (data != null) {
-			return data.length;
-		}
-		return size;
-	}
-
-	void delete() {
-		if (parent != null) {
-			parent.children.remove(name);
+	Node(final String name, final Node parent) {
+		this.name = name;
+		this.parent = parent;
+		if (Utils.isNotNull(this.parent)) {
+			this.parent.children.put(name, this);
 		}
 	}
 
-	Node findExisting(final String path) throws IOException {
+	final Node findExisting(final String path) throws IOException {
 		return find(path, false);
 	}
 
-	Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes)
+	final Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes)
 	        throws IOException {
 		// TODO: Add other parameters
 		return find(fileName, true);
 	}
 
 	// TODO: Add other parameters from createFile
-	private Node find(final String path, final boolean create) throws IOException {
+	private final Node find(final String path, final boolean create) throws IOException {
+		logger.debug("find({},{})", path, create);
+
 		final String[] parts = Utils.getPathParts(path);
 		Node cur = this;
 		for (int i = 0; (cur != null) && (i < parts.length); i++) {
 			// final boolean last = i == (parts.length - 1);
+			logger.debug("parts[i]: {}", parts[i]);
+			// TODO: always create??
 			cur = cur.child(parts[i], true);
 		}
 
 		return cur;
 	}
 
-	private Node child(final String childName, final boolean create) throws IOException {
+	private final Node child(final String childName, final boolean create) throws IOException {
+		logger.debug("child({}, {})", childName, create);
+
 		if (childName.equals("..")) {
 			return parent;
 		}
@@ -89,10 +77,10 @@ class Node {
 		if (!create) {
 			throw new FileNotFoundException(toString() + Utils.FORWARDSLASH + childName);
 		}
-		return createChild(childName);
+		return new Node(childName, this);
 	}
 
-	int read(final long loffset, final byte[] out, final int len) {
+	final int read(final long loffset, final byte[] out, final int len) {
 		final int offset = (int) loffset;
 		if (data == null) {
 			throw new DokanyException(ERROR_READ_FAULT);
@@ -102,7 +90,7 @@ class Node {
 		return readlen;
 	}
 
-	int write(final long loffset, final byte[] data, final int dataLength) {
+	final int write(final long loffset, final byte[] data, final int dataLength) {
 		final int offset = (int) loffset;
 		if (this.data == null) {
 			this.data = new byte[0];
@@ -112,11 +100,11 @@ class Node {
 		return dataLength;
 	}
 
-	void setData(final byte[] bytes) {
+	final void setData(final byte[] bytes) {
 		data = Arrays.copyOf(bytes, bytes.length);
 	}
 
-	void replaceWith(final Node node) {
+	final void replaceWith(final Node node) {
 		if (node.name.equals("Root")) {
 			throw new IllegalArgumentException("Cannot replace root node");
 		}
@@ -126,20 +114,42 @@ class Node {
 		parent.children.put(node.name, node);
 	}
 
-	String getName() {
+	final void delete() {
+		if (parent != null) {
+			parent.children.remove(name);
+		}
+	}
+
+	final byte[] getData() {
+		return data;
+	}
+
+	final String getName() {
 		return name;
 	}
 
-	Node getParent() {
+	final Node getParent() {
 		return parent;
 	}
 
-	LinkedHashMap<String, Node> getChildren() {
+	final boolean isDirectory() {
+		return data == null;
+	}
+
+	final long getSize() {
+		final long size = 0L;
+		if (data != null) {
+			return data.length;
+		}
+		return size;
+	}
+
+	final LinkedHashMap<String, Node> getChildren() {
 		return children;
 	}
 
 	@Override
-	public String toString() {
+	final public String toString() {
 		return name;
 	}
 
