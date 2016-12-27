@@ -74,8 +74,7 @@ public final class DokanyDriver<TItem> {
 	 * Calls {@link com.dokany.java.NativeMethods#DokanMain(DeviceOptions, Operations)}. Has {@link java.lang.Runtime#addShutdownHook(Thread)} which calls {@link #shutdown()}
 	 */
 	public final void start() {
-		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl<TItem>(fs) {
-		});
+		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl<TItem>(fs));
 
 		if (mountStatus < 0) {
 			throw new IllegalStateException(MountError.fromInt(mountStatus).name);
@@ -102,7 +101,7 @@ public final class DokanyDriver<TItem> {
 	 * @param mountPoint
 	 */
 	public final static void stop(final String mountPoint) {
-		System.out.println("Unmount and shutdown: " + mountPoint);
+		logger.info("Unmount and shutdown: {}", mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));
 	}
