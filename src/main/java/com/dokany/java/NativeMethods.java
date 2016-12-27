@@ -7,7 +7,7 @@ import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
 
 /**
- * Native API to the kernel Dokany driver. This is an internal class and should not used directly.
+ * Native API to the kernel Dokany driver. This is an internal class and should not used directly by code outside com.dokany.java.
  *
  */
 final class NativeMethods {
@@ -82,6 +82,10 @@ final class NativeMethods {
 	 * @param outFileAttributesAndFlags
 	 * @param outCreationDisposition
 	 */
-	final static native void DokanMapKernelToUserCreateFileFlags(long fileAttributes, long createOptions, long createDisposition, IntByReference outFileAttributesAndFlags,
+	final static native void DokanMapKernelToUserCreateFileFlags(
+	        long fileAttributes,
+	        long createOptions,
+	        long createDisposition,
+	        IntByReference outFileAttributesAndFlags,
 	        IntByReference outCreationDisposition);
 }
