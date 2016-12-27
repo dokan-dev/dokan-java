@@ -12,9 +12,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-  compile 'com.google.guava:guava:18.0'
-  compile 'org.slf4j:slf4j-api:1.7.10'
-  compile 'ch.qos.logback:logback-classic:1.1.2'
+  compile 'com.google.guava:guava:19.0'
+  compile 'org.slf4j:slf4j-api:1.7.22'
+  compile 'ch.qos.logback:logback-classic:1.1.8'
   compile  'net.java.dev.jna:jna:4.2.2'
   testCompile 'com.google.jimfs:jimfs:1.0'
   testCompile 'junit:junit:4.12'
