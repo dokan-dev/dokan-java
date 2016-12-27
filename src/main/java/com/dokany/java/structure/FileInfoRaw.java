@@ -20,7 +20,8 @@ public class FileInfoRaw extends Structure implements Structure.ByReference {
 
 	@Override
 	protected List<String> getFieldOrder() {
-		return Arrays.asList("_context", "_dokanContext", "_dokanOptions", "_processId", "_isDirectory", "_deleteOnClose", "_pagingIo", "_synchronousIo", "_noCache", "_writeToEndOfFile");
+		return Arrays.asList("_context", "_dokanContext", "_dokanOptions", "_processId", "_isDirectory", "_deleteOnClose", "_pagingIo", "_synchronousIo", "_noCache",
+		        "_writeToEndOfFile");
 	}
 
 	@Override
@@ -37,5 +38,29 @@ public class FileInfoRaw extends Structure implements Structure.ByReference {
 		        ", _noCache=" + _noCache +
 		        ", _writeToEndOfFile=" + _writeToEndOfFile +
 		        '}';
+	}
+
+	public final boolean isDirectory() {
+		return _isDirectory != 0;
+	}
+
+	public final boolean deleteOnClose() {
+		return _deleteOnClose != 0;
+	}
+
+	public final boolean pagingIo() {
+		return _pagingIo != 0;
+	}
+
+	public final boolean synchronousIo() {
+		return _synchronousIo != 0;
+	}
+
+	public final boolean noCache() {
+		return _noCache != 0;
+	}
+
+	public final boolean writeToEndOfFile() {
+		return _writeToEndOfFile != 0;
 	}
 }
