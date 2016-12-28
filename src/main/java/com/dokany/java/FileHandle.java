@@ -1,29 +1,31 @@
 package com.dokany.java;
 
+import java.nio.file.Path;
+
 import com.dokany.java.structure.ByHandleFileInfo;
 
 /**
  *
  * This should be extended by file system providers.
  *
- * @param <TItem>
+ * @param <TNode>
  */
-public abstract class FileHandle<TItem> {
-	private final String fileName;
-	private final TItem item;
+public abstract class FileHandle<TNode> {
+	private final Path path;
+	private final TNode node;
 	private long id;
 
-	public FileHandle(final String fileName, final TItem item) {
-		this.fileName = fileName;
-		this.item = item;
+	public FileHandle(final Path path, final TNode node) {
+		this.path = path;
+		this.node = node;
 	}
 
-	public final String getFileName() {
-		return fileName;
+	public final Path getPath() {
+		return path;
 	}
 
-	public final TItem getItem() {
-		return item;
+	public final TNode getNode() {
+		return node;
 	}
 
 	public void setID(final long id) {
@@ -39,6 +41,6 @@ public abstract class FileHandle<TItem> {
 	@Override
 	public String toString() {
 		// TODO: add id
-		return fileName;
+		return path.toString();
 	}
 }
