@@ -6,22 +6,40 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-public class FileHandleStore {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ *
+ */
+public class FileHandleStore<TNode> {
 
 	private long lastAvailableId = 0;
 	private final Queue<Long> availableIds = new LinkedList<Long>();
-	final Map<Long, FileHandle> handles = new HashMap<>();
+	private final Map<Long, FileHandle<TNode>> handles = new HashMap<>();
+	private final static Logger logger = LoggerFactory.getLogger(FileHandleStore.class);
 
-	public final <TItem> long allocateFileHandle(final FileHandle<TItem> handle) {
+	public final long getNextID(final FileHandle<TNode> handle) {
 		long id;
 		if (availableIds.isEmpty()) {
 			id = lastAvailableId++;
 		} else {
 			id = availableIds.remove();
 		}
+		return id;
+	}
+
+	private final long allocateHandle(final FileHandle<TNode> handle, final long id) {
 		handles.put(id, handle);
+		logger.debug("stashed id in allocateFileHandle: {}", id);
 		handle.setID(id);
 		return id;
+	}
+
+	public final long allocateHandle(final FileHandle<TNode> handle) {
+		final long id = getNextID(handle);
+		return allocateHandle(handle, id);
 	}
 
 	/**
@@ -30,13 +48,14 @@ public class FileHandleStore {
 	 * @param id
 	 * @return
 	 */
-	public final <TItem> FileHandle<TItem> removeFileHandle(final long id) {
-		final FileHandle<TItem> handle = handles.remove(id);
+	public final FileHandle<TNode> removeHandle(final long id) {
+		final FileHandle<TNode> handle = handles.remove(id);
 		availableIds.add(id);
 		return handle;
 	}
 
-	public final <TItem> FileHandle<TItem> getFileHandle(final String fileName, final long id) throws IOException {
+	public final FileHandle<TNode> getHandle(final long id) throws IOException {
+		logger.debug("getFileHandle for ID {}", id);
 		return handles.get(id);
 	}
 }
