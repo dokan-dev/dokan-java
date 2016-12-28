@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.dokany.java.Utils;
+import com.dokany.java.structure.ByHandleFileInfo.FileInfoBuilder;
 import com.sun.jna.Native;
 
 /**
@@ -16,11 +17,11 @@ import com.sun.jna.Native;
  *
  * Not all file systems can record creation and last access times, and not all file systems record them in the same manner. For example, on the FAT file system, create time has a
  * resolution of 10 milliseconds, write time has a resolution of 2 seconds, and access time has a resolution of 1 day. The NTFS file system delays updates to the last access time
- * for a file by up to 1 hour after the last access.For more information, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times
+ * for a file by up to 1 hour after the last access. For more information, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times
  * (MSDN)</a>.
  *
  */
-public class Win32FindData extends FileInfo {
+public class Win32FindData extends BaseFileInfo {
 	public static final int MAX_PATH = 260;
 
 	/**
@@ -38,7 +39,12 @@ public class Win32FindData extends FileInfo {
 	// An alternative name for the file. This name is in the classic 8.3 file name format.
 	public char[] cAlternateFileName = new char[14];
 
-	Win32FindData(final Builder builder) {
+	Win32FindData(final BaseFileInfoBuilder builder, final String name) {
+		super(builder);
+		setFileName(name, Utils.toShortName(name));
+	}
+
+	Win32FindData(final FileInfoBuilder builder) {
 		super(builder);
 		setFileName(builder.name, Utils.toShortName(builder.name));
 	}
@@ -49,28 +55,23 @@ public class Win32FindData extends FileInfo {
 
 	private final void setFileName(final String name, final String shortName) {
 		name.getChars(0, name.length(), cFileName, 0);
+		System.out.println("name: " + name);
+		System.out.println("cFileName: " + getFileName());
 		shortName.getChars(0, shortName.length(), cAlternateFileName, 0);
 	}
 
 	@Override
 	protected List<String> getFieldOrder() {
 		return Arrays.asList(
-		        "cAlternateFileName",
-		        "cFileName",
 		        "dwFileAttributes",
-		        "dwNumberOfLinks",
-		        "dwReserved0",
-		        "dwReserved1",
-		        "dwVolumeSerialNumber",
-		        "fileIndex",
-		        "fileName",
-		        "fileSize",
 		        "ftCreationTime",
 		        "ftLastAccessTime",
 		        "ftLastWriteTime",
-		        "nFileIndexHigh",
-		        "nFileIndexLow",
 		        "nFileSizeHigh",
-		        "nFileSizeLow");
+		        "nFileSizeLow",
+		        "dwReserved0",
+		        "dwReserved1",
+		        "cFileName",
+		        "cAlternateFileName");
 	}
 }

@@ -1,11 +1,11 @@
 package com.dokany.java.structure;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import com.dokany.java.constants.FileAttribute;
-import com.sun.jna.Structure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jna.WString;
 
 /**
@@ -28,13 +28,9 @@ import com.sun.jna.WString;
  *
  *
  */
-public class FileInfo extends Structure implements Structure.ByReference {
+public class ByHandleFileInfo extends BaseFileInfo {
 
-	/*
-	 * The file attributes of a file. For possible values and their descriptions, see <see cref="FileAttributes"/>. The <see cref="FileAttributes.SparseFile"/> attribute on the
-	 * file is set if any of the streams of the file have ever been sparse.
-	 */
-	public int dwFileAttributes;
+	private final static Logger logger = LoggerFactory.getLogger(ByHandleFileInfo.class);
 
 	public int dwNumberOfLinks = 1;
 	public int dwVolumeSerialNumber;
@@ -44,24 +40,6 @@ public class FileInfo extends Structure implements Structure.ByReference {
 	public String fileName;
 
 	public long fileSize;
-	/*
-	 * A FileTime structure that specifies when a file or directory was created. If the underlying file system does not support creation time, this member is zero.
-	 */
-	public FileTime.VAL ftCreationTime;
-
-	/*
-	 * For a file, the structure specifies when the file was last read from, written to, or for executable files, run. For a directory, the structure specifies when the directory
-	 * is created. If the underlying file system does not support last access time, this member is zero. On the FAT file system, the specified date for both files and directories
-	 * is correct, but the time of day is always set to midnight.
-	 */
-	public FileTime.VAL ftLastAccessTime;
-
-	/*
-	 * For a file, the structure specifies when the file was last written to, truncated, or overwritten, for example, when WriteFile or SetEndOfFile are used. The date and time are
-	 * not updated when file attributes or security descriptors are changed. For a directory, the structure specifies when the directory is created. If the underlying file system
-	 * does not support last write time,
-	 */
-	public FileTime.VAL ftLastWriteTime;
 
 	/*
 	 * The high-order DWORD value of the file size, in bytes. This value is zero unless the file size is greater than MAXDWORD. The size of the file is equal to (nFileSizeHigh*
@@ -74,57 +52,38 @@ public class FileInfo extends Structure implements Structure.ByReference {
 	 */
 	public int nFileIndexLow;
 
-	/*
-	 *
-	 */
-	public int nFileSizeHigh;
-	public int nFileSizeLow;
+	private FileInfoBuilder fileInfoBuilder;
 
-	private Builder builder;
-
-	public FileInfo() {
+	public ByHandleFileInfo() {
 	}
 
-	FileInfo(final Builder builder) {
-		this.builder = builder;
-		setVariables(builder.name, builder.size, builder.attributes, builder.creationTime, builder.lastAccessTime, builder.lastWriteTime, builder.index);
+	ByHandleFileInfo(final FileInfoBuilder builder) {
+		super(builder);
+		setVariables(builder.name, builder.size, builder.index, builder.numberOfLinks, builder.volumeSerialNumber);
+		fileInfoBuilder = builder;
 	}
 
-	private void setVariables(final String name, final long size, final int attributes, final FileTime.VAL creationTime, final FileTime.VAL lastAccessTime,
-	        final FileTime.VAL lastWriteTime, final long index) {
+	void setVariables(final String name, final long size, final long index, final int numberOfLinks, final int volumeSerialNumber) {
 		fileName = name;
 
 		size(size);
 		index(index);
 
-		dwFileAttributes = attributes;
-		ftCreationTime = creationTime;
-		ftLastAccessTime = lastAccessTime;
-		ftLastWriteTime = lastWriteTime;
+		dwNumberOfLinks = numberOfLinks;
+		dwVolumeSerialNumber = volumeSerialNumber;
 	}
 
 	public Win32FindData toWin32FindData() {
-		if (builder == null) {
+		if (fileInfoBuilder == null) {
 			throw new IllegalStateException("Builder cannot be null");
 		}
-		return builder.buildWin32FindData();
+
+		return fileInfoBuilder.buildWin32FindData();
 	}
 
-	public ByHandleFileInformation toByHandleFileInformation(final int numberOfLinks, final int volumeSerialNumber) {
-		if (builder == null) {
-			throw new IllegalStateException("Builder cannot be null");
-		}
-		return builder.buildByHandleFileInformation(numberOfLinks, volumeSerialNumber);
-	}
-
-	public void copyTo(final ByHandleFileInformation info) {
-		info.index(fileIndex);
-		info.size(fileSize);
-		info.dwNumberOfLinks = dwNumberOfLinks;
-		info.dwFileAttributes = dwFileAttributes;
-		info.ftCreationTime = ftCreationTime;
-		info.ftLastAccessTime = ftLastAccessTime;
-		info.ftLastWriteTime = ftLastWriteTime;
+	public void copyTo(final ByHandleFileInfo info) {
+		info.setVariables(dwFileAttributes, ftCreationTime, ftLastAccessTime, ftLastWriteTime);
+		info.setVariables(fileName, fileSize, fileIndex, dwNumberOfLinks, dwVolumeSerialNumber);
 	}
 
 	@Override
@@ -167,78 +126,48 @@ public class FileInfo extends Structure implements Structure.ByReference {
 		nFileIndexLow = (int) ((index >> 0L) & 0xFFFFFFFFL);
 	}
 
-	public static class Builder {
-		final String name;
-		private int attributes;
-		private FileTime.VAL creationTime;
-		private FileTime.VAL lastAccessTime;
-		private FileTime.VAL lastWriteTime;
+	public static class FileInfoBuilder extends BaseFileInfoBuilder {
 
+		final String name;
 		private long size;
 		private long index;
+		public int numberOfLinks = 1;
+		public int volumeSerialNumber;
 
-		public Builder(final WString name) {
-			this(name.toString());
-		}
-
-		public Builder(final String name) {
+		public FileInfoBuilder(final String name) {
 			this.name = name;
 		}
 
-		public FileInfo buildFileInfo() {
-			return new FileInfo(this);
+		public FileInfoBuilder(final WString name) {
+			this(name.toString());
 		}
 
-		public Win32FindData buildWin32FindData() {
-			return new Win32FindData(this);
-		}
-
-		public ByHandleFileInformation buildByHandleFileInformation(final int numberOfLinks, final int volumeSerialNumber) {
-			return new ByHandleFileInformation(this, numberOfLinks, volumeSerialNumber);
-		}
-
-		public Builder size(final long size) {
+		public FileInfoBuilder size(final long size) {
 			this.size = size;
 			return this;
 		}
 
-		public Builder attributes(final FileAttribute... attributes) {
-			this.attributes = FileAttribute.fromAttributes(attributes);
+		public FileInfoBuilder index(final long index) {
+			this.index = index;
 			return this;
 		}
 
-		public Builder creationTime(final Date creationTime) {
-			return creationTime(new FileTime.VAL(creationTime));
-		}
-
-		public Builder creationTime(final FileTime.VAL creationTime) {
-			this.creationTime = creationTime;
+		public FileInfoBuilder numberOfLinks(final int numberOfLinks) {
+			this.numberOfLinks = numberOfLinks;
 			return this;
 		}
 
-		public Builder lastAccessTime(final Date lastAccessTime) {
-			return lastAccessTime(new FileTime.VAL(lastAccessTime));
-		}
-
-		public Builder lastAccessTime(final FileTime.VAL lastAccessTime) {
-			this.lastAccessTime = lastAccessTime;
+		public FileInfoBuilder volumeSerialNumber(final int volumeSerialNumber) {
+			this.volumeSerialNumber = volumeSerialNumber;
 			return this;
 		}
 
-		public Builder lastWriteTime(final Date lastWriteTime) {
-			return lastWriteTime(new FileTime.VAL(lastWriteTime));
+		public ByHandleFileInfo build() {
+			return new ByHandleFileInfo(this);
 		}
 
-		/**
-		 * Also sets lastAccessTime to same time
-		 *
-		 * @param lastWriteTime
-		 * @return
-		 */
-		public Builder lastWriteTime(final FileTime.VAL lastWriteTime) {
-			lastAccessTime(lastWriteTime);
-			this.lastWriteTime = lastWriteTime;
-			return this;
+		public Win32FindData buildWin32FindData() {
+			return new Win32FindData(this);
 		}
 	}
 }
