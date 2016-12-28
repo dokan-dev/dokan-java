@@ -4,8 +4,10 @@ import static com.dokany.java.constants.ErrorCodes.ERROR_READ_FAULT;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.slf4j.Logger;
@@ -13,72 +15,118 @@ import org.slf4j.LoggerFactory;
 
 import com.dokany.java.DokanyException;
 import com.dokany.java.Utils;
-import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.FileAttribute;
 
 final class Node {
-	private String name;
+	private Path path;
 	private final Node parent;
-	private final LinkedHashMap<String, Node> children = new LinkedHashMap<String, Node>();
+	private final LinkedHashMap<Path, Node> children = new LinkedHashMap<>();
 	private byte[] data = null;
+	private long handleID;
+
+	// TODO: how are these read?
+	private int attributes;
+
 	public Date date = new Date();
-	private final static Logger logger = LoggerFactory.getLogger(Mount.class);
+	private final static Logger logger = LoggerFactory.getLogger(Node.class);
 
 	// constructor
-	Node(final String name, final Node parent) {
-		this.name = name;
+	Node(final Path path, final Node parent) {
+		this.path = path;
+		if (Utils.isNotNull(path)) {
+			this.path = path.getFileName();
+			if (Utils.isNull(this.path)) {
+				this.path = path;
+			}
+		}
+
 		this.parent = parent;
 		if (Utils.isNotNull(this.parent)) {
-			this.parent.children.put(name, this);
+			this.parent.children.put(this.path, this);
 		}
 	}
 
-	final Node findExisting(final String path) throws IOException {
-		return find(path, false);
+	final Node findExisting(final Path path) throws IOException {
+		return find(path, false, null);
 	}
 
-	final Node createFile(final String fileName, final CreationDisposition disposition, final long options, final boolean isDirectory, final FileAttribute... attributes)
+	final Node createFile(final Path filePath, final long options, final FileAttribute... attributes)
 	        throws IOException {
 		// TODO: Add other parameters
-		return find(fileName, true);
+		return find(filePath, true, attributes);
+	}
+
+	final Node createDirectory(final Path directoryPath, final long options, final FileAttribute... attributes)
+	        throws IOException {
+		// TODO: Add other parameters
+		return find(directoryPath, true, attributes);
 	}
 
 	// TODO: Add other parameters from createFile
-	private final Node find(final String path, final boolean create) throws IOException {
-		logger.debug("find({},{})", path, create);
+	private final Node find(final Path path, final boolean create, final FileAttribute... attributes) throws FileNotFoundException {
+		logger.debug("find({}, {}, {})", path, create, attributes);
 
-		final String[] parts = Utils.getPathParts(path);
-		Node cur = this;
-		for (int i = 0; (cur != null) && (i < parts.length); i++) {
-			// final boolean last = i == (parts.length - 1);
-			logger.debug("parts[i]: {}", parts[i]);
-			// TODO: always create??
-			cur = cur.child(parts[i], true);
+		Node parentNode = this;
+		Node currentNode = this;
+
+		final Iterator<Path> i = Utils.getPathParts(path).iterator();
+		while (i.hasNext()) {
+
+			final Path childNodePath = i.next();
+			// TODO: What about new folder attributes along the path?
+			currentNode = parentNode.getChild(childNodePath);
+
+			if (Utils.isNull(currentNode)) {
+				// Create child if it does not exist
+				if (create) {
+					currentNode = createChild(childNodePath, parentNode);
+				}
+
+				// TODO: get rid of if not needed
+				// else if (!create) {
+				// throw new FileNotFoundException(toString() + Utils.FORWARDSLASH + currentPathPart);
+				// }
+			}
+
+			if (Utils.isNotNull(currentNode)) {
+				parentNode = currentNode;
+			}
 		}
-
-		return cur;
+		logger.debug("returning: {}", currentNode);
+		return currentNode;
 	}
 
-	private final Node child(final String childName, final boolean create) throws IOException {
-		logger.debug("child({}, {})", childName, create);
+	/**
+	 * Will return
+	 *
+	 * @param childName
+	 * @param create
+	 * @return null if child does not currently exist
+	 * @throws IOException
+	 */
+	private final Node getChild(final Path childNode) {
+		logger.debug("getChild({})", childNode);
 
-		if (childName.equals("..")) {
-			return parent;
+		Node toReturn = null;
+
+		if (Utils.isNull(childNode)) {
+			throw new IllegalStateException("getChild cannot be called on null childNode");
 		}
-		if (childName.equals(".")) {
-			return this;
+
+		if ((toReturn == null) && children.containsKey(childNode)) {
+			toReturn = children.get(childNode);
+			logger.debug("toReturn: {}", toReturn);
 		}
-		if (childName.equals("")) {
-			return this;
-		}
-		if (children.containsKey(childName)) {
-			return children.get(childName);
-		}
-		if (!create) {
-			throw new FileNotFoundException(toString() + Utils.FORWARDSLASH + childName);
-		}
-		return new Node(childName, this);
+
+		return toReturn;
 	}
+
+	private final Node createChild(final Path childNode, final Node parentNode) {
+		final Node child = new Node(childNode, parentNode);
+		logger.debug("Created child {} in parentNode {}", child, parentNode);
+		return child;
+		// TODO: should this set attributes or do elsewhere?
+	};
 
 	final int read(final long loffset, final byte[] out, final int len) {
 		final int offset = (int) loffset;
@@ -95,37 +143,63 @@ final class Node {
 		if (this.data == null) {
 			this.data = new byte[0];
 		}
-		this.data = Arrays.copyOf(this.data, Math.max(this.data.length, offset + dataLength));
+		setData(this.data, Math.max(this.data.length, offset + dataLength));
 		System.arraycopy(data, 0, this.data, offset, data.length);
 		return dataLength;
 	}
 
+	private final void setData(final byte[] bytes, final int length) {
+		if (length == 0) {
+			data = new byte[0];
+		} else {
+			data = Arrays.copyOf(bytes, length);
+		}
+	}
+
 	final void setData(final byte[] bytes) {
-		data = Arrays.copyOf(bytes, bytes.length);
+		int length = 0;
+		if (Utils.isNotNull(bytes)) {
+			length = bytes.length;
+		}
+		setData(bytes, length);
+	}
+
+	final void setAttributes(final FileAttribute attributes) {
+		this.attributes = attributes.val;
 	}
 
 	final void replaceWith(final Node node) {
-		if (node.name.equals("Root")) {
+		// TODO: get root path from elsewhere
+		if (node.path.equals("/")) {
 			throw new IllegalArgumentException("Cannot replace root node");
 		}
 		node.delete();
 		delete();
-		node.name = name;
-		parent.children.put(node.name, node);
+		node.path = path;
+		parent.children.put(node.path, node);
 	}
 
 	final void delete() {
 		if (parent != null) {
-			parent.children.remove(name);
+			parent.children.remove(path);
 		}
+	}
+
+	final long getHandleID() {
+		return handleID;
+	}
+
+	final void setHandleID(final long handleID) {
+		this.handleID = handleID;
+		logger.debug("setHandleID: {}", handleID);
 	}
 
 	final byte[] getData() {
 		return data;
 	}
 
-	final String getName() {
-		return name;
+	final Path getPath() {
+		return path;
 	}
 
 	final Node getParent() {
@@ -144,13 +218,13 @@ final class Node {
 		return size;
 	}
 
-	final LinkedHashMap<String, Node> getChildren() {
+	final LinkedHashMap<Path, Node> getChildren() {
 		return children;
 	}
 
 	@Override
 	final public String toString() {
-		return name;
+		return path.toString();
 	}
 
 }
