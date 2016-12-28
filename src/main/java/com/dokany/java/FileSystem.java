@@ -5,9 +5,8 @@ import static com.dokany.java.constants.FileSystemFeatures.CasePreservedNames;
 import java.io.IOException;
 import java.util.Date;
 
-import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.FileAttribute;
-import com.dokany.java.structure.FileInfo;
+import com.dokany.java.structure.ByHandleFileInfo;
 import com.sun.jna.WString;
 
 /**
@@ -16,8 +15,6 @@ import com.sun.jna.WString;
  * @param <TItem>
  */
 public interface FileSystem<TItem> {
-
-	final FileHandleStore fileHandles = new FileHandleStore();
 
 	public default boolean isDefaultLog() {
 		return isDebug();
@@ -117,7 +114,7 @@ public interface FileSystem<TItem> {
 		return CasePreservedNames.val;
 	}
 
-	public FileInfo getFileInformation(final FileHandle<TItem> handle) throws IOException;
+	public ByHandleFileInfo getFileInfo(final FileHandle<TItem> handle) throws IOException;
 
 	public default FileHandle<TItem> getHandle(final WString fileName, final long id) throws IOException {
 		return getHandle(fileName.toString(), id);
@@ -128,11 +125,17 @@ public interface FileSystem<TItem> {
 	public FileHandle<TItem> createHandle(final String fileName) throws IOException;
 
 	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
-	public TItem createFile(final String fileName,
-	        CreationDisposition disposition,
+	public TItem createFile(
+	        final String filePath,
 	        long options,
-	        final boolean isDirectory,
 	        final FileAttribute... attributes) throws IOException;
+
+	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
+	public TItem createDirectory(
+	        final String directoryPath,
+	        final long options,
+	        final FileAttribute... attributes)
+	        throws IOException;
 
 	public TItem findExisting(final String fileName, final boolean isDirectory) throws IOException;
 
@@ -181,7 +184,7 @@ public interface FileSystem<TItem> {
 	public void setTime(final FileHandle<TItem> handle, final Date creation, final Date access, final Date modification);
 
 	public interface FileEmitter {
-		void emit(FileInfo info);
+		void emit(ByHandleFileInfo info);
 	}
 
 	public interface StreamEmitter {

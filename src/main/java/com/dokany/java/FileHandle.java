@@ -1,6 +1,6 @@
 package com.dokany.java;
 
-import com.dokany.java.structure.FileInfo;
+import com.dokany.java.structure.ByHandleFileInfo;
 
 /**
  *
@@ -34,7 +34,7 @@ public abstract class FileHandle<TItem> {
 		return id;
 	}
 
-	public abstract FileInfo getFileInfo();
+	public abstract ByHandleFileInfo getFileInfo();
 
 	@Override
 	public String toString() {
