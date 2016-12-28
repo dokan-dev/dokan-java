@@ -1,71 +1,70 @@
 package com.dokany.java;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Files;
-
 public class Utils {
 	public static final String BACKSLASH = "\\";
-	public static final String FORWARDSLASH = "/";
 	private final static Logger logger = LoggerFactory.getLogger(Utils.class);
 
-	public static String trimTailBackSlash(final String path) {
-		final String toReturn = path;
+	public static String trimTailBackslash(final String path) {
+		String toReturn = path;
 		if (path.endsWith(BACKSLASH)) {
-			return path.substring(0, path.length() - 1);
+			toReturn = path.substring(0, path.length() - 1);
 		}
 		return toReturn;
 	}
 
-	public static String toUnixStylePath(final String path) {
-		final String unixPath = path.replace(BACKSLASH, FORWARDSLASH);
-		logger.debug("path: {}", unixPath);
-		return unixPath;
+	public static Path toUnixStylePath(final Path path) {
+		return Paths.get(FilenameUtils.normalize(path.toString(), true));
 	}
 
 	/**
-	 * Split apart path using split("/").
+	 * Split apart path using {@link java.nio.file.Path#forEach()}.
 	 *
 	 * @param path
 	 * @return array containing parts between slashes.
 	 */
-	public static String[] getPathParts(final String path) {
-		return toUnixStylePath(path).split(FORWARDSLASH);
+	public static Set<Path> getPathParts(final Path path) {
+		final Set<Path> toReturn = new HashSet<>();
+		path.forEach(node -> {
+			toReturn.add(node);
+		});
+		return toReturn;
+
 	}
 
-	/**
-	 * Get file name from partParts.
-	 *
-	 * @param pathParts
-	 * @return actual file name
-	 */
-	public static String getFileNameFromPath(final String[] pathParts) {
-		return pathParts[pathParts.length - 1];
+	static String getFileName(final String fileName) {
+		return FilenameUtils.getBaseName(fileName);
 	}
 
-	public static String getFileName(final String fileName) {
-		return Files.getNameWithoutExtension(fileName);
+	static String getExtension(final String fileName) {
+		return FilenameUtils.getExtension(fileName);
 	}
 
-	public static String getExtension(final String fileName) {
-		return Files.getFileExtension(fileName);
-	}
+	public static String toShortName(final Path path) {
+		final String pathAsStr = path.toString();
 
-	// This is not correct.
-	public static String toShortName(final String fileName) {
-		String base = getFileName(fileName);
+		String base = getFileName(pathAsStr);
 		if (base.length() > 8) {
-			base = base.substring(8);
+			base = base.substring(0, 8);
 		}
+		logger.debug("base: {}", base);
 
-		String ext = getExtension(fileName);
+		String ext = getExtension(pathAsStr);
 		if (ext.length() > 3) {
 			ext = ext.substring(3);
 		}
 		if (ext.length() > 0) {
 			ext = "." + ext;
 		}
+		logger.debug("ext: {}", ext);
 
 		return base + ext;
 	}
