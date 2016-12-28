@@ -40,12 +40,14 @@ import com.sun.jna.ptr.LongByReference;
 /**
  * Implementation of {@link com.dokany.java.Operations} which connects to {@link com.dokany.java.FileSystem}.
  *
- * @param <TItem>
+ * @param <TNode>
  */
-abstract class OperationsImpl<TItem> extends Operations {
-	final FileSystem<TItem> fs;
+final class OperationsImpl<TNode> extends Operations {
+	final FileSystem<TNode> fs;
 
-	OperationsImpl(final FileSystem<TItem> fs) {
+	private final static Logger logger = LoggerFactory.getLogger(OperationsImpl.class);
+
+	OperationsImpl(final FileSystem<TNode> fs) {
 		this.fs = fs;
 
 		ZwCreateFile = new ZwCreateFile();
@@ -78,7 +80,8 @@ abstract class OperationsImpl<TItem> extends Operations {
 
 	private class ZwCreateFile implements Operations.ZwCreateFileDelegate {
 		@Override
-		public long callback(final WString rawFileName,
+		public long callback(
+		        final WString rawFileName,
 		        final IntByReference securityContext,
 		        final int rawDesiredAccess,
 		        final int rawFileAttributes,
@@ -164,10 +167,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 
 			try {
 				fs.mounted();
-
-				if (isDefaultLog()) {
-					System.out.println("Dokany File System mounted");
-				}
+				logger.info("Dokany File System mounted");
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -181,11 +181,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 
 			try {
 				fs.unmounted();
-
-				if (isDefaultLog()) {
-					System.out.println("Dokany File System unmounted");
-				}
-
+				logger.info("Dokany File System unmounted");
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -197,19 +193,13 @@ abstract class OperationsImpl<TItem> extends Operations {
 		@Override
 		public void callback(final WString fileName,
 		        final FileInfoRaw rawFileInfo) {
-			System.out.println("Cleanup");
-
 			if (isSkipFile(fileName)) {
 				return;
 			}
 
 			try {
 				fs.cleanup(getHandle(fileName, rawFileInfo._context));
-
-				if (isDefaultLog()) {
-					System.out.println("Cleaned up: " + fileName);
-				}
-
+				logger.trace("Cleaned up: {}", fileName);
 			} catch (final Throwable t) {
 				t.printStackTrace();
 			}
@@ -219,18 +209,13 @@ abstract class OperationsImpl<TItem> extends Operations {
 	private class CloseFile implements Operations.CloseFileDelegate {
 		@Override
 		public void callback(final WString fileName, final FileInfoRaw rawFileInfo) {
-			System.out.println("CloseFile");
-
 			if (isSkipFile(fileName)) {
 				return;
 			}
 
 			try {
 				fs.close(getHandle(fileName, rawFileInfo._context));
-
-				if (isDefaultLog()) {
-					System.out.println("Closed file: " + fileName.toString());
-				}
+				logger.trace("Closed file: {}", fileName);
 			} catch (final FileNotFoundException e) {
 			} catch (final Throwable t) {
 				t.printStackTrace();
@@ -249,21 +234,23 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final int rawFileSystemNameSize,
 		        final FileInfoRaw rawFileInfo) {
 
+			logger.trace("GetVolumeInformation");
+
 			try {
 				volumeNameBuffer.setWideString(0L, Utils.trimStrToSize(fs.getVolumeName(), volumeNameSize));
-				System.out.println("Volume name: " + fs.getVolumeName());
+				logger.trace("Volume name: {}", fs.getVolumeName());
 
 				rawFileSystemNameBuffer.setWideString(0L, Utils.trimStrToSize(fs.getFileSystemName(), rawFileSystemNameSize));
-				System.out.println("File system name: " + fs.getFileSystemName());
+				logger.trace("File system name: {}", fs.getFileSystemName());
 
 				rawVolumeSerialNumber.setValue(fs.getVolumeSerialNumber());
-				System.out.println("Serial number: " + fs.getVolumeSerialNumber());
+				logger.trace("Serial number: {}", fs.getVolumeSerialNumber());
 
 				rawMaximumComponentLength.setValue(fs.getMaxComponentLength());
-				System.out.println("Max component length: " + fs.getMaxComponentLength());
+				logger.trace("Max component length: {}", fs.getMaxComponentLength());
 
 				rawFileSystemFlags.setValue(fs.getFileSystemFeatures());
-				System.out.println("File system features: " + FileSystemFeatures.fromInt(fs.getFileSystemFeatures()));
+				logger.trace("File system features: {}", FileSystemFeatures.fromInt(fs.getFileSystemFeatures()));
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -279,7 +266,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final LongByReference rawTotalNumberOfFreeBytes,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("GetDiskFreeSpace");
+			logger.trace("GetDiskFreeSpace");
 
 			rawFreeBytesAvailable.setValue(fs.getFreeBytesAvailable());
 			rawTotalNumberOfBytes.setValue(fs.getTotalBytesAvailable());
@@ -295,16 +282,24 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final Operations.FillWin32FindData rawFillFindData,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("FindFiles");
+			logger.trace("FindFiles");
 
 			try {
 				fs.findFiles(getHandle(fileName, rawFileInfo._context), file -> rawFillFindData.callback(file.toWin32FindData(), rawFileInfo));
-
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
 			}
 		}
+	}
+
+	private void findFilesWithPattern(final FileHandle<TNode> handle, final PathMatcher pathMatcher, final FileEmitter emitter) throws IOException {
+		fs.findFiles(handle, info -> {
+			final Path path = Paths.get(info.fileName);
+			if (pathMatcher.matches(path)) {
+				emitter.emit(info);
+			}
+		});
 	}
 
 	private class FindFilesWithPattern implements Operations.FindFilesWithPatternDelegate {
@@ -314,12 +309,11 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final Operations.FillWin32FindData rawFillFindData,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("FindFilesWithPattern: " + searchPattern.toString());
-
 			try {
-				find(getHandle(fileName, rawFileInfo._context), FileSystems.getDefault().getPathMatcher(GLOB + searchPattern.toString()), fileInfo -> {
-					System.out.println("EMIT: " + fileInfo.fileName);
-					rawFillFindData.callback(fileInfo.toWin32FindData(), rawFileInfo);
+				final FileHandle<TNode> handle = getHandle(fileName, rawFileInfo._context);
+				final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(GLOB + searchPattern.toString());
+				findFilesWithPattern(handle, matcher, info -> {
+					rawFillFindData.callback(info.toWin32FindData(), rawFileInfo);
 				});
 
 				return Success.val;
@@ -338,14 +332,14 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final long offset,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("ReadFile");
+			logger.trace("ReadFile: {}", fileName);
 
 			try {
 				final byte[] data = new byte[bufferLength];
 				final int read = fs.read(getHandle(fileName, rawFileInfo._context), offset, data, bufferLength);
 				buffer.write(0, data, 0, read);
 				readLength.setValue(read);
-
+				logger.trace("Read this number of bytes: {}", read);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_READ_FAULT.val);
@@ -362,14 +356,13 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final long offset,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("WriteFile");
-
+			logger.debug("WriteFile: {}", fileName);
 			try {
 				final byte[] data = new byte[numberOfBytesToWrite];
 				buffer.read(0L, data, 0, numberOfBytesToWrite);
 				final int written = fs.write(getHandle(fileName, rawFileInfo._context), offset, data, numberOfBytesToWrite);
 				numberOfBytesWritten.setValue(written);
-
+				logger.trace("Wrote this number of bytes: {}", written);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -382,11 +375,9 @@ abstract class OperationsImpl<TItem> extends Operations {
 		public long callback(final WString fileName,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("FlushFileBuffers");
-
+			logger.trace("FlushFileBuffers");
 			try {
 				fs.flushFileBuffers(getHandle(fileName, rawFileInfo._context));
-
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -397,34 +388,16 @@ abstract class OperationsImpl<TItem> extends Operations {
 	private class GetFileInformation implements Operations.GetFileInformationDelegate {
 		@Override
 		public long callback(final WString fileName,
-		        final ByHandleFileInformation handleFileInfo,
+		        final ByHandleFileInfo handleFileInfo,
 		        final FileInfoRaw rawFileInfo) {
-			System.out.println("GetFileInformation: " + fileName);
+			logger.trace("GetFileInformation: {}", fileName);
 
 			if (isSkipFile(fileName)) {
 				return FileInvalid.val;
 			}
 
 			try {
-				final FileHandle<TItem> handle = getHandle(fileName, rawFileInfo._context);
-				final int numberOfLinks = 1;
-				final int volumeSerialNumber = fs.getVolumeSerialNumber();
-				final ByHandleFileInformation bhfi;
-				final FileInfo fi;
-
-				if (fileName.toString().equals("\\")) {
-					fi = new FileInfo.Builder(fileName)
-					        .attributes(FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_DIRECTORY)
-					        .creationTime(fs.getRootCreateDate())
-					        .lastWriteTime(fs.getRootCreateDate())
-					        .buildFileInfo();
-				} else {
-					fi = fs.getFileInformation(handle);
-
-				}
-				bhfi = fi.toByHandleFileInformation(numberOfLinks, volumeSerialNumber);
-				handleFileInfo.copyTo(bhfi);
-
+				handleFileInfo.copyTo(getFileInfo(fileName, handleFileInfo, rawFileInfo));
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -438,11 +411,10 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final int attributes,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("SetFileAttributes");
+			logger.trace("SetFileAttributes as {} for {}", attributes, fileName);
 
 			try {
 				fs.setAttributes(getHandle(fileName, rawFileInfo._context), attributes);
-
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -458,11 +430,10 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final FileTime lastWriteTime,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("SetFileTime");
+			logger.debug("SetFileTime as creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", creationTime, lastAccessTime, lastWriteTime);
 
 			try {
 				fs.setTime(getHandle(fileName, rawFileInfo._context), creationTime.getDate(), lastAccessTime.getDate(), lastWriteTime.getDate());
-
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -476,7 +447,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final Operations.FillWin32FindStreamData fill,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("FindStreams");
+			logger.trace("FindStreams for {}", fileName);
 
 			try {
 				fs.findStreams(getHandle(fileName, rawFileInfo._context), stream -> fill.callback(stream.toStruct(), rawFileInfo));
@@ -497,7 +468,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final IntByReference rawSecurityDescriptorLengthNeeded,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("GetFileSecurity");
+			logger.debug("GetFileSecurity");
 
 			try {
 				final byte[] out = new byte[rawSecurityDescriptorLength];
@@ -520,7 +491,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final int rawSecurityDescriptorLength,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("SetFileSecurity");
+			logger.debug("SetFileSecurity");
 
 			try {
 				final byte[] data = new byte[rawSecurityDescriptorLength];
@@ -539,7 +510,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		public long callback(final WString fileName,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("DeleteFile");
+			logger.debug("DeleteFile");
 
 			try {
 				fs.deleteFile(getHandle(fileName, rawFileInfo._context));
@@ -556,7 +527,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		public long callback(final WString fileName,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("DeleteDirectory");
+			logger.debug("DeleteDirectory");
 
 			try {
 				fs.deleteDirectory(getHandle(fileName, rawFileInfo._context));
@@ -575,7 +546,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final boolean replaceIfExisting,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("MoveFile");
+			logger.debug("MoveFile");
 
 			try {
 				fs.move(getHandle(oldFileName, rawFileInfo._context), getHandle(newFileName, rawFileInfo._context), replaceIfExisting);
@@ -590,7 +561,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 	private class SetEndOfFile implements Operations.SetEndOfFileDelegate {
 		@Override
 		public long callback(final WString fileName, final long byteOffset, final FileInfoRaw rawFileInfo) {
-			System.out.println("SetEndOfFile");
+			logger.debug("SetEndOfFile");
 			try {
 				fs.setEndOfFile(getHandle(fileName, rawFileInfo._context), byteOffset);
 				return Success.val;
@@ -605,7 +576,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		public long callback(final WString fileName,
 		        final long length,
 		        final FileInfoRaw rawFileInfo) {
-			System.out.println("SetAllocationSize");
+			logger.debug("SetAllocationSize");
 			try {
 				fs.setAllocationSize(getHandle(fileName, rawFileInfo._context), length);
 				return Success.val;
@@ -622,7 +593,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final long length,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("LockFile");
+			logger.debug("LockFile");
 
 			try {
 				fs.lock(getHandle(fileName, rawFileInfo._context), byteOffset, length);
@@ -641,7 +612,7 @@ abstract class OperationsImpl<TItem> extends Operations {
 		        final long length,
 		        final FileInfoRaw rawFileInfo) {
 
-			System.out.println("UnlockFile");
+			logger.debug("UnlockFile");
 
 			try {
 				fs.unlock(getHandle(fileName, rawFileInfo._context), byteOffset, length);
@@ -688,38 +659,74 @@ abstract class OperationsImpl<TItem> extends Operations {
 			return ERROR_ALREADY_EXISTS.val;
 		}
 
-		t.printStackTrace();
+		logger.warn(t.getMessage(), t);
+		;
 		return defaultCode;
 	}
 
 	private boolean isSkipFile(final WString fileName) {
 		boolean toReturn = false;
 
-		System.out.println("fileName: " + fileName.toString());
-
-		if (// fileName.toString().equals("\\") ||
-		fileName.toString().equals("\\desktop.ini")) {
-			System.out.println("Skipping file: " + fileName);
+		if (// fileName.toString().equals(ROOT_PATH) ||
+		fileName.toString().endsWith("desktop.ini")
+		        || fileName.toString().endsWith("folder.jpg")) {
+			// logger.debug("Skipping file: " + fileName);
 			toReturn = true;
 		}
 		return toReturn;
 	}
 
-	private FileHandle<TItem> getHandle(final WString fileName, final long id) throws IOException {
-		return fs.getHandle(fileName, id);
+	private FileHandle<TNode> getHandle(final WString path, final long id) throws IOException {
+		return fs.getHandle(Paths.get(path.toString()), id);
 	}
 
+	private ByHandleFileInfo getFileInfo(final WString fileNameW,
+	        final ByHandleFileInfo handleFileInfo,
+	        final FileInfoRaw rawFileInfo) throws IOException {
+
+		final String fileName = fileNameW.toString();
+		logger.debug("fileName: {}", fileName);
+
+		final FileHandle<TNode> handle = getHandle(fileNameW, rawFileInfo._context);
+		final ByHandleFileInfo fileInfo;
+		logger.debug("Paths.get(fileName): {}", Paths.get(fileName));
+		logger.debug("fs.getRootPath: {}", fs.getRootPath());
+
+		if (Paths.get(fileName).equals(fs.getRootPath())) {
+			fileInfo = getRootInfo();
+		} else {
+			fileInfo = fs.getFileInfo(handle);
+
+		}
+		return fileInfo;
+	}
+
+	/**
+	 * Get root file info.
+	 *
+	 * @return ByHandleFileInfo for root
+	 */
+	private ByHandleFileInfo getRootInfo() {
+		final FileInfoBuilder builder = new FileInfoBuilder(fs.getRootPath());
+		builder.attributes(FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_DIRECTORY);
+		builder.creationTime(fs.getRootCreateDate());
+		builder.lastWriteTime(fs.getRootCreateDate());
+
+		builder.numberOfLinks(1);
+		builder.volumeSerialNumber(fs.getVolumeSerialNumber());
+		return builder.build();
+	}
+
+	/**
+	 * @see {@link com.dokany.java.FileSystem#isDefaultLog()}
+	 * @return true if default file system log is enabled.
+	 */
 	private boolean isDefaultLog() {
 		return fs.isDefaultLog();
 	}
 
-	public void find(final FileHandle<TItem> handle, final PathMatcher pathMatcher, final FileEmitter emitter) throws IOException {
-		fs.findFiles(handle, file -> {
-			if (pathMatcher.matches(Paths.get(file.fileName))) {
-				emitter.emit(file);
-			}
-		});
-	}
-
+	/**
+	 * Path matcher glob
+	 */
 	private final static String GLOB = "glob:";
 }
