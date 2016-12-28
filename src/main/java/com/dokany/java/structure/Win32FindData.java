@@ -1,7 +1,11 @@
 package com.dokany.java.structure;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dokany.java.Utils;
 import com.dokany.java.structure.ByHandleFileInfo.FileInfoBuilder;
@@ -23,6 +27,7 @@ import com.sun.jna.Native;
  */
 public class Win32FindData extends BaseFileInfo {
 	public static final int MAX_PATH = 260;
+	private final static Logger logger = LoggerFactory.getLogger(Win32FindData.class);
 
 	/**
 	 * If the {@link com.dokany.java.structure.FileInfo#dwFileAttributes} includes {@link com.dokany.java.constants.FileAttribute#FILE_ATTRIBUTE_REPARSE_POINT}, this member
@@ -39,14 +44,14 @@ public class Win32FindData extends BaseFileInfo {
 	// An alternative name for the file. This name is in the classic 8.3 file name format.
 	public char[] cAlternateFileName = new char[14];
 
-	Win32FindData(final BaseFileInfoBuilder builder, final String name) {
+	Win32FindData(final BaseFileInfoBuilder builder, final Path path) {
 		super(builder);
-		setFileName(name, Utils.toShortName(name));
+		setFileName(path.toString(), Utils.toShortName(path));
 	}
 
 	Win32FindData(final FileInfoBuilder builder) {
 		super(builder);
-		setFileName(builder.name, Utils.toShortName(builder.name));
+		setFileName(builder.path.toString(), Utils.toShortName(builder.path));
 	}
 
 	public final String getFileName() {
@@ -54,10 +59,15 @@ public class Win32FindData extends BaseFileInfo {
 	}
 
 	private final void setFileName(final String name, final String shortName) {
+		logger.debug("set({}, {})", name, shortName);
+		if (Utils.isNull(name)) {
+			throw new IllegalStateException("name cannot be null");
+		}
 		name.getChars(0, name.length(), cFileName, 0);
-		System.out.println("name: " + name);
-		System.out.println("cFileName: " + getFileName());
-		shortName.getChars(0, shortName.length(), cAlternateFileName, 0);
+
+		if (Utils.isNotNull(shortName)) {
+			shortName.getChars(0, shortName.length(), cAlternateFileName, 0);
+		}
 	}
 
 	@Override

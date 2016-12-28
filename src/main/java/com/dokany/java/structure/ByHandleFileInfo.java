@@ -1,12 +1,11 @@
 package com.dokany.java.structure;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.jna.WString;
 
 /**
  *
@@ -59,7 +58,7 @@ public class ByHandleFileInfo extends BaseFileInfo {
 
 	ByHandleFileInfo(final FileInfoBuilder builder) {
 		super(builder);
-		setVariables(builder.name, builder.size, builder.index, builder.numberOfLinks, builder.volumeSerialNumber);
+		setVariables(builder.path.toString(), builder.size, builder.index, builder.numberOfLinks, builder.volumeSerialNumber);
 		fileInfoBuilder = builder;
 	}
 
@@ -128,18 +127,14 @@ public class ByHandleFileInfo extends BaseFileInfo {
 
 	public static class FileInfoBuilder extends BaseFileInfoBuilder {
 
-		final String name;
+		final Path path;
 		private long size;
 		private long index;
 		public int numberOfLinks = 1;
 		public int volumeSerialNumber;
 
-		public FileInfoBuilder(final String name) {
-			this.name = name;
-		}
-
-		public FileInfoBuilder(final WString name) {
-			this(name.toString());
+		public FileInfoBuilder(final Path path) {
+			this.path = path;
 		}
 
 		public FileInfoBuilder size(final long size) {
