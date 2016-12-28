@@ -31,11 +31,14 @@ public enum FileAttribute {
 				return current;
 			}
 		}
-		throw new IllegalArgumentException("Invalid int value for FileAttribute");
+		if (value == 0) {
+			return FILE_ATTRIBUTE_NORMAL;
+		}
+		throw new IllegalArgumentException(String.format("Invalid int value (%s) for FileAttribute", value));
 	}
 
 	public final static int fromAttributes(final FileAttribute... attributes) {
-		int toReturn = 0;
+		int toReturn = FILE_ATTRIBUTE_NORMAL.val;
 		for (final FileAttribute current : attributes) {
 			toReturn |= current.val;
 		}
