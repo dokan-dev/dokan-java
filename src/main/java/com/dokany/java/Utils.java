@@ -2,7 +2,7 @@ package com.dokany.java;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -32,10 +32,12 @@ public class Utils {
 	 * @return array containing parts between slashes.
 	 */
 	public static Set<Path> getPathParts(final Path path) {
-		final Set<Path> toReturn = new HashSet<>();
-		path.forEach(node -> {
-			toReturn.add(node);
-		});
+		final Set<Path> toReturn = new LinkedHashSet<>();
+		final Path unixPath = toUnixStylePath(path);
+		for (int i = 0; i < unixPath.getNameCount(); ++i) {
+			toReturn.add(unixPath.getName(i));
+		}
+
 		return toReturn;
 
 	}
@@ -55,7 +57,7 @@ public class Utils {
 		if (base.length() > 8) {
 			base = base.substring(0, 8);
 		}
-		logger.debug("base: {}", base);
+		logger.trace("base: {}", base);
 
 		String ext = getExtension(pathAsStr);
 		if (ext.length() > 3) {
@@ -64,7 +66,7 @@ public class Utils {
 		if (ext.length() > 0) {
 			ext = "." + ext;
 		}
-		logger.debug("ext: {}", ext);
+		logger.trace("ext: {}", ext);
 
 		return base + ext;
 	}
