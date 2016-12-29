@@ -6,7 +6,7 @@ import java.util.List;
 import com.sun.jna.Structure;
 import com.sun.jna.ptr.IntByReference;
 
-public class FileInfoRaw extends Structure implements Structure.ByReference {
+public class DokanFileInfo extends Structure implements Structure.ByReference {
 	public long _context;
 	public long _dokanContext;
 	public IntByReference _dokanOptions;
