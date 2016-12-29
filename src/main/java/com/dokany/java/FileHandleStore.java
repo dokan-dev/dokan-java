@@ -15,30 +15,39 @@ import org.slf4j.LoggerFactory;
  */
 public class FileHandleStore<TNode> {
 
-	private long lastAvailableId = 0;
-	private final Queue<Long> availableIds = new LinkedList<Long>();
+	private long lastAvailableID = 0;
+	private final Queue<Long> availableIDs = new LinkedList<Long>();
 	private final Map<Long, FileHandle<TNode>> handles = new HashMap<>();
 	private final static Logger logger = LoggerFactory.getLogger(FileHandleStore.class);
 
-	public final long getNextID(final FileHandle<TNode> handle) {
+	public final long getNextID() {
 		long id;
-		if (availableIds.isEmpty()) {
-			id = lastAvailableId++;
+		if (availableIDs.isEmpty()) {
+			id = lastAvailableID++;
 		} else {
-			id = availableIds.remove();
+			id = availableIDs.remove();
 		}
 		return id;
 	}
 
-	private final long allocateHandle(final FileHandle<TNode> handle, final long id) {
+	/**
+	 * Only use if you know what you are doing.
+	 *
+	 * @param handle
+	 * @param id Should be value from most recent call to {@link com.dokany.java.FileHandleStore#getNextID()}.
+	 * @return
+	 */
+	public final long allocateHandle(final FileHandle<TNode> handle, final long id) {
 		handles.put(id, handle);
-		logger.debug("stashed id in allocateFileHandle: {}", id);
+		logger.trace("allocated id {} for {}", id, handle.getPath());
 		handle.setID(id);
 		return id;
 	}
 
 	public final long allocateHandle(final FileHandle<TNode> handle) {
-		final long id = getNextID(handle);
+		final long id = getNextID();
+		handle.getFileInfo().setIndex(id);
+		logger.debug("Set id to {} now printing out handle.getFileInfo to see if it actually stored {}", id, handle.getFileInfo());
 		return allocateHandle(handle, id);
 	}
 
@@ -50,12 +59,12 @@ public class FileHandleStore<TNode> {
 	 */
 	public final FileHandle<TNode> removeHandle(final long id) {
 		final FileHandle<TNode> handle = handles.remove(id);
-		availableIds.add(id);
+		availableIDs.add(id);
 		return handle;
 	}
 
 	public final FileHandle<TNode> getHandle(final long id) throws IOException {
-		logger.debug("getFileHandle for ID {}", id);
+		logger.trace("getHandle for ID {}", id);
 		return handles.get(id);
 	}
 }
