@@ -8,6 +8,7 @@ import java.util.Date;
 
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.structure.ByHandleFileInfo;
+import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
 /**
  * This should be extended by file system providers.
@@ -79,8 +80,7 @@ public interface FileSystem<TNode> {
 	 * @return
 	 */
 	public default int getVolumeSerialNumber() {
-		// return 0x12345678;
-		return 0x00000000;
+		return 0x12345678;
 	}
 
 	/**
@@ -101,11 +101,11 @@ public interface FileSystem<TNode> {
 		return "DOKANY";
 	}
 
-	public default int getSecurity(final FileHandle<TNode> handle, final int kind, final byte[] out) {
+	public default int getSecurity(final FileHandle<TNode> handle, final int kind, final byte[] out) throws IOException {
 		return 0;
 	}
 
-	public void setSecurity(final FileHandle<TNode> handle, final int kind, final byte[] data);
+	public void setSecurity(final FileHandle<TNode> handle, final int kind, final byte[] data) throws IOException;
 
 	/**
 	 * Default is FileSystemFeatures.CasePreservedNames
@@ -116,7 +116,7 @@ public interface FileSystem<TNode> {
 		return CasePreservedNames.val;
 	}
 
-	public ByHandleFileInfo getFileInfo(final FileHandle<TNode> handle) throws IOException;
+	public ByHandleFileInfo getInfo(final FileHandle<TNode> handle) throws IOException;
 
 	public FileHandle<TNode> getHandle(final TNode node) throws IOException;
 
@@ -128,38 +128,38 @@ public interface FileSystem<TNode> {
 	public TNode createFile(
 	        final Path path,
 	        long options,
-	        final FileAttribute... attributes) throws IOException;
+	        final FileAttribute attributes) throws IOException;
 
 	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
 	public TNode createDirectory(
 	        final Path path,
 	        final long options,
-	        final FileAttribute... attributes)
+	        final FileAttribute attributes)
 	        throws IOException;
 
 	public TNode findExisting(final Path nodePath, final boolean isDirectory) throws IOException;
 
-	public void cleanup(final FileHandle<TNode> handle);
+	public void cleanup(final FileHandle<TNode> handle) throws IOException;
 
-	public void close(final FileHandle<TNode> handle);
+	public void close(final FileHandle<TNode> handle) throws IOException;
 
-	public void mounted();
+	public void mounted() throws IOException;
 
-	public void unmounted();
-
-	/**
-	 * Only used if dokan option UserModeLock is enabled
-	 */
-	public void unlock(final FileHandle<TNode> handle, final long byteOffset, final long length);
+	public void unmounted() throws IOException;
 
 	/**
 	 * Only used if dokan option UserModeLock is enabled
 	 */
-	public void lock(final FileHandle<TNode> handle, final long byteOffset, final long length);
+	public void unlock(final FileHandle<TNode> handle, final long byteOffset, final long length) throws IOException;
 
-	public void setAllocationSize(final FileHandle<TNode> handle, final long length);
+	/**
+	 * Only used if dokan option UserModeLock is enabled
+	 */
+	public void lock(final FileHandle<TNode> handle, final long byteOffset, final long length) throws IOException;
 
-	public void setEndOfFile(final FileHandle<TNode> handle, final long byteOffset);
+	public void setAllocationSize(final FileHandle<TNode> handle, final long length) throws IOException;
+
+	public void setEndOfFile(final FileHandle<TNode> handle, final long byteOffset) throws IOException;
 
 	public void move(final FileHandle<TNode> oldHandle, final FileHandle<TNode> newHandle, final boolean replaceIfExisting) throws IOException;
 
@@ -177,14 +177,14 @@ public interface FileSystem<TNode> {
 
 	public void findStreams(final FileHandle<TNode> handle, final StreamEmitter emitter) throws IOException;
 
-	public void flushFileBuffers(final FileHandle<TNode> handle);
+	public void flushFileBuffers(final FileHandle<TNode> handle) throws IOException;
 
-	public void setAttributes(final FileHandle<TNode> handle, final int attributes);
+	public void setAttributes(final FileHandle<TNode> handle, final FileAttribute attributes);
 
-	public void setTime(final FileHandle<TNode> handle, final Date creation, final Date access, final Date modification);
+	public void setTime(final FileHandle<TNode> handle, final Date creation, final Date lastAccess, final Date lastModification) throws IOException;
 
 	public interface FileEmitter {
-		void emit(ByHandleFileInfo info);
+		void emit(WIN32_FIND_DATA win32FindData);
 	}
 
 	public interface StreamEmitter {
