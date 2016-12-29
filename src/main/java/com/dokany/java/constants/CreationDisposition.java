@@ -1,11 +1,13 @@
 package com.dokany.java.constants;
 
+import com.sun.jna.platform.win32.WinNT;
+
 public enum CreationDisposition {
-	CREATE_NEW(1, "Create New"),
-	CREATE_ALWAYS(2, "Create Always"),
-	OPEN_EXISTING(3, "Open Existing"),
-	OPEN_ALWAYS(4, "Open Always"),
-	TRUNCATE_EXISTING(5, "Truncate Existing");
+	CREATE_NEW(WinNT.CREATE_NEW, "Create New"),
+	CREATE_ALWAYS(WinNT.CREATE_ALWAYS, "Create Always"),
+	OPEN_EXISTING(WinNT.OPEN_EXISTING, "Open Existing"),
+	OPEN_ALWAYS(WinNT.OPEN_ALWAYS, "Open Always"),
+	TRUNCATE_EXISTING(WinNT.TRUNCATE_EXISTING, "Truncate Existing");
 
 	public final int val;
 	public final String name;
