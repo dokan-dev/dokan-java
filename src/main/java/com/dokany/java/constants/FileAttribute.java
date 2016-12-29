@@ -16,9 +16,14 @@ import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_SYSTEM;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_TEMPORARY;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_VIRTUAL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dokany.java.Utils;
 import com.sun.jna.ptr.IntByReference;
 
 public enum FileAttribute {
+
 	ARCHIVE(FILE_ATTRIBUTE_ARCHIVE),
 	COMPRESSED(FILE_ATTRIBUTE_COMPRESSED),
 	DEVICE(FILE_ATTRIBUTE_DEVICE),
@@ -39,6 +44,8 @@ public enum FileAttribute {
 
 	public final int val;
 
+	private final static Logger logger = LoggerFactory.getLogger(FileAttribute.class);
+
 	private FileAttribute(final int i) {
 		val = i;
 	}
@@ -54,7 +61,10 @@ public enum FileAttribute {
 	}
 
 	public final static int fromAttributesAndFlags(final IntByReference attributesAndFlags) {
-		return (attributesAndFlags.getValue() & FileAttribute.MASK);
+		if (Utils.isNull(attributesAndFlags)) {
+			return NORMAL.val;
+		}
+		return (attributesAndFlags.getValue() & MASK);
 	}
 
 	public final static FileAttribute fromInt(final int value) {
@@ -71,9 +81,16 @@ public enum FileAttribute {
 
 	public final static int fromAttributes(final FileAttribute... attributes) {
 		int toReturn = NORMAL.val;
-		for (final FileAttribute current : attributes) {
-			toReturn |= current.val;
+
+		if (Utils.isNotNull(attributes)) {
+			for (final FileAttribute current : attributes) {
+				logger.debug("current attrib: {}", current);
+				if (Utils.isNotNull(current)) {
+					toReturn |= current.val;
+				}
+			}
 		}
+
 		return toReturn;
 	}
 }
