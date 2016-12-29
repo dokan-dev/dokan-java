@@ -1,7 +1,7 @@
 package com.dokany.java;
 
 import com.dokany.java.structure.DeviceOptions;
-import com.dokany.java.structure.FileInfoRaw;
+import com.dokany.java.structure.DokanFileInfo;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
@@ -60,18 +60,18 @@ final class NativeMethods {
 	 * Extends the time out of the current IO operation in driver.
 	 *
 	 * @param timeout Extended time in milliseconds requested.
-	 * @param rawFileInfo {@link com.dokany.java.structure.FileInfoRaw} of the operation to extend.
+	 * @param dokanFileInfo {@link com.dokany.java.structure.DokanFileInfo} of the operation to extend.
 	 * @return if the operation was successful or not.
 	 */
-	final static native boolean DokanResetTimeout(long timeout, FileInfoRaw rawFileInfo);
+	final static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
 	 *
-	 * @param rawFileInfo {@link com.dokany.java.structure.FileInfoRaw} of the operation.
+	 * @param rawFileInfo {@link com.dokany.java.structure.DokanFileInfo} of the operation.
 	 * @return A handle to the account token for the user on whose behalf the code is running.
 	 */
-	final static native IntByReference DokanOpenRequestorToken(FileInfoRaw rawFileInfo);
+	final static native IntByReference DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
 
 	/**
 	 * Convert {@link com.dokany.java.structure.Operations.ZwCreateFileDelegate} parameters to CreateFile parameters.
