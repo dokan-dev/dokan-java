@@ -1,14 +1,13 @@
 package com.dokany.java.examples.memoryfs;
 
 import static com.dokany.java.constants.ErrorCodes.ERROR_READ_FAULT;
+import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_NORMAL;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,84 +15,47 @@ import org.slf4j.LoggerFactory;
 import com.dokany.java.DokanyException;
 import com.dokany.java.Utils;
 import com.dokany.java.constants.FileAttribute;
+import com.dokany.java.structure.ByHandleFileInfo;
 
 final class Node {
 	private Path path;
-	private final Node parent;
+	private Node parent;
 	private final LinkedHashMap<Path, Node> children = new LinkedHashMap<>();
-	private byte[] data = null;
+	private byte[] data;
 	private long handleID;
+	private ByHandleFileInfo info = new ByHandleFileInfo();
 
-	// TODO: how are these read?
-	private int attributes;
-
-	public Date date = new Date();
 	private final static Logger logger = LoggerFactory.getLogger(Node.class);
 
 	// constructor
-	Node(final Path path, final Node parent) {
-		this.path = path;
-		if (Utils.isNotNull(path)) {
-			this.path = path.getFileName();
-			if (Utils.isNull(this.path)) {
-				this.path = path;
-			}
+	Node(final Path pathForNewNode, final Node parentForNewNode, final ByHandleFileInfo infoForNewNode) {
+		logger.trace("new Node({}, {}, {})", pathForNewNode, parentForNewNode, infoForNewNode);
+
+		final Set<Path> parts = Utils.getPathParts(pathForNewNode);
+		logger.trace("numParts: {}", parts.size());
+		if (parts.size() > 1) {
+			final Node createdNode = MemoryFS.find(MemoryFS.getRootNode(), pathForNewNode, true, FileAttribute.DIRECTORY);
+			createdNode.copyTo(this);
+		} else {
+			setPath(pathForNewNode);
+
+			setFamily(parentForNewNode);
+
+			// No data initially so set to null (which means this is a directory)
+			data = null;
+
+			infoForNewNode.copyTo(info);
+			logger.debug("successfully set info for path {} : {}", path, info);
 		}
-
-		this.parent = parent;
-		if (Utils.isNotNull(this.parent)) {
-			this.parent.children.put(this.path, this);
-		}
 	}
 
-	final Node findExisting(final Path path) throws IOException {
-		return find(path, false, null);
-	}
-
-	final Node createFile(final Path filePath, final long options, final FileAttribute... attributes)
-	        throws IOException {
-		// TODO: Add other parameters
-		return find(filePath, true, attributes);
-	}
-
-	final Node createDirectory(final Path directoryPath, final long options, final FileAttribute... attributes)
-	        throws IOException {
-		// TODO: Add other parameters
-		return find(directoryPath, true, attributes);
-	}
-
-	// TODO: Add other parameters from createFile
-	private final Node find(final Path path, final boolean create, final FileAttribute... attributes) throws FileNotFoundException {
-		logger.debug("find({}, {}, {})", path, create, attributes);
-
-		Node parentNode = this;
-		Node currentNode = this;
-
-		final Iterator<Path> i = Utils.getPathParts(path).iterator();
-		while (i.hasNext()) {
-
-			final Path childNodePath = i.next();
-			// TODO: What about new folder attributes along the path?
-			currentNode = parentNode.getChild(childNodePath);
-
-			if (Utils.isNull(currentNode)) {
-				// Create child if it does not exist
-				if (create) {
-					currentNode = createChild(childNodePath, parentNode);
-				}
-
-				// TODO: get rid of if not needed
-				// else if (!create) {
-				// throw new FileNotFoundException(toString() + Utils.FORWARDSLASH + currentPathPart);
-				// }
-			}
-
-			if (Utils.isNotNull(currentNode)) {
-				parentNode = currentNode;
-			}
-		}
-		logger.debug("returning: {}", currentNode);
-		return currentNode;
+	private void copyTo(final Node nodeToReceive) {
+		nodeToReceive.path = path;
+		nodeToReceive.parent = parent;
+		nodeToReceive.children.putAll(children);
+		nodeToReceive.data = data;
+		nodeToReceive.handleID = handleID;
+		nodeToReceive.info = info;
 	}
 
 	/**
@@ -104,28 +66,42 @@ final class Node {
 	 * @return null if child does not currently exist
 	 * @throws IOException
 	 */
-	private final Node getChild(final Path childNode) {
-		logger.debug("getChild({})", childNode);
+	final Node getChild(final Path childNodePath) {
+		logger.trace("getChild({})", childNodePath);
 
 		Node toReturn = null;
 
-		if (Utils.isNull(childNode)) {
+		if (Utils.isNull(childNodePath)) {
 			throw new IllegalStateException("getChild cannot be called on null childNode");
 		}
 
-		if ((toReturn == null) && children.containsKey(childNode)) {
-			toReturn = children.get(childNode);
-			logger.debug("toReturn: {}", toReturn);
+		logger.trace("children: {}", children);
+
+		if (Utils.isNotNull(childNodePath)) {
+			toReturn = children.get(childNodePath);
 		}
 
+		logger.trace("toReturn: {}", toReturn);
 		return toReturn;
 	}
 
-	private final Node createChild(final Path childNode, final Node parentNode) {
-		final Node child = new Node(childNode, parentNode);
+	final Node createChild(final Path childNodePath, final Node parentNode, final FileAttribute attributes) {
+		logger.info("createChild({}, {}, {})", childNodePath, parentNode, attributes);
+		// TODO: What about new folder attributes along the path?
+
+		final ByHandleFileInfo.Builder builder = new ByHandleFileInfo.Builder(childNodePath);
+		builder.attributes(attributes);
+
+		// Cannot set size yet
+		// Cannot set index/id yet
+		// Canot set volume serial number because there is no reference to MemoryFS
+
+		final Node child = new Node(childNodePath, parentNode, builder.build());
+		setAttributes(attributes);
 		logger.debug("Created child {} in parentNode {}", child, parentNode);
+		logger.trace("Child's info: {}", child.info);
+
 		return child;
-		// TODO: should this set attributes or do elsewhere?
 	};
 
 	final int read(final long loffset, final byte[] out, final int len) {
@@ -138,13 +114,13 @@ final class Node {
 		return readlen;
 	}
 
-	final int write(final long loffset, final byte[] data, final int dataLength) {
+	final int write(final long loffset, final byte[] dataToWrite, final int dataLength) {
 		final int offset = (int) loffset;
-		if (this.data == null) {
-			this.data = new byte[0];
+		if (data == null) {
+			data = new byte[0];
 		}
-		setData(this.data, Math.max(this.data.length, offset + dataLength));
-		System.arraycopy(data, 0, this.data, offset, data.length);
+		setData(data, Math.max(data.length, offset + dataLength));
+		System.arraycopy(dataToWrite, 0, data, offset, dataToWrite.length);
 		return dataLength;
 	}
 
@@ -154,6 +130,8 @@ final class Node {
 		} else {
 			data = Arrays.copyOf(bytes, length);
 		}
+		logger.debug("info inside set Data: {}", info);
+		info.setSize(getSize());
 	}
 
 	final void setData(final byte[] bytes) {
@@ -165,7 +143,18 @@ final class Node {
 	}
 
 	final void setAttributes(final FileAttribute attributes) {
-		this.attributes = attributes.val;
+		int toSet = FILE_ATTRIBUTE_NORMAL;
+		// Will be null if coming from findExisting method
+		if (Utils.isNotNull(attributes)) {
+			toSet = attributes.val;
+		}
+
+		info.dwFileAttributes = toSet;
+	}
+
+	final int getAttributes() {
+		// Will be null if coming from findExisting method
+		return info.dwFileAttributes;
 	}
 
 	final void replaceWith(final Node node) {
@@ -189,9 +178,13 @@ final class Node {
 		return handleID;
 	}
 
-	final void setHandleID(final long handleID) {
-		this.handleID = handleID;
-		logger.debug("setHandleID: {}", handleID);
+	final void setHandleID(final long idToSet) {
+		handleID = idToSet;
+		logger.trace("setHandleID: {}", handleID);
+	}
+
+	final ByHandleFileInfo getInfo() {
+		return info;
 	}
 
 	final byte[] getData() {
@@ -211,9 +204,9 @@ final class Node {
 	}
 
 	final long getSize() {
-		final long size = 0L;
-		if (data != null) {
-			return data.length;
+		long size = 0L;
+		if (Utils.isNotNull(data)) {
+			size = data.length;
 		}
 		return size;
 	}
@@ -224,7 +217,32 @@ final class Node {
 
 	@Override
 	final public String toString() {
-		return path.toString();
+		return "path: " + path + "   info: " + info;
+	}
+
+	private void setPath(final Path initPath) {
+		Path pathToSave = initPath;
+		if (Utils.isNotNull(pathToSave)) {
+			pathToSave = pathToSave.getFileName();
+
+			// getFileName was null so set back to initPath which is not null
+			if (Utils.isNull(pathToSave) && Utils.isNotNull(initPath)) {
+				pathToSave = initPath;
+			}
+		}
+
+		// Path should never be null at this point
+		if (Utils.isNull(pathToSave)) {
+			throw new IllegalStateException("Path or its name (via getFileName()) cannot be null");
+		}
+		path = pathToSave;
+	}
+
+	private void setFamily(final Node parentForNewNode) {
+		parent = parentForNewNode;
+		if (Utils.isNotNull(parent)) {
+			parent.children.put(path, this);
+		}
 	}
 
 }
