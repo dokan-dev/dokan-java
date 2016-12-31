@@ -9,20 +9,38 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Utils {
-	public static final String BACKSLASH = "\\";
-	private final static Logger logger = LoggerFactory.getLogger(Utils.class);
+import com.sun.jna.WString;
 
-	public static String trimTailBackslash(final String path) {
-		String toReturn = path;
-		if (path.endsWith(BACKSLASH)) {
-			toReturn = path.substring(0, path.length() - 1);
+public class Utils {
+	public static final String FORWARD_SLASH = "/";
+	private final static Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+
+	public static String trimTailSlash(final String str) {
+		String toReturn = str;
+		if (str.endsWith(FORWARD_SLASH)) {
+			toReturn = str.substring(0, str.length() - 1);
 		}
 		return toReturn;
 	}
 
+	public static String trimFrontSlash(final String str) {
+		String toReturn = str;
+		if (str.startsWith(FORWARD_SLASH)) {
+			toReturn = str.substring(1, str.length());
+		}
+		return toReturn;
+	}
+
+	public static String normalize(final String path) {
+		return FilenameUtils.normalize(path, true);
+	}
+
+	public static String normalize(final WString path) {
+		return normalize(path.toString());
+	}
+
 	public static Path toUnixStylePath(final Path path) {
-		return Paths.get(FilenameUtils.normalize(path.toString(), true));
+		return Paths.get(normalize(path.toString()));
 	}
 
 	/**
@@ -53,21 +71,14 @@ public class Utils {
 	public static String toShortName(final Path path) {
 		final String pathAsStr = path.toString();
 
-		String base = getFileName(pathAsStr);
-		if (base.length() > 8) {
-			base = base.substring(0, 8);
-		}
-		logger.trace("base: {}", base);
+		final String base = trimStrToSize(getFileName(pathAsStr), 8);
+		LOGGER.trace("base: {}", base);
 
-		String ext = getExtension(pathAsStr);
-		if (ext.length() > 3) {
-			ext = ext.substring(3);
-		}
+		String ext = trimStrToSize(getExtension(pathAsStr), 3);
 		if (ext.length() > 0) {
 			ext = "." + ext;
 		}
-		logger.trace("ext: {}", ext);
-
+		LOGGER.trace("ext: {}", ext);
 		return base + ext;
 	}
 
