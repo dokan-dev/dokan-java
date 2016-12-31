@@ -10,11 +10,11 @@ import com.dokany.java.DokanyDriver;
  *
  */
 public class Mount {
-	private final static Logger logger = LoggerFactory.getLogger(Mount.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(Mount.class);
 
 	public static void main(final String[] args) throws Throwable {
-		logger.info("Starting Dokany ExampleFS");
-		final DokanyDriver<Node> dokanyDriver = new DokanyDriver<Node>("M:\\", new MemoryFS());
+		LOGGER.info("Starting Dokany ExampleFS");
+		final DokanyDriver dokanyDriver = new DokanyDriver("M:\\", new MemoryFS());
 		dokanyDriver.start();
 	}
 }
