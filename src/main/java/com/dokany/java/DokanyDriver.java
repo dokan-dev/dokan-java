@@ -15,13 +15,13 @@ import com.sun.jna.WString;
  *
  * @param <TItem> This is used in {@link com.dokany.java.FileHandle}
  */
-public final class DokanyDriver<TItem> {
+public final class DokanyDriver {
 
-	private final FileSystem<TItem> fs;
+	private final FileSystem fs;
 	private final DeviceOptions driverOptions;
-	private final static Logger logger = LoggerFactory.getLogger(DokanyDriver.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyDriver.class);
 
-	public DokanyDriver(final String mountPoint, final FileSystem<TItem> fs) {
+	public DokanyDriver(final String mountPoint, final FileSystem fs) {
 		this.fs = fs;
 		int options = 0;
 
@@ -36,8 +36,8 @@ public final class DokanyDriver<TItem> {
 		final short threadCount = 1;
 		driverOptions = new DeviceOptions(mountPoint, threadCount, options, null, fs.getTimeout(), fs.getAllocationUnitSize(), fs.getSectorSize());
 
-		logger.info("Dokany version: {}", getVersion());
-		logger.info("Dokany driver version: {}", getDriverVersion());
+		LOGGER.info("Dokany version: {}", getVersion());
+		LOGGER.info("Dokany driver version: {}", getDriverVersion());
 	}
 
 	/**
@@ -66,7 +66,7 @@ public final class DokanyDriver<TItem> {
 	 *
 	 * @return
 	 */
-	public final FileSystem<TItem> getFileSystem() {
+	public final FileSystem getFileSystem() {
 		return fs;
 	}
 
@@ -74,7 +74,7 @@ public final class DokanyDriver<TItem> {
 	 * Calls {@link com.dokany.java.NativeMethods#DokanMain(DeviceOptions, Operations)}. Has {@link java.lang.Runtime#addShutdownHook(Thread)} which calls {@link #shutdown()}
 	 */
 	public final void start() {
-		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl<TItem>(fs));
+		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl(fs));
 
 		if (mountStatus < 0) {
 			throw new IllegalStateException(MountError.fromInt(mountStatus).name);
@@ -101,7 +101,7 @@ public final class DokanyDriver<TItem> {
 	 * @param mountPoint
 	 */
 	public final static void stop(final String mountPoint) {
-		logger.info("Unmount and shutdown: {}", mountPoint);
+		LOGGER.info("Unmount and shutdown: {}", mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));
 	}

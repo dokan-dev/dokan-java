@@ -9,8 +9,8 @@ public class StreamInfo {
 		this.length = length;
 	}
 
-	Operations.Win32FindStreamData toStruct() {
-		final Operations.Win32FindStreamData out = new OperationsImpl.Win32FindStreamData();
+	Win32FindStreamData toStruct() {
+		final Win32FindStreamData out = new Win32FindStreamData();
 		out.length(length);
 		name.getChars(0, name.length(), out.cFileName(), 0);
 		return out;
