@@ -12,29 +12,21 @@ import static com.dokany.java.constants.NtStatus.Unsuccessful;
 import static com.dokany.java.constants.WinError.ERROR_NOT_SUPPORTED;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dokany.java.FileSystem.FileEmitter;
 import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.constants.FileSystemFeatures;
 import com.dokany.java.structure.ByHandleFileInfo;
 import com.dokany.java.structure.DokanFileInfo;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
+import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
@@ -43,12 +35,12 @@ import com.sun.jna.ptr.LongByReference;
  *
  * @param <TNode>
  */
-final class OperationsImpl<TNode> extends Operations {
-	final FileSystem<TNode> fs;
+final class OperationsImpl extends Operations {
+	final FileSystem fs;
 	public static final int MAX_PATH = 260;
-	private final static Logger logger = LoggerFactory.getLogger(OperationsImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(OperationsImpl.class);
 
-	OperationsImpl(final FileSystem<TNode> fs) {
+	OperationsImpl(final FileSystem fs) {
 		this.fs = fs;
 
 		ZwCreateFile = new ZwCreateFile();
@@ -82,7 +74,7 @@ final class OperationsImpl<TNode> extends Operations {
 	private class ZwCreateFile implements Operations.ZwCreateFileDelegate {
 		@Override
 		public long callback(
-		        final WString rawFileName,
+		        final WString path,
 		        final IntByReference securityContext,
 		        final int rawDesiredAccess,
 		        final int rawFileAttributes,
@@ -108,16 +100,15 @@ final class OperationsImpl<TNode> extends Operations {
 			// int desiredAccess = (FileAccess )(rawDesiredAccess & FileAccessMask);
 			// int shareAccess = (FileShare )(rawShareAccess & FileShareMask);
 
-			final Path path = Paths.get(rawFileName.toString());
+			final String normalizedPath = Utils.normalize(path);
 			final boolean isDirectory = dokanFileInfo.isDirectory();
-			final String itemType = isDirectory ? "directory" : "file";
 			final CreationDisposition disposition = CreationDisposition.fromInt(creationDisposition.getValue());
 
 			// Set initial result to success
 			long result = SUCCESS.val;
 
 			try {
-				if (path.equals(fs.getRootPath())) {
+				if (normalizedPath.equals(fs.getRootPath())) {
 					switch (disposition) {
 					case CREATE_NEW:
 					case CREATE_ALWAYS: {
@@ -133,20 +124,13 @@ final class OperationsImpl<TNode> extends Operations {
 					}
 
 				}
-				if (isSkipFile(rawFileName)) {
+				if (isSkipFile(path)) {
 					return FileInvalid.val;
 				}
 
-				logger.debug("ZwCreateFile with {} and {}: {}", disposition.name, itemType, path);
-				logger.debug("attribs: {} ", fileAttributes);
-
-				TNode node;
-
 				try {
-					node = fs.findExisting(path, isDirectory);
-
-					final boolean itemExists = Utils.isNotNull(node);
-					logger.trace("item {} exists? {}", path, itemExists);
+					final boolean itemExists = fs.pathExists(normalizedPath);
+					LOGGER.trace("item {} exists? {}", normalizedPath, itemExists);
 
 					switch (disposition) {
 
@@ -171,7 +155,7 @@ final class OperationsImpl<TNode> extends Operations {
 						// TODO: need to truncate somehow
 						// May not be correct
 						if (!isDirectory) {
-							fs.truncate(getHandle(rawFileName, dokanFileInfo._context));
+							fs.truncate(normalizedPath);
 						}
 						break;
 					}
@@ -187,27 +171,24 @@ final class OperationsImpl<TNode> extends Operations {
 
 						if (!itemExists) {
 							if (isDirectory) {
-								node = fs.createDirectory(path, rawCreateOptionsLong, attributes);
+								fs.createEmptyDirectory(normalizedPath, rawCreateOptionsLong, attributes);
 							} else {
-								node = fs.createFile(path, rawCreateOptionsLong, attributes);
+								fs.createEmptyFile(normalizedPath, rawCreateOptionsLong, attributes);
 							}
 						}
-
-						dokanFileInfo._context = fs.getHandle(node).getID();
-						dokanFileInfo.write();
 
 						result = SUCCESS.val;
 					}
 
 				} catch (final Throwable t) {
-					logger.warn("Caught error: ", t);
+					LOGGER.warn("Caught error: ", t);
 					result = exceptionToErrorCode(t);
-					logger.warn("Set result to {}: ", result);
+					LOGGER.warn("Set result to {}: ", result);
 				}
 
 				return result;
 			} finally {
-				logger.trace("final result for {}: {}", path, result);
+				LOGGER.trace("final result for {}: {}", normalizedPath, result);
 			}
 		}
 	}
@@ -218,7 +199,7 @@ final class OperationsImpl<TNode> extends Operations {
 
 			try {
 				fs.mounted();
-				logger.info("Dokany File System mounted");
+				LOGGER.info("Dokany File System mounted");
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -232,7 +213,7 @@ final class OperationsImpl<TNode> extends Operations {
 
 			try {
 				fs.unmounted();
-				logger.info("Dokany File System unmounted");
+				LOGGER.info("Dokany File System unmounted");
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -242,15 +223,16 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class Cleanup implements Operations.CleanupDelegate {
 		@Override
-		public void callback(final WString fileName,
+		public void callback(final WString path,
 		        final DokanFileInfo dokanFileInfo) {
-			if (isSkipFile(fileName)) {
+			if (isSkipFile(path)) {
 				return;
 			}
 
 			try {
-				fs.cleanup(getHandle(fileName, dokanFileInfo._context));
-				logger.trace("Cleaned up: {}", fileName);
+				final String normalizedPath = Utils.normalize(path);
+				fs.cleanup(normalizedPath);
+				LOGGER.trace("Cleaned up: {}", normalizedPath);
 			} catch (final Throwable t) {
 				t.printStackTrace();
 			}
@@ -259,14 +241,15 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class CloseFile implements Operations.CloseFileDelegate {
 		@Override
-		public void callback(final WString fileName, final DokanFileInfo dokanFileInfo) {
-			if (isSkipFile(fileName)) {
+		public void callback(final WString path, final DokanFileInfo dokanFileInfo) {
+			if (isSkipFile(path)) {
 				return;
 			}
 
 			try {
-				fs.close(getHandle(fileName, dokanFileInfo._context));
-				logger.trace("Closed file: {}", fileName);
+				final String normalizedPath = Utils.normalize(path);
+				fs.close(normalizedPath);
+				LOGGER.trace("Closed file: {}", normalizedPath);
 			} catch (final FileNotFoundException e) {
 			} catch (final Throwable t) {
 				t.printStackTrace();
@@ -286,25 +269,23 @@ final class OperationsImpl<TNode> extends Operations {
 		        final int rawFileSystemNameSize,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("GetVolumeInformation");
+			LOGGER.trace("GetVolumeInformation");
 
 			try {
 				volumeNameBuffer.setWideString(0L, Utils.trimStrToSize(fs.getVolumeName(), volumeNameSize));
-				logger.debug("Volume name: {}", fs.getVolumeName());
+				LOGGER.trace("Volume name: {}", fs.getVolumeName());
 
 				rawVolumeSerialNumber.setValue(fs.getVolumeSerialNumber());
-				logger.debug("Serial number: {}", fs.getVolumeSerialNumber());
+				LOGGER.trace("Serial number: {}", fs.getVolumeSerialNumber());
 
 				rawMaximumComponentLength.setValue(fs.getMaxComponentLength());
-				logger.debug("Max component length: {}", fs.getMaxComponentLength());
+				LOGGER.trace("Max component length: {}", fs.getMaxComponentLength());
 
 				rawFileSystemFlags.setValue(fs.getFileSystemFeatures());
-				logger.debug("File system features: {}", FileSystemFeatures.fromInt(fs.getFileSystemFeatures()));
+				LOGGER.trace("File system features: {}", FileSystemFeatures.fromInt(fs.getFileSystemFeatures()));
 
 				rawFileSystemNameBuffer.setWideString(0L, Utils.trimStrToSize(fs.getFileSystemName(), rawFileSystemNameSize));
-				logger.debug("File system name: {}", fs.getFileSystemName());
-
-				logger.debug("dokanFileInfo: {}", dokanFileInfo);
+				LOGGER.trace("File system name: {}", fs.getFileSystemName());
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -320,7 +301,7 @@ final class OperationsImpl<TNode> extends Operations {
 		        final LongByReference rawTotalNumberOfFreeBytes,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.trace("GetDiskFreeSpace");
+			LOGGER.trace("GetDiskFreeSpace");
 
 			rawFreeBytesAvailable.setValue(fs.getFreeBytesAvailable());
 			rawTotalNumberOfBytes.setValue(fs.getTotalBytesAvailable());
@@ -332,42 +313,18 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class FindFiles implements Operations.FindFilesDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final Operations.FillWin32FindData rawFillFindData,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.trace("FindFiles");
+			final String pathToSearch = Utils.normalize(path);
+			LOGGER.trace("FindFiles: {}", pathToSearch);
 
 			try {
-				fs.findFiles(getHandle(fileName, dokanFileInfo._context), win32FindData -> rawFillFindData.callback(win32FindData, dokanFileInfo));
-				return Success.val;
-			} catch (final Throwable t) {
-				return exceptionToErrorCode(t);
-			}
-		}
-	}
-
-	private void findFilesWithPattern(final FileHandle<TNode> handle, final PathMatcher pathMatcher, final FileEmitter emitter) throws IOException {
-		fs.findFiles(handle, win32FindData -> {
-			final Path path = Paths.get(Native.toString(win32FindData.cFileName));
-			if (pathMatcher.matches(path)) {
-				emitter.emit(win32FindData);
-			}
-		});
-	}
-
-	private class FindFilesWithPattern implements Operations.FindFilesWithPatternDelegate {
-		@Override
-		public long callback(final WString fileName,
-		        final WString searchPattern,
-		        final Operations.FillWin32FindData rawFillFindData,
-		        final DokanFileInfo dokanFileInfo) {
-
-			try {
-				final FileHandle<TNode> handle = getHandle(fileName, dokanFileInfo._context);
-				final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(GLOB + searchPattern.toString());
-				findFilesWithPattern(handle, matcher, win32FindData -> {
-					rawFillFindData.callback(win32FindData, dokanFileInfo);
+				final Set<WIN32_FIND_DATA> files = fs.findFiles(pathToSearch);
+				LOGGER.debug("Found {} files", files.size());
+				files.forEach(file -> {
+					rawFillFindData.callback(file, dokanFileInfo);
 				});
 
 				return Success.val;
@@ -377,47 +334,95 @@ final class OperationsImpl<TNode> extends Operations {
 		}
 	}
 
+	private class FindFilesWithPattern implements Operations.FindFilesWithPatternDelegate {
+		@Override
+		public long callback(final WString path,
+		        final WString searchPattern,
+		        final Operations.FillWin32FindData rawFillFindData,
+		        final DokanFileInfo dokanFileInfo) {
+
+			final String pathToSearch = Utils.normalize(path);
+			final String pattern = searchPattern.toString();
+			LOGGER.trace("FindFilesWithPattern {} with pattern {}", pathToSearch, pattern);
+
+			try {
+				final Set<WIN32_FIND_DATA> files = fs.findFilesWithPattern(pathToSearch, pattern);
+				LOGGER.debug("Found {} files", files.size());
+				files.forEach(file -> {
+					rawFillFindData.callback(file, dokanFileInfo);
+				});
+
+				return Success.val;
+			} catch (final Throwable t) {
+				return exceptionToErrorCode(t);
+			}
+		}
+	}
+
+	private class FindStreams implements Operations.FindStreamsDelegate {
+		@Override
+		public long callback(final WString path,
+		        final FillWin32FindStreamData rawFillFindData,
+		        final DokanFileInfo dokanFileInfo) {
+
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("FindStreams: {}", normalizedPath);
+
+			try {
+				final Set<Win32FindStreamData> streams = fs.findStreams(normalizedPath);
+				LOGGER.debug("Found {} streams", streams.size());
+				streams.forEach(file -> {
+					rawFillFindData.callback(file, dokanFileInfo);
+				});
+				return Success.val;
+			} catch (final Throwable t) {
+				return exceptionToErrorCode(t);
+			}
+		}
+	}
+
 	private class ReadFile implements Operations.ReadFileDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final Pointer buffer,
 		        final int bufferLength,
-		        final IntByReference readLength,
+		        final IntByReference readLengthRef,
 		        final long offset,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("ReadFile: {}", fileName);
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("ReadFile: {}", normalizedPath);
 
 			try {
 				final byte[] data = new byte[bufferLength];
-				final int read = fs.read(getHandle(fileName, dokanFileInfo._context), offset, data, bufferLength);
-				buffer.write(0, data, 0, read);
-				readLength.setValue(read);
-				logger.debug("Read this number of bytes: {}", read);
-				logger.debug("buffer.getString: {}", buffer.getString(0));
-				return Success.val;
+				final int numRead = fs.read(normalizedPath, (int) offset, data, bufferLength);
+				buffer.write(0, data, 0, numRead);
+				readLengthRef.setValue(numRead);
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_READ_FAULT.val);
 			}
+			return Success.val;
 		}
 	}
 
 	private class WriteFile implements Operations.WriteFileDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final Pointer buffer,
 		        final int numberOfBytesToWrite,
 		        final IntByReference numberOfBytesWritten,
 		        final long offset,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("WriteFile: {}", fileName);
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.debug("WriteFile: {}", normalizedPath);
+
 			try {
 				final byte[] data = new byte[numberOfBytesToWrite];
 				buffer.read(0L, data, 0, numberOfBytesToWrite);
-				final int written = fs.write(getHandle(fileName, dokanFileInfo._context), offset, data, numberOfBytesToWrite);
+				final int written = fs.write(normalizedPath, (int) offset, data, numberOfBytesToWrite);
 				numberOfBytesWritten.setValue(written);
-				logger.debug("Wrote this number of bytes: {}", written);
+				LOGGER.debug("Wrote this number of bytes: {}", written);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -427,12 +432,13 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class FlushFileBuffers implements Operations.FlushFileBuffersDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.trace("FlushFileBuffers");
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("FlushFileBuffers: {}", normalizedPath);
 			try {
-				fs.flushFileBuffers(getHandle(fileName, dokanFileInfo._context));
+				fs.flushFileBuffers(normalizedPath);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -442,23 +448,21 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class GetFileInformation implements Operations.GetFileInformationDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final ByHandleFileInfo info,
 		        final DokanFileInfo dokanFileInfo) {
-			logger.debug("GetFileInformation: {}", fileName);
 
-			if (isSkipFile(fileName)) {
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.debug("GetFileInformation native: {}", path.toString());
+			LOGGER.debug("GetFileInformation normalized: {}", normalizedPath);
+
+			if (isSkipFile(path)) {
 				return FileInvalid.val;
 			}
-			logger.debug("origInfo: {}", info);
 			try {
-				final ByHandleFileInfo retrievedInfo = getFileInfo(fileName, dokanFileInfo);
-				// if (!fileName.toString().equals("\\")) {
+				final ByHandleFileInfo retrievedInfo = fs.getInfo(normalizedPath);
 				retrievedInfo.copyTo(info);
-				// }
-
-				logger.debug("updatedInfo: {}", info);
-
+				LOGGER.debug("info for {}: {}", normalizedPath, info);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -468,14 +472,16 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class SetFileAttributes implements Operations.SetFileAttributesDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final int attributes,
 		        final DokanFileInfo rawInfo) {
 
-			logger.debug("SetFileAttributes as {} for {}", FileAttribute.fromInt(attributes), fileName);
+			final String normalizedPath = Utils.normalize(path);
+			final FileAttribute attribs = FileAttribute.fromInt(attributes);
+			LOGGER.trace("SetFileAttributes as {} for {}", attribs, normalizedPath);
 
 			try {
-				fs.setAttributes(getHandle(fileName, rawInfo._context), FileAttribute.fromInt(attributes));
+				fs.setAttributes(normalizedPath, attribs);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -485,16 +491,17 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class SetFileTime implements Operations.SetFileTimeDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final FILETIME creationTime,
 		        final FILETIME lastAccessTime,
 		        final FILETIME lastWriteTime,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("SetFileTime as creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", creationTime, lastAccessTime, lastWriteTime);
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("SetFileTime for {}; creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", normalizedPath, creationTime, lastAccessTime, lastWriteTime);
 
 			try {
-				fs.setTime(getHandle(fileName, dokanFileInfo._context), null, null, null);
+				fs.setTime(Utils.normalize(path), creationTime, lastAccessTime, lastWriteTime);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t, ERROR_WRITE_FAULT.val);
@@ -502,38 +509,21 @@ final class OperationsImpl<TNode> extends Operations {
 		}
 	}
 
-	private class FindStreams implements Operations.FindStreamsDelegate {
-		@Override
-		public long callback(final WString fileName,
-		        final Operations.FillWin32FindStreamData fill,
-		        final DokanFileInfo dokanFileInfo) {
-
-			logger.trace("FindStreams for {}", fileName);
-
-			try {
-				fs.findStreams(getHandle(fileName, dokanFileInfo._context), stream -> fill.callback(stream.toStruct(), dokanFileInfo));
-
-				return Success.val;
-			} catch (final Throwable t) {
-				return exceptionToErrorCode(t);
-			}
-		}
-	}
-
 	private class GetFileSecurity implements Operations.GetFileSecurityDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final int rawRequestedInformation,
 		        final Pointer rawSecurityDescriptor,
 		        final int rawSecurityDescriptorLength,
 		        final IntByReference rawSecurityDescriptorLengthNeeded,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("GetFileSecurity");
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
 
 			try {
 				final byte[] out = new byte[rawSecurityDescriptorLength];
-				final int expectedLength = fs.getSecurity(getHandle(fileName, dokanFileInfo._context), rawRequestedInformation, out);
+				final int expectedLength = fs.getSecurity(normalizedPath, rawRequestedInformation, out);
 				rawSecurityDescriptor.write(0L, out, 0, rawSecurityDescriptorLength);
 				rawSecurityDescriptorLengthNeeded.setValue(expectedLength);
 
@@ -546,18 +536,19 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class SetFileSecurity implements Operations.SetFileSecurityDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final int rawSecurityInformation,
 		        final Pointer rawSecurityDescriptor,
 		        final int rawSecurityDescriptorLength,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("SetFileSecurity");
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
 
 			try {
 				final byte[] data = new byte[rawSecurityDescriptorLength];
 				rawSecurityDescriptor.read(0L, data, 0, rawSecurityDescriptorLength);
-				fs.setSecurity(getHandle(fileName, dokanFileInfo._context), rawSecurityInformation, data);
+				fs.setSecurity(normalizedPath, rawSecurityInformation, data);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -568,13 +559,14 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class DeleteFile implements Operations.DeleteFileDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("DeleteFile: {}", fileName);
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("DeleteFile: {}", normalizedPath);
 
 			try {
-				fs.deleteFile(getHandle(fileName, dokanFileInfo._context));
+				fs.deleteFile(normalizedPath);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -585,13 +577,14 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class DeleteDirectory implements Operations.DeleteDirectoryDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("DeleteDirectory: {}", fileName);
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("DeleteDirectory: {}", normalizedPath);
 
 			try {
-				fs.deleteDirectory(getHandle(fileName, dokanFileInfo._context));
+				fs.deleteDirectory(normalizedPath);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -602,15 +595,17 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class MoveFile implements Operations.MoveFileDelegate {
 		@Override
-		public long callback(final WString oldFileName,
-		        final WString newFileName,
+		public long callback(final WString oldPath,
+		        final WString newPath,
 		        final boolean replaceIfExisting,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("MoveFile: {} to {}; replace existing? ", oldFileName, newFileName, replaceIfExisting);
+			final String oldNormalizedPath = Utils.normalize(oldPath);
+			final String newNormalizedPath = Utils.normalize(newPath);
+			LOGGER.debug("trace: {} to {}; replace existing? ", oldNormalizedPath, newNormalizedPath, replaceIfExisting);
 
 			try {
-				fs.move(getHandle(oldFileName, dokanFileInfo._context), getHandle(newFileName, dokanFileInfo._context), replaceIfExisting);
+				fs.move(oldNormalizedPath, newNormalizedPath, replaceIfExisting);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -621,10 +616,13 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class SetEndOfFile implements Operations.SetEndOfFileDelegate {
 		@Override
-		public long callback(final WString fileName, final long byteOffset, final DokanFileInfo dokanFileInfo) {
-			logger.debug("SetEndOfFile");
+		public long callback(final WString path, final long offset, final DokanFileInfo dokanFileInfo) {
+
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("SetEndOfFile: {}", normalizedPath);
+
 			try {
-				fs.setEndOfFile(getHandle(fileName, dokanFileInfo._context), byteOffset);
+				fs.setEndOfFile(normalizedPath, (int) offset);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -634,12 +632,15 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class SetAllocationSize implements Operations.SetAllocationSizeDelegate {
 		@Override
-		public long callback(final WString fileName,
+		public long callback(final WString path,
 		        final long length,
 		        final DokanFileInfo dokanFileInfo) {
-			logger.debug("SetAllocationSize");
+
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("SetAllocationSize: {}", normalizedPath);
+
 			try {
-				fs.setAllocationSize(getHandle(fileName, dokanFileInfo._context), length);
+				fs.setAllocationSize(normalizedPath, (int) length);
 				return Success.val;
 			} catch (final Throwable t) {
 				return exceptionToErrorCode(t);
@@ -649,14 +650,16 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class LockFile implements Operations.LockFileDelegate {
 		@Override
-		public long callback(final WString fileName,
-		        final long byteOffset,
+		public long callback(final WString path,
+		        final long offset,
 		        final long length,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("LockFile");
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("LockFile: {}", normalizedPath);
+
 			try {
-				fs.lock(getHandle(fileName, dokanFileInfo._context), byteOffset, length);
+				fs.lock(normalizedPath, (int) offset, (int) length);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -667,14 +670,15 @@ final class OperationsImpl<TNode> extends Operations {
 
 	private class UnlockFile implements Operations.UnlockFileDelegate {
 		@Override
-		public long callback(final WString fileName,
-		        final long byteOffset,
+		public long callback(final WString path,
+		        final long offset,
 		        final long length,
 		        final DokanFileInfo dokanFileInfo) {
 
-			logger.debug("UnlockFile");
+			final String normalizedPath = Utils.normalize(path);
+			LOGGER.trace("UnlockFile: {}", normalizedPath);
 			try {
-				fs.unlock(getHandle(fileName, dokanFileInfo._context), byteOffset, length);
+				fs.unlock(normalizedPath, (int) offset, (int) length);
 
 				return Success.val;
 			} catch (final Throwable t) {
@@ -683,32 +687,12 @@ final class OperationsImpl<TNode> extends Operations {
 		}
 	}
 
-	static class Win32FindStreamData extends Structure implements Operations.Win32FindStreamData {
-		public long length;
-		public char[] cFileName = new char[MAX_PATH + 36];
-
-		@Override
-		public void length(final long val) {
-			length = val;
-		}
-
-		@Override
-		public char[] cFileName() {
-			return cFileName;
-		}
-
-		@Override
-		protected List<String> getFieldOrder() {
-			return Arrays.asList("length", "cFileName");
-		}
-	}
-
 	private static long exceptionToErrorCode(final Throwable t) {
 		return exceptionToErrorCode(t, Unsuccessful.val);
 	}
 
 	private static long exceptionToErrorCode(final Throwable t, final long defaultCode) {
-		logger.warn(t.getMessage(), t);
+		LOGGER.warn(t.getMessage(), t);
 
 		if (t instanceof DokanyException) {
 			return ((DokanyException) t).val;
@@ -723,45 +707,18 @@ final class OperationsImpl<TNode> extends Operations {
 		return defaultCode;
 	}
 
-	private boolean isSkipFile(final WString fileName) {
+	private boolean isSkipFile(final WString path) {
 		boolean toReturn = false;
 
-		if (fileName.toString().endsWith("desktop.ini")
-		        || fileName.toString().endsWith("folder.jpg")
-		        || fileName.toString().endsWith("folder.gif")) {
-			// logger.debug("Skipping file: " + fileName);
+		final String normalizedPath = Utils.normalize(path);
+
+		if (normalizedPath.endsWith("desktop.ini")
+		        || normalizedPath.endsWith("folder.jpg")
+		        || normalizedPath.endsWith("folder.gif")) {
+			LOGGER.trace("Skipping file: " + normalizedPath);
 			toReturn = true;
 		}
 		return toReturn;
-	}
-
-	private FileHandle<TNode> getHandle(final WString path, final long id) throws IOException {
-		return fs.getHandle(Paths.get(path.toString()), id);
-	}
-
-	private ByHandleFileInfo getFileInfo(final WString fileNameW, final DokanFileInfo dokanFileInfo) throws IOException {
-		final String fileName = fileNameW.toString();
-
-		final FileHandle<TNode> handle = getHandle(fileNameW, dokanFileInfo._context);
-		final ByHandleFileInfo fileInfo;
-
-		if (Paths.get(fileName).toString().equals(fs.getRootPath().toString())) {
-			fileInfo = getRootInfo();
-			logger.debug("retrieved root info");
-		} else {
-			fileInfo = fs.getInfo(handle);
-		}
-		return fileInfo;
-	}
-
-	/**
-	 * Get root file info.
-	 *
-	 * @return ByHandleFileInfo for root
-	 */
-	private ByHandleFileInfo getRootInfo() {
-		final ByHandleFileInfo.Builder builder = new ByHandleFileInfo.Builder(fs.getRootPath());
-		return builder.build();
 	}
 
 	/**
@@ -771,9 +728,4 @@ final class OperationsImpl<TNode> extends Operations {
 	private boolean isDefaultLog() {
 		return fs.isDefaultLog();
 	}
-
-	/**
-	 * Path matcher glob
-	 */
-	private final static String GLOB = "glob:";
 }
