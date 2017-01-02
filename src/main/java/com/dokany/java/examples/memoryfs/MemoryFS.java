@@ -23,7 +23,8 @@ import com.dokany.java.Utils;
 import com.dokany.java.Win32FindStreamData;
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.constants.MountError;
-import com.dokany.java.structure.ByHandleFileInfo;
+import com.dokany.java.structure.FileData;
+import com.dokany.java.structure.FullFileInfo;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
@@ -148,13 +149,14 @@ public class MemoryFS implements FileSystem {
 	public Set<WIN32_FIND_DATA> findFilesWithPattern(final String pathToSearch, final String pattern) {
 		final Set<WIN32_FIND_DATA> files = new HashSet<>();
 
+		LOGGER.debug("findFilesWithPattern memoryfs:   path  {};     pattern {}", pathToSearch, pattern);
 		// Only use if pattern is not null
 		final PathMatcher pathMatcher = Utils.isNotNull(pattern) ? DEFAULT_FS.getPathMatcher(GLOB + ROOT_PATH + pattern) : null;
 
 		env.executeInTransaction((@NotNull final Transaction txn) -> {
 			vfs.getFiles(txn).forEach(file -> {
 				final String path = file.getPath();
-				if (isPathMatch(pathToSearch, pattern, pathMatcher)) {
+				if (isPathMatch(path, pattern, pathMatcher)) {
 					files.add(getInfo(path, txn).toWin32FindData());
 				}
 			});
@@ -162,19 +164,19 @@ public class MemoryFS implements FileSystem {
 		return files;
 	}
 
-	public boolean isPathMatch(final String pathToSearch, final String pattern, final PathMatcher pathMatcher) {
+	public boolean isPathMatch(final String pathToMatchAgainst, final String pattern, final PathMatcher pathMatcher) {
 		boolean isMatch = false;
 
-		LOGGER.debug("isPathMatch:  pathToSearch = {}; pattern = {}", pathToSearch, pattern);
+		LOGGER.debug("isPathMatch:  pathToMatchAgainst = {}; pattern = {}", pathToMatchAgainst, pattern);
 
 		// Do not match root or it will get listed in the directory
-		if (!pathToSearch.equals(ROOT_PATH)) {
+		if (!pathToMatchAgainst.equals(ROOT_PATH)) {
 			if (Utils.isNotNull(pattern)) {
 				// findFilesWithPattern
-				isMatch = pathMatcher.matches(Paths.get(pathToSearch));
+				isMatch = pathMatcher.matches(Paths.get(pathToMatchAgainst));
 			} else {
 				// findFiles
-				isMatch = pathToSearch.startsWith(pathToSearch);
+				isMatch = pathToMatchAgainst.startsWith(pathToMatchAgainst);
 			}
 		}
 		return isMatch;
@@ -215,36 +217,33 @@ public class MemoryFS implements FileSystem {
 	}
 
 	/**
-	 * This method creates ByHandleFileInfo for the specified file and attributes. All times are automatically set to now. Size is automatically set to 0.
+	 * This method creates FullFileInfo for the specified file and attributes. All times are automatically set to now. Size is automatically set to 0.
 	 *
 	 * @param file
 	 * @param attributes
 	 * @return
 	 */
-	private ByHandleFileInfo getNewInfo(final File file, final FileAttribute attributes) {
-		return new ByHandleFileInfo.Builder(file.getPath())
-		        .attributes(attributes)
-		        .volumeSerialNumber(getVolumeSerialNumber())
-		        .build();
+	private synchronized FullFileInfo getNewInfo(final File file, final FileAttribute attributes) {
+		return new FullFileInfo(file.getPath(), file.getDescriptor(), attributes, getVolumeSerialNumber());
 	}
 
 	/**
-	 * This method retrieves ByHandleFileInfo from the VFS.
+	 * This method retrieves FullFileInfo from the VFS.
 	 */
 	@Override
-	public ByHandleFileInfo getInfo(final String path) {
+	public synchronized FullFileInfo getInfo(final String path) {
 		return env.computeInTransaction((@NotNull final Transaction txn) -> {
 			return getInfo(path, txn);
 		});
 	}
 
 	/**
-	 * This method retrieves ByHandleFileInfo from the VFS.
+	 * This method retrieves FullFileInfo from the VFS.
 	 */
-	private ByHandleFileInfo getInfo(final String path, final Transaction txn) {
+	private FullFileInfo getInfo(final String path, final Transaction txn) {
 		final ArrayByteIterable pathKey = StringBinding.stringToEntry(path);
 		final ByteIterable iterable = infoStore.get(txn, pathKey);
-		return new ByHandleFileInfo(path, iterable);
+		return new FullFileInfo(path, iterable);
 	}
 
 	/**
@@ -262,7 +261,7 @@ public class MemoryFS implements FileSystem {
 	 */
 	private void createEmptyFile(final String path, final long options, final FileAttribute attributes, final Transaction txn) {
 		final File file = createFile(path, txn);
-		final ByHandleFileInfo info = getNewInfo(file, attributes);
+		final FullFileInfo info = getNewInfo(file, attributes);
 		setInfo(path, info, txn);
 	}
 
@@ -291,17 +290,17 @@ public class MemoryFS implements FileSystem {
 	 * Reads file from VFS and stores into data array.
 	 */
 	@Override
-	public int read(final String path, final int offset, final byte[] data, final int readLength) throws IOException {
+	public FileData read(final String path, final int offset, final int readLength) throws IOException {
 		if (readLength < 1) {
-			throw new IOException("readLength cannot be empty; file should not be read if it is empty");
+			throw new IOException("readLength cannot be empty");
 		}
 
 		if (Utils.isNull(path)) {
 			throw new FileNotFoundException("path was null");
 		}
 
-		final int numRead = env.computeInTransaction((@NotNull final Transaction txn) -> {
-			int toReturn = 0;
+		final FileData fileData = env.computeInTransaction((@NotNull final Transaction txn) -> {
+			FileData toReturn = null;
 
 			final File file = getExistingFile(path, txn);
 			final long fileSize = vfs.getFileLength(txn, file);
@@ -310,26 +309,30 @@ public class MemoryFS implements FileSystem {
 				if (Utils.isNotNull(file)) {
 					final VfsInputStream inputStream = vfs.readFile(txn, file);
 					try {
-						toReturn = inputStream.read(data, offset, Math.min(readLength, data.length - offset));
+						final byte[] data = new byte[readLength];
+						final int numRead = inputStream.read(data, offset, Math.min(readLength, data.length - offset));
+						toReturn = new FileData(data, numRead);
 					} catch (final IOException e) {
 						LOGGER.warn("Read fault on path {}", path, e);
-						toReturn = -1;
 					}
 				}
+			} else {
+				// initialize empty so IOException is not thrown
+				toReturn = new FileData(new byte[0], 0);
 			}
 			return toReturn;
 		});
 
-		if (numRead == -1) {
+		if (Utils.isNull(fileData)) {
 			throw new IOException("Error reading file");
 		}
-		return numRead;
+		return fileData;
 	}
 
 	/**
 	 * Writes a file or directory to VFS.
 	 *
-	 * @param path
+	 * @param filePath
 	 * @param offset
 	 * @param data
 	 * @param int
@@ -372,7 +375,7 @@ public class MemoryFS implements FileSystem {
 		return writeLength;
 	}
 
-	private int write(final File file, final int offset, final byte[] data, final int writeLength, final ByHandleFileInfo info, final Transaction txn) throws IOException {
+	private int write(final File file, final int offset, final byte[] data, final int writeLength, final FullFileInfo info, final Transaction txn) throws IOException {
 		try (DataOutputStream output = new DataOutputStream(vfs.writeFile(txn, file))) {
 			output.write(data, offset, writeLength);
 		}
@@ -381,41 +384,36 @@ public class MemoryFS implements FileSystem {
 		final long fileSize = vfs.getFileLength(txn, file);
 		LOGGER.debug("wrote file: {}", file.getPath());
 
-		ByHandleFileInfo infoToSet = info;
+		FullFileInfo newInfo = info;
 		if (Utils.isNull(info)) {
-			infoToSet = new ByHandleFileInfo.Builder(file.getPath())
-
-			        // TODO: attribute may not be correct
-			        // Find way to determine if this is a directory
-			        .attributes(FileAttribute.NORMAL)
-			        .volumeSerialNumber(getVolumeSerialNumber())
-			        .size(fileSize)
-			        .creationTime(file.getCreated())
-			        .build();
+			// Figure out how to properly set attribute
+			newInfo = getNewInfo(file, FileAttribute.NORMAL);
+			newInfo.setCreationTime(file.getCreated());
+			newInfo.setSize(fileSize);
 		}
-		setInfo(file.getPath(), infoToSet, txn);
+		setInfo(file.getPath(), newInfo, txn);
 		return writeLength;
 	}
 
 	/**
-	 * Stores ByHandleFileInfo into VFS.
+	 * Stores FullFileInfo into VFS.
 	 *
 	 * @param path
 	 * @param info
 	 */
-	private void setInfo(final String path, final ByHandleFileInfo info, final Transaction txn) {
+	private void setInfo(final String path, final FullFileInfo info, final Transaction txn) {
 		final ArrayByteIterable pathKey = StringBinding.stringToEntry(path);
 		LOGGER.debug("set info for {} to {}", path, info);
 		infoStore.put(txn, pathKey, info.toByteIterable());
 	}
 
 	/**
-	 * Stores ByHandleFileInfo into VFS.
+	 * Stores FullFileInfo into VFS.
 	 *
 	 * @param path
 	 * @param info
 	 */
-	private void setInfo(final String path, final ByHandleFileInfo info) {
+	private void setInfo(final String path, final FullFileInfo info) {
 		env.executeInTransaction((@NotNull final Transaction txn) -> {
 			setInfo(path, info, txn);
 		});
@@ -432,14 +430,14 @@ public class MemoryFS implements FileSystem {
 			toSet = attributes.val;
 		}
 
-		final ByHandleFileInfo info = getInfo(path);
+		final FullFileInfo info = getInfo(path);
 		info.dwFileAttributes = toSet;
 		setInfo(path, info);
 	}
 
 	@Override
 	public void setTime(final String path, final FILETIME creation, final FILETIME lastAccess, final FILETIME lastModification) {
-		final ByHandleFileInfo info = getInfo(path);
+		final FullFileInfo info = getInfo(path);
 		info.ftCreationTime = creation;
 		info.ftLastAccessTime = lastAccess;
 		info.ftLastWriteTime = lastModification;
@@ -466,9 +464,9 @@ public class MemoryFS implements FileSystem {
 		// final Node parent = item.getParent();
 
 		/*
-		 * vfs. final ByHandleFileInfo fileInfo = handle.getFileInfo(); final ByHandleFileInfo parentFileInfo = createHandle(parent.getPath(), parent).getFileInfo(); final FILETIME
-		 * now = new FILETIME(new Date()); fileInfo.ftLastAccessTime = now; parentFileInfo.ftLastAccessTime = now; fileInfo.ftLastWriteTime = now; parentFileInfo.ftLastWriteTime =
-		 * now; return ErrorCodes.ERROR_ALREADY_EXISTS.val;
+		 * vfs. final FullFileInfo fileInfo = handle.getFileInfo(); final FullFileInfo parentFileInfo = createHandle(parent.getPath(), parent).getFileInfo(); final FILETIME now =
+		 * new FILETIME(new Date()); fileInfo.ftLastAccessTime = now; parentFileInfo.ftLastAccessTime = now; fileInfo.ftLastWriteTime = now; parentFileInfo.ftLastWriteTime = now;
+		 * return ErrorCodes.ERROR_ALREADY_EXISTS.val;
 		 */
 		// TODO: complete
 		return 0;
@@ -564,24 +562,20 @@ public class MemoryFS implements FileSystem {
 	 * @throws IOException
 	 */
 	private void createSampleItems() throws IOException {
-		final ByHandleFileInfo info = new ByHandleFileInfo.Builder(ROOT_PATH)
-		        .size(getTotalBytesAvailable())
-		        .attributes(FileAttribute.DEVICE)
-		        .volumeSerialNumber(getVolumeSerialNumber())
-		        .build();
-
 		final IOException error = env.computeInTransaction((@NotNull final Transaction txn) -> {
 			IOException toReturn = null;
 			try {
 				// Root - must be created
-				createFile(ROOT_PATH, txn);
+				File file = createFile(ROOT_PATH, txn);
+				final FullFileInfo info = new FullFileInfo(ROOT_PATH, file.getDescriptor(), FileAttribute.DEVICE, getVolumeSerialNumber());
+				info.setSize(getTotalBytesAvailable());
 				setInfo(ROOT_PATH, info, txn);
 
 				// File 1 - empty
 				createEmptyFile(ROOT_PATH + "1.txt", 0, FileAttribute.NORMAL, txn);
 
 				// File 2 - 5 bytes
-				File file = createFile(ROOT_PATH + "2.txt", txn);
+				file = createFile(ROOT_PATH + "2.txt", txn);
 				writeAll(file, new byte[] { 'H', 'E', 'L', 'L', 'O' }, txn);
 
 				// Directory - empty

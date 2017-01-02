@@ -3,7 +3,6 @@ package com.dokany.java.structure;
 import java.util.Date;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,15 +10,7 @@ import com.dokany.java.Utils;
 import com.dokany.java.constants.FileAttribute;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
-import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
-
-import jetbrains.exodus.ArrayByteIterable;
-import jetbrains.exodus.ByteIterable;
-import jetbrains.exodus.ByteIterator;
-import jetbrains.exodus.bindings.IntegerBinding;
-import jetbrains.exodus.bindings.LongBinding;
-import jetbrains.exodus.util.LightOutputStream;
 
 /**
  *
@@ -46,9 +37,9 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	private final static Logger LOGGER = LoggerFactory.getLogger(ByHandleFileInfo.class);
 
 	// Used to store actual values (instead of high/low) which can be retrieved using getter method
-	private String path;
-	private long fileIndex;
-	private long fileSize;
+	String filePath;
+	long fileIndex;
+	long fileSize;
 
 	/**
 	 * The high-order DWORD value of the file size, in bytes. This value is zero unless the file size is greater than MAXDWORD. The size of the file is equal to (nFileSizeHigh*
@@ -97,124 +88,112 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 */
 	public int nFileSizeLow;
 
-	// Additional variables that are not defined in WIN32_FIND_DATA
 	public int dwVolumeSerialNumber;
 	public int dwNumberOfLinks = 1;
 
 	public ByHandleFileInfo() {
-		super();
-	}
-
-	public ByHandleFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) {
-		final ByteIterator iterator = iterable.iterator();
-
-		final long size = LongBinding.readCompressed(iterator);
-		final long index = LongBinding.readCompressed(iterator);
-
-		final int attributes = IntegerBinding.readCompressed(iterator);
-
-		final FILETIME creationTime = new FILETIME(new Date(LongBinding.readCompressed(iterator)));
-		final FILETIME lastAccessTime = new FILETIME(new Date(LongBinding.readCompressed(iterator)));
-		final FILETIME lastWriteTime = new FILETIME(new Date(LongBinding.readCompressed(iterator)));
-
-		setVariables(path, size, index, attributes, creationTime, lastAccessTime, lastWriteTime, 0, 0);
-	}
-
-	public ArrayByteIterable toByteIterable() {
-		final LightOutputStream output = new LightOutputStream();
-
-		LongBinding.writeCompressed(output, fileSize);
-		LongBinding.writeCompressed(output, fileIndex);
-
-		IntegerBinding.writeCompressed(output, dwFileAttributes);
-
-		LongBinding.writeCompressed(output, ftCreationTime.toTime());
-		LongBinding.writeCompressed(output, ftLastAccessTime.toTime());
-		LongBinding.writeCompressed(output, ftLastWriteTime.toTime());
-
-		return output.asArrayByteIterable();
-	}
-
-	ByHandleFileInfo(
-	        final String path,
-	        final long size,
-	        final long index,
-	        final int attributes,
-	        final FILETIME creationTime,
-	        final FILETIME lastAccessTime,
-	        final FILETIME lastWriteTime,
-	        final int numberOfLinks,
-	        final int volumeSerialNumber) {
-		setVariables(path, size, index, attributes, creationTime, lastAccessTime, lastWriteTime, numberOfLinks, volumeSerialNumber);
-	}
-
-	void setVariables(
-	        final String path,
-	        final long size,
-	        final long index,
-	        final int attributes,
-	        final FILETIME creationTime,
-	        final FILETIME lastAccessTime,
-	        final FILETIME lastWriteTime,
-	        final int numberOfLinks,
-	        final int volumeSerialNumber) {
-
-		this.path = path;
-
-		setSize(size);
-		setIndex(index);
-
-		dwFileAttributes = attributes;
-
-		final Date now = new Date();
-
-		ftCreationTime = Utils.isNull(creationTime) ? new FILETIME(now) : creationTime;
-		ftLastAccessTime = Utils.isNull(lastAccessTime) ? new FILETIME(now) : lastAccessTime;
-		ftLastWriteTime = Utils.isNull(lastWriteTime) ? new FILETIME(now) : lastWriteTime;
-
-		dwNumberOfLinks = numberOfLinks;
-		dwVolumeSerialNumber = volumeSerialNumber;
-	}
-
-	public WIN32_FIND_DATA toWin32FindData() {
-
-		final char[] cFileName = Utils.trimFrontSlash(Utils.trimStrToSize(path, 260)).toCharArray();
-		final char[] cAlternateFileName = new char[1];
-		// final char[] cAlternateFileName = Utils.trimFrontSlash(Utils.trimStrToSize(path, 14)).toCharArray();
-		// TODO: Why does setting alternate name cause file name to show up twice??
-		return new WIN32_FIND_DATA(
-		        dwFileAttributes,
-		        ftCreationTime, ftLastAccessTime, ftLastWriteTime,
-		        nFileSizeHigh, nFileSizeLow,
-		        0,
-		        0,
-		        cFileName, cAlternateFileName);
+		setTimes(0, 0, 0);
 	}
 
 	public void copyTo(final ByHandleFileInfo infoToReceive) {
 		if (Utils.isNull(infoToReceive)) {
-			throw new IllegalStateException("ByHandleFileInfo to copy cannot be null");
+			throw new IllegalStateException("infoToReceive cannot be null");
 		}
 
-		infoToReceive.setVariables(path, fileSize, fileIndex, dwFileAttributes, ftCreationTime, ftLastAccessTime, ftLastWriteTime, dwNumberOfLinks, dwVolumeSerialNumber);
+		infoToReceive.filePath = filePath;
+
+		infoToReceive.setSize(fileSize, nFileSizeHigh, nFileSizeLow);
+
+		infoToReceive.setIndex(fileIndex, nFileIndexHigh, nFileIndexLow);
+
+		infoToReceive.dwFileAttributes = dwFileAttributes;
+
+		infoToReceive.setTimes(ftCreationTime, ftLastAccessTime, ftLastWriteTime);
+
+		infoToReceive.dwNumberOfLinks = dwNumberOfLinks;
+		infoToReceive.dwVolumeSerialNumber = dwVolumeSerialNumber;
 	}
 
-	private final void setSize(final long size) {
+	public void setAttributes(final FileAttribute attributes) {
+		int toSet = FileAttribute.NORMAL.val;
+		if (Utils.isNotNull(this)) {
+			toSet = attributes.val;
+		}
+		dwFileAttributes = toSet;
+	}
+
+	public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
+		final Date now = new Date();
+
+		ftCreationTime = creationTime == 0 ? new FILETIME(now) : new FILETIME(new Date(creationTime));
+		ftLastAccessTime = lastAccessTime == 0 ? new FILETIME(now) : new FILETIME(new Date(lastAccessTime));
+		ftLastWriteTime = lastWriteTime == 0 ? new FILETIME(now) : new FILETIME(new Date(lastWriteTime));
+	}
+
+	void setTimes(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
+		ftCreationTime = creationTime;
+		ftLastAccessTime = lastAccessTime;
+		ftLastWriteTime = lastWriteTime;
+	}
+
+	/**
+	 * Also sets lastAccessTime to same time.
+	 *
+	 * @param lastWriteTimeToSet
+	 * @return
+	 */
+	public void setLastWriteTime(final long lastWriteTime) {
+		ftLastWriteTime = lastWriteTime == 0 ? new FILETIME(new Date()) : new FILETIME(new Date(lastWriteTime));
+		ftLastAccessTime = ftLastWriteTime;
+	}
+
+	/**
+	 * Also sets lastAccessTime to same time.
+	 *
+	 * @param lastWriteTimeToSet
+	 * @return
+	 */
+	public void setCreationTime(final long creationTime) {
+		ftCreationTime = creationTime == 0 ? new FILETIME(new Date()) : new FILETIME(new Date(creationTime));
+	}
+
+	public void setSize(final long sizeToSet) {
+		setSize(sizeToSet, 0, 0);
+	}
+
+	final void setSize(final long size, final int sizeHigh, final int sizeLow) {
 		fileSize = size;
-		final LARGE_INTEGER largeInt = new LARGE_INTEGER(size);
-		nFileSizeHigh = largeInt.getHigh().intValue();
-		nFileSizeLow = largeInt.getLow().intValue();
+
+		final LARGE_INTEGER largeInt = getLargeInt(size, sizeHigh, sizeLow);
+
+		nFileSizeHigh = ((size != 0) && (sizeHigh == 0)) ? largeInt.getHigh().intValue() : (int) size;
+		nFileSizeLow = ((size != 0) && (sizeLow == 0)) ? largeInt.getLow().intValue() : (int) size;
+
 	}
 
 	public final long getSize() {
 		return fileSize;
 	}
 
-	private final void setIndex(final long index) {
+	public void setIndex(final long indexToSet) {
+		setIndex(indexToSet, 0, 0);
+	}
+
+	final void setIndex(final long index, final int indexHigh, final int indexLow) {
 		fileIndex = index;
-		final LARGE_INTEGER largeInt = new LARGE_INTEGER(index);
-		nFileIndexHigh = largeInt.getHigh().intValue();
-		nFileIndexLow = largeInt.getLow().intValue();
+
+		final LARGE_INTEGER largeInt = getLargeInt(index, indexHigh, indexLow);
+
+		nFileIndexHigh = ((index != 0) && (indexHigh == 0)) ? largeInt.getHigh().intValue() : (int) index;
+		nFileIndexLow = ((index != 0) && (indexLow == 0)) ? largeInt.getLow().intValue() : (int) index;
+	}
+
+	private static final LARGE_INTEGER getLargeInt(final long val, final int high, final int low) {
+		LARGE_INTEGER largeInt = null;
+		if ((val != 0) && ((high == 0) || (low == 0))) {
+			largeInt = new LARGE_INTEGER(val);
+		}
+		return largeInt;
 	}
 
 	@Override
@@ -225,7 +204,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 		        ", lastAccessTime=" + ftLastAccessTime +
 		        ", lastWriteTime=" + ftLastWriteTime +
 		        ", fileSize=" + fileSize +
-		        ", fileName='" + path + '\'' +
+		        ", fileName='" + filePath + '\'' +
 		        ", fileIndex=" + fileIndex +
 		        ", numberOfLinks=" + dwNumberOfLinks +
 		        ", volumeSerialNumber=" + dwVolumeSerialNumber +
@@ -241,101 +220,5 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 		        "nFileSizeHigh", "nFileSizeLow",
 		        "dwNumberOfLinks",
 		        "nFileIndexHigh", "nFileIndexLow");
-	}
-
-	public static class Builder {
-
-		final String path;
-		private long size;
-		private long index;
-		private int attributes;
-		private FILETIME creationTime;
-		private FILETIME lastAccessTime;
-		private FILETIME lastWriteTime;
-		private int numberOfLinks;
-		private int volumeSerialNumber;
-
-		public Builder(final String path) {
-			this.path = path;
-		}
-
-		public Builder size(final long sizeToSet) {
-			size = sizeToSet;
-			return this;
-		}
-
-		public Builder index(final long indexToSet) {
-			index = indexToSet;
-			return this;
-		}
-
-		public Builder attributes(final FileAttribute attributes) {
-			int toSet = FileAttribute.NORMAL.val;
-			if (Utils.isNotNull(this)) {
-				toSet = attributes.val;
-			}
-			this.attributes = toSet;
-			return this;
-		}
-
-		public Builder creationTime(final long creationTimeToSet) {
-			return creationTime(new FILETIME(new Date(creationTimeToSet)));
-		}
-
-		public Builder creationTime(final Date creationTimeToSet) {
-			return creationTime(new FILETIME(creationTimeToSet));
-		}
-
-		public Builder creationTime(final FILETIME creationTimeToSet) {
-			creationTime = creationTimeToSet;
-			return this;
-		}
-
-		public Builder lastAccessTime(final long lastAccessTimeToSet) {
-			return lastAccessTime(new FILETIME(new Date(lastAccessTimeToSet)));
-		}
-
-		public Builder lastAccessTime(final Date creationTimeToSet) {
-			return creationTime(new FILETIME(creationTimeToSet));
-		}
-
-		public Builder lastAccessTime(final FILETIME lastAccessTimeToSet) {
-			lastAccessTime = lastAccessTimeToSet;
-			return this;
-		}
-
-		public Builder lastWriteTime(final long lastWriteTimeToSet) {
-			return lastWriteTime(new FILETIME(new Date(lastWriteTimeToSet)));
-		}
-
-		public Builder lastWriteTime(final Date lastWriteTimeToSet) {
-			return lastWriteTime(new FILETIME(lastWriteTimeToSet));
-		}
-
-		/**
-		 * Also sets lastAccessTime to same time.
-		 *
-		 * @param lastWriteTimeToSet
-		 * @return
-		 */
-		public Builder lastWriteTime(final FILETIME lastWriteTimeToSet) {
-			lastWriteTime = new FILETIME(lastWriteTimeToSet.toDate());
-			lastAccessTime(lastWriteTimeToSet);
-			return this;
-		}
-
-		public Builder numberOfLinks(final int numberOfLinksToSet) {
-			numberOfLinks = numberOfLinksToSet;
-			return this;
-		}
-
-		public Builder volumeSerialNumber(final int volumeSerialNumberToSet) {
-			volumeSerialNumber = volumeSerialNumberToSet;
-			return this;
-		}
-
-		public ByHandleFileInfo build() {
-			return new ByHandleFileInfo(path, size, index, attributes, creationTime, lastAccessTime, lastWriteTime, numberOfLinks, volumeSerialNumber);
-		}
 	}
 }
