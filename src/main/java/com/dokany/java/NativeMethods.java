@@ -1,9 +1,14 @@
 package com.dokany.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dokany.java.constants.FileAccess;
 import com.dokany.java.structure.DeviceOptions;
 import com.dokany.java.structure.DokanFileInfo;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.NTStatus;
 import com.sun.jna.ptr.IntByReference;
 
 /**
@@ -11,7 +16,8 @@ import com.sun.jna.ptr.IntByReference;
  *
  */
 final class NativeMethods {
-	final static String DOKAN_DLL = "dokan1";
+	private final static String DOKAN_DLL = "dokan1";
+	private final static Logger LOGGER = LoggerFactory.getLogger(NativeMethods.class);
 
 	static {
 		Native.register(DOKAN_DLL);
@@ -21,10 +27,10 @@ final class NativeMethods {
 	 * Mount a new Dokan Volume. This function block until the device is unmount. If the mount fail, it will directly return {@link com.dokany.java.constants.MountError}.
 	 *
 	 * @param options A {@link com.dokany.java.structure.DeviceOptions} that describe the mount.
-	 * @param operations Instance of {@link com.dokany.java.Operations} that will be called for each request made by the kernel.
+	 * @param operations Instance of {@link com.dokany.java.DokanyOperations} that will be called for each request made by the kernel.
 	 * @return {@link com.dokany.java.constants.MountError}.
 	 */
-	final static native int DokanMain(DeviceOptions options, Operations operations);
+	final static native int DokanMain(DeviceOptions options, DokanyOperations operations);
 
 	/**
 	 * Get the version of Dokan.
@@ -63,7 +69,7 @@ final class NativeMethods {
 	 * @param dokanFileInfo {@link com.dokany.java.structure.DokanFileInfo} of the operation to extend.
 	 * @return if the operation was successful or not.
 	 */
-	final static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
+	static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
@@ -74,7 +80,7 @@ final class NativeMethods {
 	final static native IntByReference DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
 
 	/**
-	 * Convert {@link com.dokany.java.structure.Operations.ZwCreateFileDelegate} parameters to CreateFile parameters.
+	 * Convert {@link com.dokany.java.DokanyOperations.CreateFile} parameters to CreateFile parameters.
 	 *
 	 * @param fileAttributes FileAttributes
 	 * @param createOptions CreateOptions
@@ -88,4 +94,58 @@ final class NativeMethods {
 	        long createDisposition,
 	        IntByReference outFileAttributesAndFlags,
 	        IntByReference outCreationDisposition);
+
+	/**
+	 * Convert IRP_MJ_CREATE DesiredAccess to generic rights.
+	 *
+	 * @param DesiredAccess Standard rights to convert
+	 * @return New DesiredAccess with generic rights.
+	 * @see {@linkplain https://msdn.microsoft.com/windows/hardware/drivers/ifs/access-mask}
+	 */
+	final static native FileAccess DokanMapStandardToGenericAccess(FileAccess DesiredAccess);
+
+	/**
+	 * Checks whether Name can match Expression
+	 *
+	 * @param expression - Expression can contain wildcard characters (? and *)
+	 * @param name - Name to check
+	 * @param ignoreCase - Case sensitive or not
+	 * @return result if name matches the expression
+	 */
+	final static native boolean DokanIsNameInExpression(String expression, String name, boolean ignoreCase);
+
+	final static native boolean DokanServiceInstall(String serviceName, int serviceType, String serviceFullPath);
+
+	final static native boolean DokanServiceDelete(String serviceName);
+
+	final static native boolean DokanNetworkProviderInstall();
+
+	final static native boolean DokanNetworkProviderUninstall();
+
+	final static native boolean DokanSetDebugMode(int mode);
+
+	final static native void DokanUseStdErr(boolean status);
+
+	final static native void DokanDebugMode(boolean status);
+
+	/**
+	 * Get active Dokan mount points
+	 *
+	 * @param list - Allocate array of DOKAN_CONTROL
+	 * @param length - Number of DOKAN_CONTROL instance in list.
+	 * @param uncOnly - Get only instances that have UNC Name.
+	 * @param nbRead- Number of instances successfully retrieved
+	 * @return List retrieved or not.
+	 */
+	final static native boolean DokanGetMountPointList(long fileAttributes, long length, boolean uncOnly, long nbRead);
+
+	/**
+	 * Convert WIN32 error to NTSTATUS
+	 *
+	 * @see {@linkplain https://support.microsoft.com/en-us/kb/113996}
+	 *
+	 * @param error - Win32 Error to convert
+	 * @return NtStatus associated to the error
+	 */
+	final static native NTStatus DokanNtStatusFromWin32(int error);
 }
