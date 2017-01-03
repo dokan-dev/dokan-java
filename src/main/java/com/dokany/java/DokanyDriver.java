@@ -1,8 +1,5 @@
 package com.dokany.java;
 
-import static com.dokany.java.constants.MountOptions.DEBUG_MODE;
-import static com.dokany.java.constants.MountOptions.STD_ERR_OUTPUT;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,28 +10,17 @@ import com.sun.jna.WString;
 /**
  * Main class to start and stop Dokany file system.
  *
- * @param <TItem> This is used in {@link com.dokany.java.FileHandle}
  */
 public final class DokanyDriver {
 
-	private final FileSystem fs;
-	private final DeviceOptions driverOptions;
+	private final FileSystem fileSystem;
+	private final DeviceOptions deviceOptions;
 	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyDriver.class);
 
-	public DokanyDriver(final String mountPoint, final FileSystem fs) {
-		this.fs = fs;
-		int options = 0;
+	public DokanyDriver(final DeviceOptions deviceOptions, final FileSystem fileSystem) {
 
-		if (fs.isDebug()) {
-			options |= DEBUG_MODE.val;
-		}
-
-		if (fs.isDebugStderrOutput()) {
-			options |= STD_ERR_OUTPUT.val;
-		}
-
-		final short threadCount = 1;
-		driverOptions = new DeviceOptions(mountPoint, threadCount, options, null, fs.getTimeout(), fs.getAllocationUnitSize(), fs.getSectorSize());
+		this.deviceOptions = deviceOptions;
+		this.fileSystem = fileSystem;
 
 		LOGGER.info("Dokany version: {}", getVersion());
 		LOGGER.info("Dokany driver version: {}", getDriverVersion());
@@ -67,32 +53,37 @@ public final class DokanyDriver {
 	 * @return
 	 */
 	public final FileSystem getFileSystem() {
-		return fs;
+		return fileSystem;
 	}
 
 	/**
 	 * Calls {@link com.dokany.java.NativeMethods#DokanMain(DeviceOptions, Operations)}. Has {@link java.lang.Runtime#addShutdownHook(Thread)} which calls {@link #shutdown()}
 	 */
 	public final void start() {
-		final int mountStatus = NativeMethods.DokanMain(driverOptions, new OperationsImpl(fs));
+		try {
+			final int mountStatus = NativeMethods.DokanMain(deviceOptions, new DokanyOperationsProxy(fileSystem));
 
-		if (mountStatus < 0) {
-			throw new IllegalStateException(MountError.fromInt(mountStatus).name);
-		}
-
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				shutdown();
+			if (mountStatus < 0) {
+				throw new IllegalStateException(MountError.fromInt(mountStatus).name);
 			}
-		});
+
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				@Override
+				public void run() {
+					shutdown();
+				}
+			});
+		} catch (final Throwable t) {
+			LOGGER.warn("Error mounting", t);
+			throw t;
+		}
 	}
 
 	/**
 	 * Calls {@link #stop(String)}.
 	 */
 	public final void shutdown() {
-		stop(driverOptions.MountPoint.toString());
+		stop(deviceOptions.MountPoint.toString());
 	}
 
 	/**
