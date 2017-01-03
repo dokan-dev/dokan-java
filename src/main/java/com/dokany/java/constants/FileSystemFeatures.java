@@ -2,21 +2,21 @@ package com.dokany.java.constants;
 
 public enum FileSystemFeatures {
 	NONE(0),
-	CaseSensitiveSearch(1),
-	CasePreservedNames(2),
-	UnicodeOnDisk(4),
-	PersistentAcls(8),
-	VolumeQuotas(0x20),
-	SupportsSparseFiles(0x40),
-	SupportsReparsePoints(0x80),
-	SupportsRemoteStorage(0x100),
-	VolumeIsCompressed(0x00008000),
-	SupportsObjectIDs(0x00010000),
-	SupportsEncryption(0x00020000),
-	NamedStreams(0x00040000),
-	ReadOnlyVolume(0x00080000),
-	SequentialWriteOnce(0x00100000),
-	SupportsTransactions(0x00200000);
+	CASE_SENSITIVE_SEARCH(1),
+	CASE_PRESERVED_NAMES(2),
+	UNICODE_ON_DISK(4),
+	PERSISTENT_ACLS(8),
+	VOLUME_QUOTAS(0x20),
+	SUPPORTS_SPARSE_FILES(0x40),
+	SUPPORTS_REPARSE_POINTS(0x80),
+	SUPPORTS_REMOTE_STORAGE(0x100),
+	VOLUME_IS_COMPRESSED(0x00008000),
+	SUPPORTS_OBJECT_IDS(0x00010000),
+	SUPPORTS_ENCRYPTION(0x00020000),
+	NAMED_STREAMS(0x00040000),
+	READ_ONLY_VOLUME(0x00080000),
+	SEQUENTIAL_WRITE_ONCE(0x00100000),
+	SUPPORTS_TRANSACTIONS(0x00200000);
 
 	public final int val;
 
