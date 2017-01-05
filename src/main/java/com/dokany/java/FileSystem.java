@@ -1,60 +1,59 @@
 package com.dokany.java;
 
-import static com.dokany.java.constants.FileSystemFeatures.CasePreservedNames;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dokany.java.constants.FileAttribute;
-import com.dokany.java.structure.ByHandleFileInfo;
+import com.dokany.java.structure.DeviceOptions;
+import com.dokany.java.structure.FileData;
+import com.dokany.java.structure.FreeSpace;
+import com.dokany.java.structure.FullFileInfo;
+import com.dokany.java.structure.VolumeInformation;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
 /**
  * This should be extended by file system providers.
- *
- * @param <TNode>
  */
-public interface FileSystem {
+public abstract class FileSystem {
+	private final static Logger LOGGER = LoggerFactory.getLogger(FileSystem.class);
 
-	public default boolean isDefaultLog() {
-		return isDebug();
+	protected final VolumeInformation volumeInfo;
+	protected final FreeSpace freeSpace;
+	protected final long allocationUnitSize;
+	protected final long sectorSize;
+	protected final long timeout;
+	protected final Date rootCreationDate;
+	protected final String rootPath;
+
+	public FileSystem(
+	        @NotNull final DeviceOptions deviceOptions,
+	        @NotNull final VolumeInformation volumeInfo,
+	        @NotNull final FreeSpace freeSpace,
+	        @NotNull final Date rootCreationDate,
+	        @NotNull final String rootPath) {
+		this.volumeInfo = volumeInfo;
+
+		this.freeSpace = freeSpace;
+
+		timeout = deviceOptions.Timeout;
+		allocationUnitSize = deviceOptions.AllocationUnitSize;
+		sectorSize = deviceOptions.SectorSize;
+		this.rootCreationDate = rootCreationDate;
+		this.rootPath = rootPath;
 	}
 
-	public default boolean isDebug() {
-		return false;
+	public final VolumeInformation getVolumeInfo() {
+		return volumeInfo;
 	}
 
-	public default boolean isDebugStderrOutput() {
-		return false;
-	}
-
-	public String getRootPath();
-
-	public default Date getRootCreateDate() {
-		return new Date();
-	}
-
-	public default int getMaxComponentLength() {
-		return 256;
-	}
-
-	public long getTotalBytesAvailable();
-
-	public long getUsedBytes();
-
-	public default long getFreeBytesAvailable() {
-		return getTotalBytesAvailable() - getUsedBytes();
-	}
-
-	/**
-	 * Default is 4096.
-	 *
-	 * @return
-	 */
-	public default int getAllocationUnitSize() {
-		return 4096;
+	public final FreeSpace getFreeSpace() {
+		return freeSpace;
 	}
 
 	/**
@@ -62,8 +61,17 @@ public interface FileSystem {
 	 *
 	 * @return
 	 */
-	public default int getSectorSize() {
-		return 4096;
+	public long getAllocationUnitSize() {
+		return allocationUnitSize;
+	}
+
+	/**
+	 * Default is 4096.
+	 *
+	 * @return
+	 */
+	public long getSectorSize() {
+		return sectorSize;
 	}
 
 	/**
@@ -71,112 +79,94 @@ public interface FileSystem {
 	 *
 	 * @return
 	 */
-	public default int getTimeout() {
-		return 10000;
+	public final long getTimeout() {
+		return timeout;
 	}
+
+	public final String getRootPath() {
+		return rootPath;
+	};
+
+	public final Date getRootCreateDate() {
+		return rootCreationDate;
+	}
+
+	public boolean isDebugStderrOutput() {
+		return false;
+	}
+
+	public boolean isDefaultLog() {
+		return isDebug();
+	}
+
+	public boolean isDebug() {
+		return false;
+	}
+
+	public abstract void mounted() throws IOException;
+
+	public abstract void unmounted() throws IOException;
+
+	public abstract boolean doesPathExist(final String path) throws IOException;
+
+	public abstract Set<WIN32_FIND_DATA> findFiles(final String path) throws IOException;
+
+	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(final String path, final String pattern) throws IOException;
+
+	public abstract Set<Win32FindStreamData> findStreams(final String path) throws IOException;
 
 	/**
-	 * Default is 0x00000000
-	 *
-	 * @return
+	 * Only used if dokan option UserModeLock is enabled
 	 */
-	public default int getVolumeSerialNumber() {
-		return 0x12345678;
-	}
+	public abstract void unlock(final String path, final int offset, final int length) throws IOException;
 
 	/**
-	 * Default is VOLUME;
-	 *
-	 * @return
+	 * Only used if dokan option UserModeLock is enabled
 	 */
-	public default String getVolumeName() {
-		return "VOLUME";
-	}
+	public abstract void lock(final String path, final int offset, final int length) throws IOException;
 
-	/**
-	 * Default is DOKANY.
-	 *
-	 * @return
-	 */
-	public default String getFileSystemName() {
-		return "DOKANY";
-	}
+	public abstract void move(final String oldPath, final String newPath, final boolean replaceIfExisting) throws IOException;
 
-	public default int getSecurity(final String path, final int kind, final byte[] out) throws IOException {
-		return 0;
-	}
+	public abstract void deleteFile(final String path) throws IOException;
 
-	public void setSecurity(final String path, final int kind, final byte[] data) throws IOException;
+	public abstract void deleteDirectory(final String path) throws IOException;
 
-	/**
-	 * Default is FileSystemFeatures.CasePreservedNames
-	 *
-	 * @return
-	 */
-	public default int getFileSystemFeatures() {
-		return CasePreservedNames.val;
-	}
+	public abstract FileData read(final String path, final int offset, final int readLength) throws IOException;
 
-	public ByHandleFileInfo getInfo(final String path) throws IOException;
+	public abstract int write(final String path, final int offset, final byte[] data, final int writeLength) throws IOException;
 
 	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
-	public void createEmptyFile(
+	public abstract void createEmptyFile(
 	        final String path,
 	        long options,
 	        final FileAttribute attributes) throws IOException;
 
 	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
-	public void createEmptyDirectory(
+	public abstract void createEmptyDirectory(
 	        final String path,
 	        final long options,
 	        final FileAttribute attributes)
 	        throws IOException;
 
-	public boolean pathExists(final String path) throws IOException;
+	public abstract void flushFileBuffers(final String path) throws IOException;
 
-	public Set<WIN32_FIND_DATA> findFiles(final String path) throws IOException;
+	public abstract void cleanup(final String path) throws IOException;
 
-	public Set<WIN32_FIND_DATA> findFilesWithPattern(final String path, final String pattern) throws IOException;
+	public abstract void close(final String path) throws IOException;
 
-	public Set<Win32FindStreamData> findStreams(final String path) throws IOException;
+	public abstract int getSecurity(final String path, final int kind, final byte[] out) throws IOException;
 
-	public void mounted() throws IOException;
+	public abstract void setSecurity(final String path, final int kind, final byte[] data) throws IOException;
 
-	public void unmounted() throws IOException;
+	public abstract long truncate(final String path) throws IOException;
 
-	/**
-	 * Only used if dokan option UserModeLock is enabled
-	 */
-	public void unlock(final String path, final int offset, final int length) throws IOException;
+	public abstract void setAllocationSize(final String path, final int length) throws IOException;
 
-	/**
-	 * Only used if dokan option UserModeLock is enabled
-	 */
-	public void lock(final String path, final int offset, final int length) throws IOException;
+	public abstract void setEndOfFile(final String path, final int offset) throws IOException;
 
-	public void move(final String oldPath, final String newPath, final boolean replaceIfExisting) throws IOException;
+	public abstract void setAttributes(final String path, final FileAttribute attributes) throws IOException;
 
-	public void deleteFile(final String path) throws IOException;
+	public abstract FullFileInfo getInfo(final String path) throws IOException;
 
-	public void deleteDirectory(final String path) throws IOException;
-
-	public int read(final String path, final int offset, final byte[] data, final int readLength) throws IOException;
-
-	public int write(final String path, final int offset, final byte[] data, final int writeLength) throws IOException;
-
-	public void flushFileBuffers(final String path) throws IOException;
-
-	public void cleanup(final String path) throws IOException;
-
-	public void close(final String path) throws IOException;
-
-	public long truncate(final String path) throws IOException;
-
-	public void setAllocationSize(final String path, final int length) throws IOException;
-
-	public void setEndOfFile(final String path, final int offset) throws IOException;
-
-	public void setAttributes(final String path, final FileAttribute attributes);
-
-	public void setTime(final String path, final FILETIME creation, final FILETIME lastAccess, final FILETIME lastModification) throws IOException;
+	public abstract void setTime(final String path, final FILETIME creation, final FILETIME lastAccess, final FILETIME lastModification) throws IOException;
 }
