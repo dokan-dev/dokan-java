@@ -20,4 +20,11 @@ public class FreeSpace {
 	public long getFreeBytes() {
 		return total - used;
 	}
+
+	@Override
+	public String toString() {
+		return "total: " + getTotalBytes() + System.lineSeparator()
+		        + "   used: " + getUsedBytes() + System.lineSeparator()
+		        + "   free: " + getFreeBytes();
+	}
 }
