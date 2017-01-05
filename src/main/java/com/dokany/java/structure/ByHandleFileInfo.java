@@ -3,8 +3,7 @@ package com.dokany.java.structure;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 
 import com.dokany.java.Utils;
 import com.dokany.java.constants.FileAttribute;
@@ -14,7 +13,7 @@ import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 
 /**
  *
- * Contains information that the {@link com.dokany.java.Operations.GetFileInformation} function retrieves.
+ * Contains information that the {@link com.dokany.java.DokanyOperations.GetFileInformation} function retrieves.
  *
  * The identifier that is stored in the nFileIndexHigh and nFileIndexLow members is called the file ID. Support for file IDs is file system-specific. File IDs are not guaranteed to
  * be unique over time, because file systems are free to reuse them. In some cases, the file ID for a file can change over time.
@@ -34,10 +33,11 @@ import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
  */
 public class ByHandleFileInfo extends Structure implements Structure.ByReference {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ByHandleFileInfo.class);
+	// private final static Logger LOGGER = LoggerFactory.getLogger(ByHandleFileInfo.class);
 
 	// Used to store actual values (instead of high/low) which can be retrieved using getter method
-	String filePath;
+	@NotNull
+	String filePath = "";
 	long fileIndex;
 	long fileSize;
 
@@ -61,6 +61,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	/**
 	 * A FILETIME structure that specifies when a file or directory was created. If the underlying file system does not support creation time, this member is zero.
 	 */
+	@NotNull
 	public FILETIME ftCreationTime;
 
 	/**
@@ -68,6 +69,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * specifies when the directory is created. If the underlying file system does not support last access time, this member is zero. On the FAT file system, the specified date for
 	 * both files and directories is correct, but the time of day is always set to midnight.
 	 */
+	@NotNull
 	public FILETIME ftLastAccessTime;
 
 	/**
@@ -75,6 +77,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * The date and time are not updated when file attributes or security descriptors are changed. For a directory, the structure specifies when the directory is created. If the
 	 * underlying file system does not support last write time, this member is zero.
 	 */
+	@NotNull
 	public FILETIME ftLastWriteTime;
 
 	/**

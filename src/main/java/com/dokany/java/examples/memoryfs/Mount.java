@@ -23,7 +23,7 @@ public class Mount {
 		int options = 0;
 		options |= DEBUG_MODE.val;
 		options |= STD_ERR_OUTPUT.val;
-		final String uncName = null;
+		final String uncName = "";
 		final long timeout = 10000;
 		final long allocationUnitSize = 4096;
 		final long sectorSize = 4096;

@@ -1,5 +1,7 @@
 package com.dokany.java.structure;
 
+import java.io.FileNotFoundException;
+
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +39,29 @@ public class FullFileInfo extends ByHandleFileInfo {
 	 */
 	private int dwReserved1;
 
-	public FullFileInfo(final String path, final long index, final FileAttribute attributes, final int volumeSerialNumber) {
+	@NotNull
+	public FullFileInfo(@NotNull final String path, final long index, final FileAttribute attributes, final int volumeSerialNumber) throws FileNotFoundException {
+		if (Utils.isNull(path)) {
+			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
+		}
+
+		// times automatically set to now by ByHandleFileInfo constructor
 		filePath = path;
 		setIndex(index);
 		setAttributes(attributes);
 		dwVolumeSerialNumber = volumeSerialNumber;
-		setTimes(0, 0, 0);
 	}
 
-	public FullFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) {
+	@NotNull
+	public FullFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) throws FileNotFoundException {
+		if (Utils.isNull(path) || Utils.isNull(iterable)) {
+			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
+		}
+
+		if ((path == null) || (iterable == null)) {
+			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
+		}
+
 		final ByteIterator iterator = iterable.iterator();
 
 		LOGGER.debug("Creating new FullFileInfo from infoStore: {}", path);
@@ -53,7 +69,6 @@ public class FullFileInfo extends ByHandleFileInfo {
 		filePath = path;
 
 		setSize(LongBinding.readCompressed(iterator), IntegerBinding.readCompressed(iterator), IntegerBinding.readCompressed(iterator));
-
 		setIndex(LongBinding.readCompressed(iterator), IntegerBinding.readCompressed(iterator), IntegerBinding.readCompressed(iterator));
 
 		dwFileAttributes = IntegerBinding.readCompressed(iterator);
@@ -100,10 +115,21 @@ public class FullFileInfo extends ByHandleFileInfo {
 		return output.asArrayByteIterable();
 	}
 
+	/**
+	 * Simply casts this object to ByHandleFileInfo
+	 *
+	 * @return this (cast as ByHandleFileInfo)
+	 */
+	@NotNull
 	public ByHandleFileInfo toByHandleFileInfo() {
 		return this;
 	}
 
+	/**
+	 *
+	 * @return WIN32_FIND_DATA
+	 */
+	@NotNull
 	public WIN32_FIND_DATA toWin32FindData() {
 		final char[] cFileName = Utils.trimFrontSlash(Utils.trimStrToSize(filePath, 260)).toCharArray();
 		final char[] cAlternateFileName = new char[1];
