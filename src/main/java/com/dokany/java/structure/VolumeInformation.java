@@ -59,4 +59,13 @@ public class VolumeInformation {
 	public FileSystemFeatures getFileSystemFeatures() {
 		return fileSystemFeatures;
 	}
+
+	@Override
+	public String toString() {
+		return "maxComponentLength: " + maxComponentLength + System.lineSeparator()
+		        + "   serialNumber: " + serialNumber + System.lineSeparator()
+		        + "   volumeName: " + volumeName + System.lineSeparator()
+		        + "   fileSystemName: " + fileSystemName + System.lineSeparator()
+		        + "   fileSystemFeatures: " + fileSystemFeatures;
+	}
 }
