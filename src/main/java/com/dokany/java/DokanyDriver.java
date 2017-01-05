@@ -1,5 +1,6 @@
 package com.dokany.java;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +13,13 @@ import com.sun.jna.WString;
  *
  */
 public final class DokanyDriver {
-
+	@NotNull
 	private final FileSystem fileSystem;
+	@NotNull
 	private final DeviceOptions deviceOptions;
 	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyDriver.class);
 
-	public DokanyDriver(final DeviceOptions deviceOptions, final FileSystem fileSystem) {
+	public DokanyDriver(@NotNull final DeviceOptions deviceOptions, @NotNull final FileSystem fileSystem) {
 
 		this.deviceOptions = deviceOptions;
 		this.fileSystem = fileSystem;
@@ -52,6 +54,7 @@ public final class DokanyDriver {
 	 *
 	 * @return
 	 */
+	@NotNull
 	public final FileSystem getFileSystem() {
 		return fileSystem;
 	}
@@ -91,7 +94,7 @@ public final class DokanyDriver {
 	 *
 	 * @param mountPoint
 	 */
-	public final static void stop(final String mountPoint) {
+	public final static void stop(@NotNull final String mountPoint) {
 		LOGGER.info("Unmount and shutdown: {}", mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));
