@@ -1,5 +1,11 @@
 package com.dokany.java;
 
+import static com.dokany.java.constants.ErrorCodes.ERROR_ALREADY_EXISTS;
+import static com.dokany.java.constants.ErrorCodes.ERROR_FILE_NOT_FOUND;
+import static com.dokany.java.constants.NtStatus.Unsuccessful;
+
+import java.io.FileNotFoundException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
@@ -104,5 +110,25 @@ public class Utils {
 	 */
 	public static boolean isNotNull(final Object obj) {
 		return !isNull(obj);
+	}
+
+	static long exceptionToErrorCode(final Throwable t) {
+		return exceptionToErrorCode(t, Unsuccessful.val);
+	}
+
+	static long exceptionToErrorCode(final Throwable t, final long defaultCode) {
+		LOGGER.warn(t.getMessage(), t);
+
+		if (t instanceof DokanyException) {
+			return ((DokanyException) t).val;
+		}
+		if (t instanceof FileNotFoundException) {
+			return ERROR_FILE_NOT_FOUND.val;
+		}
+		if (t instanceof FileAlreadyExistsException) {
+			return ERROR_ALREADY_EXISTS.val;
+		}
+
+		return defaultCode;
 	}
 }
