@@ -147,12 +147,12 @@ public class MemoryFS extends FileSystem {
 
 		env.executeInReadonlyTransaction((@NotNull final Transaction txn) -> {
 			vfs.getFiles(txn).forEach(file -> {
-				final String path = file.getPath();
+				final String currentPath = file.getPath();
 
-				// Do not match root or it will get listed in the directory
-				if (!pathToSearch.equals(rootPath) && path.startsWith(pathToSearch)) {
+				// Do not match pathToSearch or it will get listed in the directory
+				if (!pathToSearch.equals(pathToSearch) && currentPath.startsWith(currentPath)) {
 					try {
-						files.add(getInfo(path, txn).toWin32FindData());
+						files.add(getInfo(currentPath, txn).toWin32FindData());
 					} catch (final FileNotFoundException e) {
 						LOGGER.warn("Failed to add found file because of caught exception", e);
 					}
@@ -172,11 +172,14 @@ public class MemoryFS extends FileSystem {
 
 		env.executeInReadonlyTransaction((@NotNull final Transaction txn) -> {
 			vfs.getFiles(txn).forEach(file -> {
-				final String path = file.getPath();
-				// Do not match root or it will get listed in the directory
-				if (!pathToSearch.equals(rootPath) && pathMatcher.matches(Paths.get(pathToSearch))) {
+				final String currentPath = file.getPath();
+				LOGGER.trace("getFiles path: {}", currentPath);
+
+				// Do not match pathToSearch or it will get listed in the directory
+				if (!currentPath.equals(pathToSearch) && pathMatcher.matches(Paths.get(currentPath))) {
 					try {
-						files.add(getInfo(path, txn).toWin32FindData());
+						files.add(getInfo(currentPath, txn).toWin32FindData());
+						LOGGER.trace("Added {}", currentPath);
 					} catch (final FileNotFoundException e) {
 						LOGGER.warn("Failed to add found file because of caught exception", e);
 					}
