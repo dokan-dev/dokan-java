@@ -61,7 +61,8 @@ public class MemoryFS extends FileSystem {
 	private final Store infoStore;
 
 	public MemoryFS(final DeviceOptions deviceOptions) throws IOException {
-		super(deviceOptions, new VolumeInformation(), new FreeSpace(1024L * 1024L * 256L, 1024L * 1024L), new Date(), "/");
+		super(deviceOptions, new VolumeInformation(256, "Volume1", 234234, "MemoryFS", FileSystemFeatures.CASE_PRESERVED_NAMES),
+		        new FreeSpace(1024L * 1024L * 256L, 1024L * 1024L), new Date(), "/");
 
 		// Try to create store location in temp directory
 		final Path fileStorePath = Files.createTempDirectory("dokany-java_");

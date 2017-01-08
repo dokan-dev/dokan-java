@@ -12,12 +12,25 @@ public class VolumeInformation {
 	private final String fileSystemName;
 	private final FileSystemFeatures fileSystemFeatures;
 
+	public VolumeInformation(
+	        final int maxComponentLength,
+	        final String volumeName,
+	        final int serialNumber,
+	        final String fileSystemName,
+	        final FileSystemFeatures fileSystemFeatures) {
+		this.maxComponentLength = maxComponentLength;
+		this.volumeName = volumeName;
+		this.serialNumber = serialNumber;
+		this.fileSystemName = fileSystemName;
+		this.fileSystemFeatures = fileSystemFeatures;
+	}
+
 	public VolumeInformation() {
-		maxComponentLength = 256;
-		serialNumber = 0x12345678;
-		volumeName = "VOLUME";
-		fileSystemName = "DOKANY";
-		fileSystemFeatures = CASE_PRESERVED_NAMES;
+		this(256, "VOLUME", 0x12345678, "DOKANY", CASE_PRESERVED_NAMES);
+	}
+
+	public VolumeInformation(final String volumeName, final int serialNumber, final String fileSystemName) {
+		this(256, volumeName, serialNumber, fileSystemName, CASE_PRESERVED_NAMES);
 	}
 
 	public int getMaxComponentLength() {
@@ -62,10 +75,11 @@ public class VolumeInformation {
 
 	@Override
 	public String toString() {
-		return "maxComponentLength: " + maxComponentLength + System.lineSeparator()
+		return "{maxComponentLength: " + maxComponentLength + System.lineSeparator()
 		        + "   serialNumber: " + serialNumber + System.lineSeparator()
 		        + "   volumeName: " + volumeName + System.lineSeparator()
 		        + "   fileSystemName: " + fileSystemName + System.lineSeparator()
-		        + "   fileSystemFeatures: " + fileSystemFeatures;
+		        + "   fileSystemFeatures: " + fileSystemFeatures
+		        + "}";
 	}
 }
