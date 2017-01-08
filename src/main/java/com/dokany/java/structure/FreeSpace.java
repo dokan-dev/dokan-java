@@ -23,8 +23,9 @@ public class FreeSpace {
 
 	@Override
 	public String toString() {
-		return "total: " + getTotalBytes() + System.lineSeparator()
+		return "{total: " + getTotalBytes() + System.lineSeparator()
 		        + "   used: " + getUsedBytes() + System.lineSeparator()
-		        + "   free: " + getFreeBytes();
+		        + "   free: " + getFreeBytes()
+		        + "}";
 	}
 }

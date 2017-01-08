@@ -64,7 +64,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 
 		final ByteIterator iterator = iterable.iterator();
 
-		LOGGER.debug("Creating new FullFileInfo from infoStore: {}", path);
+		LOGGER.debug("Creating FullFileInfo from infoStore: {}", path);
 
 		filePath = path;
 
@@ -145,8 +145,8 @@ public class FullFileInfo extends ByHandleFileInfo {
 
 	@Override
 	public String toString() {
-		return "FileInfo{" +
-		        "fileName='" + filePath + '\'' +
+		return "{" +
+		        "fileName='" + filePath + '/' +
 		        ", fileSize=" + fileSize +
 		        ", fileIndex=" + fileIndex +
 		        ", attributes=" + dwFileAttributes +

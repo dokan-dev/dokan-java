@@ -24,7 +24,9 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public short ThreadCount;
 
 	/**
-	 * Features enable for the mount. See DokanOptions
+	 * Features enable for the mount.
+	 * 
+	 * @see {@link com.dokany.java.constants.MountOptions}
 	 */
 	public int Options;
 
@@ -61,7 +63,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public DeviceOptions(
 	        final String mountPoint,
 	        final short threadCount,
-	        final int options,
+	        final int dokanyOptions,
 	        final String uncName,
 	        final long timeout,
 	        final long allocationUnitSize,
@@ -69,7 +71,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
-		Options = options;
+		Options = dokanyOptions;
 		if (Utils.isNotNull(uncName)) {
 			UNCName = new WString(uncName);
 		} else {
