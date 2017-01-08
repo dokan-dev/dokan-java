@@ -239,10 +239,12 @@ public class MemoryFS extends FileSystem {
 	 */
 	@Override
 	public FullFileInfo getInfo(@NotNull final String path) throws IOException {
+		LOGGER.debug("getInfo for {}", path);
+
 		final FullFileInfo result = env.computeInReadonlyTransaction((@NotNull final Transaction txn) -> {
-			final FullFileInfo toReturn = null;
+			FullFileInfo toReturn = null;
 			try {
-				getInfo(path, txn);
+				toReturn = getInfo(path, txn);
 			} catch (final IOException e) {
 				LOGGER.warn("Could not retrieve info", e);
 			}
