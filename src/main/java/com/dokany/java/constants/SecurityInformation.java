@@ -1,5 +1,7 @@
 package com.dokany.java.constants;
 
+import com.sun.jna.platform.win32.WinNT;
+
 /**
  * Identifies the object-related security information being set or queried. This security information includes:
  * <ul>
@@ -16,28 +18,30 @@ package com.dokany.java.constants;
  */
 public enum SecurityInformation {
     // The owner identifier of the object is being referenced.
-	OWNER_SECURITY_INFORMATION(0x00000001),
+	OWNER_SECURITY_INFORMATION(WinNT.OWNER_SECURITY_INFORMATION),
 
     // The primary group identifier of the object is being referenced.
-	GROUP_SECURITY_INFORMATION(0x00000002),
+	GROUP_SECURITY_INFORMATION(WinNT.GROUP_SECURITY_INFORMATION),
 
     // The DACL of the object is being referenced.
-	DACL_SECURITY_INFORMATION(0x00000004),
+	DACL_SECURITY_INFORMATION(WinNT.DACL_SECURITY_INFORMATION),
 
     // The SACL of the object is being referenced.
-	SACL_SECURITY_INFORMATION(0x00000008),
+	SACL_SECURITY_INFORMATION(WinNT.SACL_SECURITY_INFORMATION),
+
+	LABEL_SECURITY_INFORMATION(WinNT.LABEL_SECURITY_INFORMATION),
 
     // The SACL inherits ACEs from the parent object. Dokan may not be passing Label ?? 0x00000010
-	UNPROTECTED_SACL_SECURITY_INFORMATION(0x10000000),
+	UNPROTECTED_SACL_SECURITY_INFORMATION(WinNT.UNPROTECTED_SACL_SECURITY_INFORMATION),
 
     // The DACL inherits ACEs from the parent object.
-	UNPROTECTED_DACL_SECURITY_INFORMATION(0x20000000),
+	UNPROTECTED_DACL_SECURITY_INFORMATION(WinNT.UNPROTECTED_DACL_SECURITY_INFORMATION),
 
     // The SACL cannot inherit ACEs.
-	PROTECTED_SACL_SECURITY_INFORMATION(0x40000000),
+	PROTECTED_SACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION),
 
     // The DACL cannot inherit access control entries (ACEs).
-	PROTECTED_DACL_SECURITY_INFORMATION(0x8000000);
+	PROTECTED_DACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION);
 
 	public final int val;
 
