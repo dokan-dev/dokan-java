@@ -20,7 +20,7 @@ import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.FileAccess;
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.structure.ByHandleFileInfo;
-import com.dokany.java.structure.DokanFileInfo;
+import com.dokany.java.structure.DokanyFileInfo;
 import com.dokany.java.structure.FileData;
 import com.dokany.java.structure.FreeSpace;
 import com.dokany.java.structure.VolumeInformation;
@@ -32,18 +32,18 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 /**
- * Implementation of {@link com.dokany.java.DokanyOperations} which connects to {@link com.dokany.java.FileSystem}.
+ * Implementation of {@link com.dokany.java.DokanyOperations} which connects to {@link com.dokany.java.DokanyFileSystem}.
  */
 final class DokanyOperationsProxy extends DokanyOperations {
 
-	final FileSystem fileSystem;
+	final DokanyFileSystem fileSystem;
 	final VolumeInformation volumeInfo;
 	final FreeSpace freeSpace;
 
 	public final static int MAX_PATH = 260;
 	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyOperationsProxy.class);
 
-	DokanyOperationsProxy(@NotNull final FileSystem fileSystem) {
+	DokanyOperationsProxy(@NotNull final DokanyFileSystem fileSystem) {
 		this.fileSystem = fileSystem;
 		volumeInfo = fileSystem.getVolumeInfo();
 		freeSpace = fileSystem.getFreeSpace();
@@ -85,7 +85,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        final int rawShareAccess,
 		        final int rawCreateDisposition,
 		        final int rawCreateOptions,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final long rawFileAttributesLong = rawFileAttributes;
 			final long rawCreateOptionsLong = rawCreateOptions;
@@ -94,7 +94,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 			final IntByReference creationDisposition = new IntByReference();
 
 			final String normalizedPath = Utils.normalize(path);
-			final boolean isDirectory = dokanFileInfo.isDirectory();
+			final boolean isDirectory = dokanyFileInfo.isDirectory();
 
 			NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributesLong, rawCreateOptionsLong, rawCreateDispositionLong, fileAttributesAndFlags,
 			        creationDisposition);
@@ -197,7 +197,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 	private final class Mounted implements DokanyOperations.Mounted {
 		@Override
-		public long mounted(final DokanFileInfo dokanFileInfo) {
+		public long mounted(final DokanyFileInfo dokanyFileInfo) {
 			try {
 				fileSystem.mounted();
 				LOGGER.info("Dokany File System mounted");
@@ -210,7 +210,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 	private class Unmounted implements DokanyOperations.Unmounted {
 		@Override
-		public long unmounted(final DokanFileInfo dokanFileInfo) {
+		public long unmounted(final DokanyFileInfo dokanyFileInfo) {
 
 			try {
 				fileSystem.unmounted();
@@ -226,14 +226,14 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		@Override
 		public void callback(
 		        @NotNull final WString path,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 			if (isSkipFile(path)) {
 				return;
 			}
 
 			try {
 				final String normalizedPath = Utils.normalize(path);
-				fileSystem.cleanup(normalizedPath);
+				fileSystem.cleanup(normalizedPath, dokanyFileInfo);
 				LOGGER.trace("Cleaned up: {}", normalizedPath);
 			} catch (final Throwable t) {
 				LOGGER.warn("Error in clearning up file: {}", path, t);
@@ -245,14 +245,14 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		@Override
 		public void callback(
 		        @NotNull final WString path,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 			if (isSkipFile(path)) {
 				return;
 			}
 
 			try {
 				final String normalizedPath = Utils.normalize(path);
-				fileSystem.close(normalizedPath);
+				fileSystem.close(normalizedPath, dokanyFileInfo);
 				LOGGER.trace("Closed file: {}", normalizedPath);
 			} catch (final Throwable e) {
 				LOGGER.warn("Error in closing file: {}", path, e);
@@ -270,7 +270,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final IntByReference rawFileSystemFlags,
 		        @NotNull final Pointer rawFileSystemNameBuffer,
 		        final int rawFileSystemNameSize,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			LOGGER.trace("GetVolumeInformation");
 
@@ -298,7 +298,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final LongByReference rawFreeBytesAvailable,
 		        @NotNull final LongByReference rawTotalNumberOfBytes,
 		        @NotNull final LongByReference rawTotalNumberOfFreeBytes,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			LOGGER.trace("GetDiskFreeSpace");
 			LOGGER.trace("rawFreeBytesAvailable: {}", rawFreeBytesAvailable.getValue());
@@ -323,7 +323,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        @NotNull final DokanyOperations.FillWin32FindData rawFillFindData,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String pathToSearch = Utils.normalize(path);
 			LOGGER.trace("FindFiles: {}", pathToSearch);
@@ -332,7 +332,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 				final Set<WIN32_FIND_DATA> filesFound = fileSystem.findFiles(pathToSearch);
 				LOGGER.debug("Found {} files", filesFound.size());
 				filesFound.forEach(file -> {
-					rawFillFindData.fillWin32FindData(file, dokanFileInfo);
+					rawFillFindData.fillWin32FindData(file, dokanyFileInfo);
 				});
 
 				return Success.val;
@@ -348,7 +348,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final WString path,
 		        @NotNull final WString searchPattern,
 		        @NotNull final DokanyOperations.FillWin32FindData rawFillFindData,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String pathToSearch = Utils.normalize(path);
 			final String pattern = searchPattern.toString();
@@ -360,7 +360,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 				LOGGER.debug("rawFillFindData: {}", rawFillFindData);
 				filesFound.forEach(file -> {
 					LOGGER.trace("file in find: {}", file.getFileName());
-					rawFillFindData.fillWin32FindData(file, dokanFileInfo);
+					rawFillFindData.fillWin32FindData(file, dokanyFileInfo);
 				});
 
 				return Success.val;
@@ -375,7 +375,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        @NotNull final FillWin32FindStreamData rawFillFindData,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("FindStreams: {}", normalizedPath);
@@ -384,7 +384,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 				final Set<Win32FindStreamData> streams = fileSystem.findStreams(normalizedPath);
 				LOGGER.debug("Found {} streams", streams.size());
 				streams.forEach(file -> {
-					rawFillFindData.callback(file, dokanFileInfo);
+					rawFillFindData.callback(file, dokanyFileInfo);
 				});
 				return Success.val;
 			} catch (final Throwable t) {
@@ -401,7 +401,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        final int bufferLength,
 		        @NotNull final IntByReference readLengthRef,
 		        final long offset,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.debug("ReadFile: {} with readLength ", normalizedPath, bufferLength);
@@ -432,7 +432,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final int numberOfBytesToWrite,
 		        @NotNull final IntByReference numberOfBytesWritten,
 		        @NotNull final long offset,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.debug("WriteFile: {}", normalizedPath);
@@ -454,7 +454,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		@Override
 		public long callback(
 		        @NotNull final WString path,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("FlushFileBuffers: {}", normalizedPath);
@@ -472,7 +472,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        @NotNull final ByHandleFileInfo info,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.debug("GetFileInformation: {}", normalizedPath);
@@ -496,7 +496,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        final int attributes,
-		        @NotNull final DokanFileInfo rawInfo) {
+		        @NotNull final DokanyFileInfo rawInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			final FileAttribute attribs = FileAttribute.fromInt(attributes);
@@ -518,7 +518,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final FILETIME creationTime,
 		        @NotNull final FILETIME lastAccessTime,
 		        @NotNull final FILETIME lastWriteTime,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("SetFileTime for {}; creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", normalizedPath, creationTime, lastAccessTime, lastWriteTime);
@@ -540,7 +540,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final Pointer rawSecurityDescriptor,
 		        final int rawSecurityDescriptorLength,
 		        @NotNull final IntByReference rawSecurityDescriptorLengthNeeded,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
@@ -565,7 +565,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        final int rawSecurityInformation,
 		        @NotNull final Pointer rawSecurityDescriptor,
 		        final int rawSecurityDescriptorLength,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
@@ -586,7 +586,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		@Override
 		public long callback(
 		        @NotNull final WString path,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("DeleteFile: {}", normalizedPath);
@@ -605,7 +605,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		@Override
 		public long callback(
 		        @NotNull final WString path,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("DeleteDirectory: {}", normalizedPath);
@@ -626,7 +626,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final WString oldPath,
 		        @NotNull final WString newPath,
 		        final boolean replaceIfExisting,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String oldNormalizedPath = Utils.normalize(oldPath);
 			final String newNormalizedPath = Utils.normalize(newPath);
@@ -647,7 +647,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        final long offset,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("SetEndOfFile: {}", normalizedPath);
@@ -666,7 +666,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long callback(
 		        @NotNull final WString path,
 		        final long length,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("SetAllocationSize: {}", normalizedPath);
@@ -686,7 +686,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final WString path,
 		        final long offset,
 		        final long length,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("LockFile: {}", normalizedPath);
@@ -707,7 +707,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final WString path,
 		        final long offset,
 		        final long length,
-		        @NotNull final DokanFileInfo dokanFileInfo) {
+		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = Utils.normalize(path);
 			LOGGER.trace("UnlockFile: {}", normalizedPath);
@@ -738,7 +738,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 	}
 
 	/**
-	 * @see {@link com.dokany.java.FileSystem#isDefaultLog()}
+	 * @see {@link com.dokany.java.DokanyFileSystem#isDefaultLog()}
 	 * @return true if default file system log is enabled.
 	 */
 	private boolean isDefaultLog() {

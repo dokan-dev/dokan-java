@@ -3,12 +3,10 @@ package com.dokany.java;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dokany.java.constants.FileAccess;
 import com.dokany.java.structure.DeviceOptions;
-import com.dokany.java.structure.DokanFileInfo;
+import com.dokany.java.structure.DokanyFileInfo;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.NTStatus;
 import com.sun.jna.ptr.IntByReference;
 
 /**
@@ -66,18 +64,18 @@ final class NativeMethods {
 	 * Extends the time out of the current IO operation in driver.
 	 *
 	 * @param timeout Extended time in milliseconds requested.
-	 * @param dokanFileInfo {@link com.dokany.java.structure.DokanFileInfo} of the operation to extend.
+	 * @param dokanFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation to extend.
 	 * @return if the operation was successful or not.
 	 */
-	static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
+	static native boolean DokanResetTimeout(long timeout, DokanyFileInfo dokanFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
 	 *
-	 * @param rawFileInfo {@link com.dokany.java.structure.DokanFileInfo} of the operation.
+	 * @param rawFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation.
 	 * @return A handle to the account token for the user on whose behalf the code is running.
 	 */
-	final static native IntByReference DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
+	final static native IntByReference DokanOpenRequestorToken(DokanyFileInfo dokanFileInfo);
 
 	/**
 	 * Convert {@link com.dokany.java.DokanyOperations.CreateFile} parameters to CreateFile parameters.
@@ -102,7 +100,8 @@ final class NativeMethods {
 	 * @return New DesiredAccess with generic rights.
 	 * @see {@linkplain https://msdn.microsoft.com/windows/hardware/drivers/ifs/access-mask}
 	 */
-	final static native FileAccess DokanMapStandardToGenericAccess(FileAccess DesiredAccess);
+	// TODO: change return type and method parameter type to FileAccess
+	final static native long DokanMapStandardToGenericAccess(long desiredAccess);
 
 	/**
 	 * Checks whether Name can match Expression
@@ -129,7 +128,7 @@ final class NativeMethods {
 	final static native void DokanDebugMode(boolean status);
 
 	/**
-	 * Get active Dokan mount points
+	 * Get active Dokany mount points
 	 *
 	 * @param list - Allocate array of DOKAN_CONTROL
 	 * @param length - Number of DOKAN_CONTROL instance in list.
@@ -140,12 +139,13 @@ final class NativeMethods {
 	final static native boolean DokanGetMountPointList(long fileAttributes, long length, boolean uncOnly, long nbRead);
 
 	/**
-	 * Convert WIN32 error to NTSTATUS
+	 * Convert Win32 error to NtStatus
 	 *
 	 * @see {@linkplain https://support.microsoft.com/en-us/kb/113996}
 	 *
-	 * @param error - Win32 Error to convert
+	 * @param error - Win32 error to convert
 	 * @return NtStatus associated to the error
 	 */
-	final static native NTStatus DokanNtStatusFromWin32(int error);
+	// TODO: Switch to NtStatus return type
+	final static native long DokanNtStatusFromWin32(int error);
 }
