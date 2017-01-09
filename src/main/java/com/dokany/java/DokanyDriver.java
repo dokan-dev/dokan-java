@@ -14,12 +14,12 @@ import com.sun.jna.WString;
  */
 public final class DokanyDriver {
 	@NotNull
-	private final FileSystem fileSystem;
+	private final DokanyFileSystem fileSystem;
 	@NotNull
 	private final DeviceOptions deviceOptions;
 	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyDriver.class);
 
-	public DokanyDriver(@NotNull final DeviceOptions deviceOptions, @NotNull final FileSystem fileSystem) {
+	public DokanyDriver(@NotNull final DeviceOptions deviceOptions, @NotNull final DokanyFileSystem fileSystem) {
 
 		this.deviceOptions = deviceOptions;
 		this.fileSystem = fileSystem;
@@ -55,7 +55,7 @@ public final class DokanyDriver {
 	 * @return
 	 */
 	@NotNull
-	public final FileSystem getFileSystem() {
+	public final DokanyFileSystem getFileSystem() {
 		return fileSystem;
 	}
 
