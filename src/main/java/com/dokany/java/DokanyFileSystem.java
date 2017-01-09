@@ -5,11 +5,10 @@ import java.util.Date;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.structure.DeviceOptions;
+import com.dokany.java.structure.DokanyFileInfo;
 import com.dokany.java.structure.FileData;
 import com.dokany.java.structure.FreeSpace;
 import com.dokany.java.structure.FullFileInfo;
@@ -20,8 +19,7 @@ import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 /**
  * This should be extended by file system providers.
  */
-public abstract class FileSystem {
-	private final static Logger LOGGER = LoggerFactory.getLogger(FileSystem.class);
+public abstract class DokanyFileSystem {
 
 	protected final VolumeInformation volumeInfo;
 	protected final FreeSpace freeSpace;
@@ -30,8 +28,10 @@ public abstract class FileSystem {
 	protected final long timeout;
 	protected final Date rootCreationDate;
 	protected final String rootPath;
+	protected final boolean isDebug;
+	protected final boolean isDebugStdErr;
 
-	public FileSystem(
+	public DokanyFileSystem(
 	        @NotNull final DeviceOptions deviceOptions,
 	        @NotNull final VolumeInformation volumeInfo,
 	        @NotNull final FreeSpace freeSpace,
@@ -46,6 +46,10 @@ public abstract class FileSystem {
 		sectorSize = deviceOptions.SectorSize;
 		this.rootCreationDate = rootCreationDate;
 		this.rootPath = rootPath;
+
+		// TODO: get from options somehow
+		isDebug = true;// MountOptions.fromInt(deviceOptions.Options);
+		isDebugStdErr = true;// ;
 	}
 
 	public final VolumeInformation getVolumeInfo() {
@@ -85,14 +89,14 @@ public abstract class FileSystem {
 
 	public final String getRootPath() {
 		return rootPath;
-	};
+	}
 
 	public final Date getRootCreateDate() {
 		return rootCreationDate;
 	}
 
 	public boolean isDebugStderrOutput() {
-		return false;
+		return isDebugStdErr;
 	}
 
 	public boolean isDefaultLog() {
@@ -100,7 +104,7 @@ public abstract class FileSystem {
 	}
 
 	public boolean isDebug() {
-		return false;
+		return isDebug;
 	}
 
 	public abstract void mounted() throws IOException;
@@ -109,11 +113,11 @@ public abstract class FileSystem {
 
 	public abstract boolean doesPathExist(final String path) throws IOException;
 
-	public abstract Set<WIN32_FIND_DATA> findFiles(final String path) throws IOException;
+	public abstract Set<WIN32_FIND_DATA> findFiles(final String pathToSearch) throws IOException;
 
-	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(final String path, final String pattern) throws IOException;
+	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(final String pathToSearch, final String pattern) throws IOException;
 
-	public abstract Set<Win32FindStreamData> findStreams(final String path) throws IOException;
+	public abstract Set<Win32FindStreamData> findStreams(final String pathToSearch) throws IOException;
 
 	/**
 	 * Only used if dokan option UserModeLock is enabled
@@ -150,9 +154,9 @@ public abstract class FileSystem {
 
 	public abstract void flushFileBuffers(final String path) throws IOException;
 
-	public abstract void cleanup(final String path) throws IOException;
+	public abstract void cleanup(final String path, final DokanyFileInfo dokanyFileInfo) throws IOException;
 
-	public abstract void close(final String path) throws IOException;
+	public abstract void close(final String path, final DokanyFileInfo dokanyFileInfo) throws IOException;
 
 	public abstract int getSecurity(final String path, final int kind, final byte[] out) throws IOException;
 
