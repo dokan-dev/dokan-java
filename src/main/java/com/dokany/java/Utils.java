@@ -4,10 +4,15 @@ import static com.dokany.java.constants.ErrorCodes.ERROR_ALREADY_EXISTS;
 import static com.dokany.java.constants.ErrorCodes.ERROR_FILE_NOT_FOUND;
 import static com.dokany.java.constants.NtStatus.Unsuccessful;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.FileTime;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -16,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.WinBase.FILETIME;
+import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 
 public class Utils {
 	public static final String FORWARD_SLASH = "/";
@@ -130,5 +137,49 @@ public class Utils {
 		}
 
 		return defaultCode;
+	}
+
+	public static FileTime toFileTime(final FILETIME time) {
+		return FileTime.from(time.toDate().toInstant());
+	}
+
+	public static FILETIME toFILETIME(final FileTime time) {
+		return getTime(time.toMillis());
+	}
+
+	public static FILETIME getTime(final Date date) {
+		return new FILETIME(date);
+	}
+
+	public static FILETIME getTime(final long time) {
+		return getTime(new Date(time));
+	}
+
+	public static FILETIME getCurrentTime() {
+		return getTime(new Date());
+	}
+
+	public static final LARGE_INTEGER getLargeInt(final long val, final int high, final int low) {
+		LARGE_INTEGER largeInt = null;
+		if ((val != 0) && ((high == 0) || (low == 0))) {
+			largeInt = new LARGE_INTEGER(val);
+		}
+		return largeInt;
+	}
+
+	public static BasicFileAttributeView getAttributes(final String path) {
+		return getAttributes(getPath(path));
+	}
+
+	public static BasicFileAttributeView getAttributes(final Path path) {
+		return Files.getFileAttributeView(path, BasicFileAttributeView.class);
+	}
+
+	public static Path getPath(final String path) {
+		return Paths.get(path);
+	}
+
+	public static File toFile(final String path) {
+		return getPath(path).toFile();
 	}
 }
