@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dokany.java.Utils;
 import com.dokany.java.constants.FileAttribute;
+import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
 import jetbrains.exodus.ArrayByteIterable;
@@ -40,12 +41,32 @@ public class FullFileInfo extends ByHandleFileInfo {
 	private int dwReserved1;
 
 	@NotNull
-	public FullFileInfo(@NotNull final String path, final long index, final FileAttribute attributes, final int volumeSerialNumber) throws FileNotFoundException {
+	public FullFileInfo(
+	        @NotNull final String path,
+	        final long index,
+	        final FileAttribute attributes,
+	        final int volumeSerialNumber) throws FileNotFoundException {
+
+		// times automatically set to now by ByHandleFileInfo constructors
+		this(path, index, attributes, volumeSerialNumber, null, null, null);
+	}
+
+	@NotNull
+	public FullFileInfo(
+	        @NotNull final String path,
+	        final long index,
+	        final FileAttribute attributes,
+	        final int volumeSerialNumber,
+	        final FILETIME creationTime,
+	        final FILETIME lastAccessTime,
+	        final FILETIME lastWriteTime) throws FileNotFoundException {
+
+		super(creationTime, lastAccessTime, lastWriteTime);
+
 		if (Utils.isNull(path)) {
-			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
+			throw new FileNotFoundException("path was null and thus file info could not be created");
 		}
 
-		// times automatically set to now by ByHandleFileInfo constructor
 		filePath = path;
 		setIndex(index);
 		setAttributes(attributes);
@@ -55,10 +76,6 @@ public class FullFileInfo extends ByHandleFileInfo {
 	@NotNull
 	public FullFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) throws FileNotFoundException {
 		if (Utils.isNull(path) || Utils.isNull(iterable)) {
-			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
-		}
-
-		if ((path == null) || (iterable == null)) {
 			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
 		}
 

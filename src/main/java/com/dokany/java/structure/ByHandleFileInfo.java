@@ -1,6 +1,5 @@
 package com.dokany.java.structure;
 
-import java.util.Date;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
@@ -94,8 +93,16 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	public int dwVolumeSerialNumber;
 	public int dwNumberOfLinks = 1;
 
+	public ByHandleFileInfo(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
+		setTimes(creationTime, lastAccessTime, lastWriteTime);
+	}
+
+	public ByHandleFileInfo(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
+		setTimes(creationTime, lastAccessTime, lastWriteTime);
+	}
+
 	public ByHandleFileInfo() {
-		setTimes(0, 0, 0);
+		this(null, null, null);
 	}
 
 	public void copyTo(final ByHandleFileInfo infoToReceive) {
@@ -126,17 +133,19 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
-		final Date now = new Date();
+		final FILETIME now = Utils.getCurrentTime();
 
-		ftCreationTime = creationTime == 0 ? new FILETIME(now) : new FILETIME(new Date(creationTime));
-		ftLastAccessTime = lastAccessTime == 0 ? new FILETIME(now) : new FILETIME(new Date(lastAccessTime));
-		ftLastWriteTime = lastWriteTime == 0 ? new FILETIME(now) : new FILETIME(new Date(lastWriteTime));
+		ftCreationTime = creationTime == 0 ? now : Utils.getTime(creationTime);
+		ftLastAccessTime = lastAccessTime == 0 ? now : Utils.getTime(lastAccessTime);
+		ftLastWriteTime = lastWriteTime == 0 ? now : Utils.getTime(lastWriteTime);
 	}
 
 	void setTimes(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
-		ftCreationTime = creationTime;
-		ftLastAccessTime = lastAccessTime;
-		ftLastWriteTime = lastWriteTime;
+		final FILETIME now = Utils.getCurrentTime();
+
+		ftCreationTime = Utils.isNull(creationTime) ? now : creationTime;
+		ftLastAccessTime = Utils.isNull(lastAccessTime) ? now : lastAccessTime;
+		ftLastWriteTime = Utils.isNull(lastWriteTime) ? now : lastWriteTime;
 	}
 
 	/**
@@ -146,7 +155,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * @return
 	 */
 	public void setLastWriteTime(final long lastWriteTime) {
-		ftLastWriteTime = lastWriteTime == 0 ? new FILETIME(new Date()) : new FILETIME(new Date(lastWriteTime));
+		ftLastWriteTime = lastWriteTime == 0 ? Utils.getCurrentTime() : Utils.getTime(lastWriteTime);
 		ftLastAccessTime = ftLastWriteTime;
 	}
 
@@ -157,7 +166,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * @return
 	 */
 	public void setCreationTime(final long creationTime) {
-		ftCreationTime = creationTime == 0 ? new FILETIME(new Date()) : new FILETIME(new Date(creationTime));
+		ftCreationTime = creationTime == 0 ? Utils.getCurrentTime() : Utils.getTime(creationTime);
 	}
 
 	public void setSize(final long sizeToSet) {
@@ -167,7 +176,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setSize(final long size, final int sizeHigh, final int sizeLow) {
 		fileSize = size;
 
-		final LARGE_INTEGER largeInt = getLargeInt(size, sizeHigh, sizeLow);
+		final LARGE_INTEGER largeInt = Utils.getLargeInt(size, sizeHigh, sizeLow);
 
 		nFileSizeHigh = ((size != 0) && (sizeHigh == 0)) ? largeInt.getHigh().intValue() : (int) size;
 		nFileSizeLow = ((size != 0) && (sizeLow == 0)) ? largeInt.getLow().intValue() : (int) size;
@@ -185,24 +194,15 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setIndex(final long index, final int indexHigh, final int indexLow) {
 		fileIndex = index;
 
-		final LARGE_INTEGER largeInt = getLargeInt(index, indexHigh, indexLow);
+		final LARGE_INTEGER largeInt = Utils.getLargeInt(index, indexHigh, indexLow);
 
 		nFileIndexHigh = ((index != 0) && (indexHigh == 0)) ? largeInt.getHigh().intValue() : (int) index;
 		nFileIndexLow = ((index != 0) && (indexLow == 0)) ? largeInt.getLow().intValue() : (int) index;
 	}
 
-	private static final LARGE_INTEGER getLargeInt(final long val, final int high, final int low) {
-		LARGE_INTEGER largeInt = null;
-		if ((val != 0) && ((high == 0) || (low == 0))) {
-			largeInt = new LARGE_INTEGER(val);
-		}
-		return largeInt;
-	}
-
 	@Override
 	public String toString() {
-		return "FileInfo{" +
-		        "attributes=" + dwFileAttributes +
+		return "{attributes=" + dwFileAttributes +
 		        ", creationTime=" + ftCreationTime +
 		        ", lastAccessTime=" + ftLastAccessTime +
 		        ", lastWriteTime=" + ftLastWriteTime +

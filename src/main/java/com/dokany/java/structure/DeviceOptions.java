@@ -8,7 +8,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.WString;
 
 /**
- * Dokan mount options used to describe dokan device behavior. This is the same structure as PDOKAN_OPTIONS (dokan.h) in the C++ version of Dokan.
+ * Dokan mount options used to describe dokan device behavior. This is the same structure as PDOKAN_OPTIONS (dokan.h) in the C++ version of Dokany.
  *
  */
 public class DeviceOptions extends Structure implements Structure.ByReference {
@@ -19,13 +19,13 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public short Version = 100;
 
 	/**
-	 * Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.
+	 * Number of threads to be used internally by Dokany library. More thread will handle more event at the same time.
 	 */
 	public short ThreadCount;
 
 	/**
 	 * Features enable for the mount.
-	 * 
+	 *
 	 * @see {@link com.dokany.java.constants.MountOptions}
 	 */
 	public int Options;
