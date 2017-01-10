@@ -32,7 +32,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 /**
- * Implementation of {@link com.dokany.java.DokanyOperations} which connects to {@link com.dokany.java.DokanyFileSystem}.
+ * Implementation of {@link DokanyOperations} which connects to {@link DokanyFileSystem}.
  */
 final class DokanyOperationsProxy extends DokanyOperations {
 
