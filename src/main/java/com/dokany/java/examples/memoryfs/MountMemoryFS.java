@@ -10,8 +10,8 @@ import com.dokany.java.structure.DeviceOptions;
 /**
  * Mounts MemoryFS at M:\\.
  */
-public class Mount {
-	private final static Logger LOGGER = LoggerFactory.getLogger(Mount.class);
+public class MountMemoryFS {
+	private final static Logger LOGGER = LoggerFactory.getLogger(MountMemoryFS.class);
 
 	public static void main(final String[] args) throws Throwable {
 		LOGGER.info("Starting Dokany MemoryFS");
