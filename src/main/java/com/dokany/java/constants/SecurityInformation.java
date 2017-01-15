@@ -16,7 +16,7 @@ import com.sun.jna.platform.win32.WinNT;
  * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa379573(v=vs.85).aspx">SECURITY_INFORMATION (MSDN)</a>
  *
  */
-public enum SecurityInformation {
+public enum SecurityInformation implements EnumInteger {
     // The owner identifier of the object is being referenced.
 	OWNER_SECURITY_INFORMATION(WinNT.OWNER_SECURITY_INFORMATION),
 
@@ -44,6 +44,11 @@ public enum SecurityInformation {
 	PROTECTED_DACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION);
 
 	public final int val;
+
+	@Override
+	public int getVal() {
+		return val;
+	}
 
 	private SecurityInformation(final int i) {
 		val = i;

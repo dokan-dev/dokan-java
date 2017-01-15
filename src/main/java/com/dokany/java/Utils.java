@@ -20,6 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dokany.java.constants.EnumInteger;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
@@ -181,5 +182,14 @@ public class Utils {
 
 	public static File toFile(final String path) {
 		return getPath(path).toFile();
+	}
+
+	public static <T extends EnumInteger> T enumFromInt(final int val, final T[] enumValues) {
+		for (final T current : enumValues) {
+			if (current.getVal() == val) {
+				return current;
+			}
+		}
+		throw new IllegalArgumentException("Invalid int value: " + val);
 	}
 }

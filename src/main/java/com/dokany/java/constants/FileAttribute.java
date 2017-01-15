@@ -16,13 +16,10 @@ import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_SYSTEM;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_TEMPORARY;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_VIRTUAL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dokany.java.Utils;
 import com.sun.jna.ptr.IntByReference;
 
-public enum FileAttribute {
+public enum FileAttribute implements EnumInteger {
 
 	ARCHIVE(FILE_ATTRIBUTE_ARCHIVE),
 
@@ -60,7 +57,10 @@ public enum FileAttribute {
 
 	public final int val;
 
-	private final static Logger logger = LoggerFactory.getLogger(FileAttribute.class);
+	@Override
+	public int getVal() {
+		return val;
+	}
 
 	private FileAttribute(final int i) {
 		val = i;
@@ -83,30 +83,7 @@ public enum FileAttribute {
 		return (attributesAndFlags.getValue() & MASK);
 	}
 
-	public final static FileAttribute fromInt(final int value) {
-		for (final FileAttribute current : values()) {
-			if (current.val == value) {
-				return current;
-			}
-		}
-		if (value == 0) {
-			return NORMAL;
-		}
-		throw new IllegalArgumentException(String.format("Invalid int value (%s) for FileAttribute", value));
-	}
-
-	public final static int fromAttributes(final FileAttribute... attributes) {
-		int toReturn = NORMAL.val;
-
-		if (Utils.isNotNull(attributes)) {
-			for (final FileAttribute current : attributes) {
-				logger.debug("current attrib: {}", current);
-				if (Utils.isNotNull(current)) {
-					toReturn |= current.val;
-				}
-			}
-		}
-
-		return toReturn;
+	public static FileAttribute fromInt(final int val) {
+		return Utils.enumFromInt(val, values());
 	}
 }

@@ -10,7 +10,7 @@ import com.sun.jna.platform.win32.WinNT;
  * @see @{linkplain https://msdn.microsoft.com/en-us/library/windows/desktop/aa374896(v=vs.85).aspx}
  * @see @{linkplain https://msdn.microsoft.com/en-us/library/windows/desktop/aa374892(v=vs.85).aspx}
  */
-public enum FileAccess {
+public enum FileAccess implements EnumInteger {
 
 	/**
 	 * Read access right to an object.
@@ -51,7 +51,7 @@ public enum FileAccess {
 	 *
 	 * nativeconst{FILE_WRITE_EA,0x00000010,File & directory}
 	 */
-	WRITE_EXTENDED_ATTRIBUTES(1L << 4),
+	WRITE_EXTENDED_ATTRIBUTES(1 << 4),
 
 	/**
 	 * For a native code file, the right to execute the file. This access right given to scripts may cause the script to be executable, depending on the script interpreter.
@@ -125,7 +125,7 @@ public enum FileAccess {
 	 *
 	 * nativeconst{MAXIMUM_ALLOWED,0x02000000}
 	 */
-	MAXIMUM_ALLOWED(1L << 25),
+	MAXIMUM_ALLOWED(1 << 25),
 
 	/**
 	 * All possible access rights.
@@ -155,9 +155,14 @@ public enum FileAccess {
 	 */
 	GENERIC_READ(WinNT.GENERIC_READ);
 
-	public final long val;
+	public final int val;
 
-	private FileAccess(final long i) {
+	@Override
+	public int getVal() {
+		return val;
+	}
+
+	private FileAccess(final int i) {
 		val = i;
 	}
 

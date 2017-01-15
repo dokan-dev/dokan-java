@@ -1,22 +1,24 @@
 package com.dokany.java.constants;
 
-public enum MountError {
+import com.dokany.java.Utils;
 
-	DOKAN_SUCCESS(0, "Successfully mounted"),
+public enum MountError implements EnumInteger {
 
-	DOKAN_ERROR(-1, "Mount error"),
+	SUCCESS(0, "Successfully mounted"),
 
-	DOKAN_DRIVE_LETTER_ERROR(-2, "Mount failed: Bad drive letter."),
+	MOUNT_ERROR(-1, "Mount error"),
 
-	DOKAN_DRIVER_INSTALL_ERROR(-3, "Mount failed: Cannot install driver."),
+	DRIVE_LETTER_ERROR(-2, "Mount failed: Bad drive letter."),
 
-	DOKAN_START_ERROR(-4, "Mount failed: Driver answer that something is wrong."),
+	DRIVER_INSTALL_ERROR(-3, "Mount failed: Cannot install driver."),
 
-	DOKAN_MOUNT_ERROR(-5, "Mount failed: Cannot assign a drive letter or mount point. Probably already used by another volume."),
+	START_ERROR(-4, "Mount failed: Driver answer that something is wrong."),
 
-	DOKAN_MOUNT_POINT_ERROR(-6, "Mount failed: Mount point is invalid."),
+	CANNOT_ASSIGN(-5, "Mount failed: Cannot assign a drive letter or mount point. Probably already used by another volume."),
 
-	DOKAN_VERSION_ERROR(-7, "Mount failed: Requested an incompatible version.");
+	MOUNT_POINT_ERROR(-6, "Mount failed: Mount point is invalid."),
+
+	VERSION_ERROR(-7, "Mount failed: Requested an incompatible version.");
 
 	public final int val;
 	public final String name;
@@ -26,12 +28,12 @@ public enum MountError {
 		this.name = name;
 	}
 
-	public final static MountError fromInt(final int value) {
-		for (final MountError current : values()) {
-			if (current.val == value) {
-				return current;
-			}
-		}
-		throw new IllegalArgumentException("Invalid int value for MountError");
+	@Override
+	public int getVal() {
+		return val;
+	}
+
+	public final static MountError fromInt(final int val) {
+		return Utils.enumFromInt(val, values());
 	}
 }
