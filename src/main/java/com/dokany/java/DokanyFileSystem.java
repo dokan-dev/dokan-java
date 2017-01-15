@@ -7,8 +7,10 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 import com.dokany.java.constants.FileAttribute;
+import com.dokany.java.constants.MountOption;
 import com.dokany.java.structure.DeviceOptions;
 import com.dokany.java.structure.DokanyFileInfo;
+import com.dokany.java.structure.EnumIntegerSet;
 import com.dokany.java.structure.FileData;
 import com.dokany.java.structure.FreeSpace;
 import com.dokany.java.structure.FullFileInfo;
@@ -47,9 +49,8 @@ public abstract class DokanyFileSystem {
 		this.rootCreationDate = rootCreationDate;
 		this.rootPath = rootPath;
 
-		// TODO: get from options somehow
-		isDebug = true;// MountOptions.fromInt(deviceOptions.Options);
-		isDebugStdErr = true;// ;
+		isDebug = deviceOptions.getMountOptions().contains(MountOption.DEBUG_MODE);
+		isDebugStdErr = deviceOptions.getMountOptions().contains(MountOption.STD_ERR_OUTPUT);
 	}
 
 	public final VolumeInformation getVolumeInfo() {
@@ -65,7 +66,7 @@ public abstract class DokanyFileSystem {
 	 *
 	 * @return
 	 */
-	public long getAllocationUnitSize() {
+	public final long getAllocationUnitSize() {
 		return allocationUnitSize;
 	}
 
@@ -74,7 +75,7 @@ public abstract class DokanyFileSystem {
 	 *
 	 * @return
 	 */
-	public long getSectorSize() {
+	public final long getSectorSize() {
 		return sectorSize;
 	}
 
@@ -95,15 +96,15 @@ public abstract class DokanyFileSystem {
 		return rootCreationDate;
 	}
 
-	public boolean isDebugStderrOutput() {
+	public final boolean isDebugStderrOutput() {
 		return isDebugStdErr;
 	}
 
-	public boolean isDefaultLog() {
+	public final boolean isDefaultLog() {
 		return isDebug();
 	}
 
-	public boolean isDebug() {
+	public final boolean isDebug() {
 		return isDebug;
 	}
 
@@ -131,9 +132,9 @@ public abstract class DokanyFileSystem {
 
 	public abstract void move(final String oldPath, final String newPath, final boolean replaceIfExisting) throws IOException;
 
-	public abstract void deleteFile(final String path) throws IOException;
+	public abstract void deleteFile(final String path, final DokanyFileInfo dokanyFileInfo) throws IOException;
 
-	public abstract void deleteDirectory(final String path) throws IOException;
+	public abstract void deleteDirectory(final String path, final DokanyFileInfo dokanyFileInfo) throws IOException;
 
 	public abstract FileData read(final String path, final int offset, final int readLength) throws IOException;
 
@@ -143,13 +144,13 @@ public abstract class DokanyFileSystem {
 	public abstract void createEmptyFile(
 	        final String path,
 	        long options,
-	        final FileAttribute attributes) throws IOException;
+	        final EnumIntegerSet<FileAttribute> attributes) throws IOException;
 
 	// TODO: Add SecurityContext and ShareAccess and DesiredAccess
 	public abstract void createEmptyDirectory(
 	        final String path,
 	        final long options,
-	        final FileAttribute attributes)
+	        final EnumIntegerSet<FileAttribute> attributes)
 	        throws IOException;
 
 	public abstract void flushFileBuffers(final String path) throws IOException;
@@ -168,7 +169,7 @@ public abstract class DokanyFileSystem {
 
 	public abstract void setEndOfFile(final String path, final int offset) throws IOException;
 
-	public abstract void setAttributes(final String path, final FileAttribute attributes) throws IOException;
+	public abstract void setAttributes(final String path, final EnumIntegerSet<FileAttribute> attributes) throws IOException;
 
 	public abstract FullFileInfo getInfo(final String path) throws IOException;
 
