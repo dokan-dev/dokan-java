@@ -22,7 +22,7 @@ final class NativeMethods {
 	}
 
 	/**
-	 * Mount a new Dokan Volume. This function block until the device is unmount. If the mount fail, it will directly return {@link com.dokany.java.constants.MountError}.
+	 * Mount a new Dokany Volume. This function block until the device is unmount. If the mount fail, it will directly return {@link com.dokany.java.constants.MountError}.
 	 *
 	 * @param options A {@link com.dokany.java.structure.DeviceOptions} that describe the mount.
 	 * @param operations Instance of {@link com.dokany.java.DokanyOperations} that will be called for each request made by the kernel.
@@ -38,25 +38,31 @@ final class NativeMethods {
 	final static native long DokanVersion();
 
 	/**
-	 * Get the version of the Dokan driver.
+	 * Get the version of the Dokany driver.
 	 *
 	 * @return The version number without the dots.
 	 */
 	final static native long DokanDriverVersion();
 
 	/**
-	 * Unmount a dokan device from a driver letter.
+	 * Unmount a Dokany device from a driver letter.
 	 *
-	 * @param driveLetter Dokan driver letter to unmount.
-	 * @return Trueif device was unmount or false in case of failure or device not found.
+	 * @param driveLetter Driver letter to unmount.
+	 * @return True if device was unmounted or false (in case of failure or device not found).
 	 */
 	final static native boolean DokanUnmount(char driveLetter);
 
 	/**
-	 * Unmount a dokan device from a mount point
+	 * Unmount a Dokany device from a mount point
 	 *
-	 * @param mountPoint Mount point to unmount Z or Z: or Z:\\ or Z:\MyMountPoint.
-	 * @return
+	 * @param mountPoint Mount point to unmount
+	 *            <ul>
+	 *            <li>Z</li>
+	 *            <li>Z:</li>
+	 *            <li>Z:\\</li>
+	 *            <li>Z:\MyMountPoint</li>
+	 *            </ul>
+	 * @return if successfully unmounted mount point or not.
 	 */
 	final static native boolean DokanRemoveMountPoint(WString mountPoint);
 
@@ -64,10 +70,10 @@ final class NativeMethods {
 	 * Extends the time out of the current IO operation in driver.
 	 *
 	 * @param timeout Extended time in milliseconds requested.
-	 * @param dokanFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation to extend.
+	 * @param dokanyFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation to extend.
 	 * @return if the operation was successful or not.
 	 */
-	static native boolean DokanResetTimeout(long timeout, DokanyFileInfo dokanFileInfo);
+	static native boolean DokanResetTimeout(long timeout, DokanyFileInfo dokanyFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
@@ -75,7 +81,7 @@ final class NativeMethods {
 	 * @param rawFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation.
 	 * @return A handle to the account token for the user on whose behalf the code is running.
 	 */
-	final static native IntByReference DokanOpenRequestorToken(DokanyFileInfo dokanFileInfo);
+	final static native IntByReference DokanOpenRequestorToken(DokanyFileInfo dokanyFileInfo);
 
 	/**
 	 * Convert {@link com.dokany.java.DokanyOperations.CreateFile} parameters to CreateFile parameters.
@@ -113,22 +119,58 @@ final class NativeMethods {
 	 */
 	final static native boolean DokanIsNameInExpression(String expression, String name, boolean ignoreCase);
 
+	/**
+	 *
+	 * @param serviceName
+	 * @param serviceType
+	 * @param serviceFullPath
+	 * @return
+	 */
 	final static native boolean DokanServiceInstall(String serviceName, int serviceType, String serviceFullPath);
 
+	/**
+	 *
+	 * @param serviceName
+	 * @return
+	 */
 	final static native boolean DokanServiceDelete(String serviceName);
 
+	/**
+	 *
+	 * @return
+	 */
 	final static native boolean DokanNetworkProviderInstall();
 
+	/**
+	 *
+	 * @return
+	 */
 	final static native boolean DokanNetworkProviderUninstall();
 
+	/**
+	 * Determine if Dokany debug mode is enabled.
+	 *
+	 * @param mode
+	 * @return
+	 */
 	final static native boolean DokanSetDebugMode(int mode);
 
+	/**
+	 * Enable or disable standard error output for Dokany.
+	 *
+	 * @param status
+	 */
 	final static native void DokanUseStdErr(boolean status);
 
+	/**
+	 * Enable or disable Dokany debug mode.
+	 *
+	 * @param status
+	 */
 	final static native void DokanDebugMode(boolean status);
 
 	/**
-	 * Get active Dokany mount points
+	 * Get active Dokany mount points.
 	 *
 	 * @param list - Allocate array of DOKAN_CONTROL
 	 * @param length - Number of DOKAN_CONTROL instance in list.
@@ -136,6 +178,7 @@ final class NativeMethods {
 	 * @param nbRead- Number of instances successfully retrieved
 	 * @return List retrieved or not.
 	 */
+	// TODO: Does this have proper params?
 	final static native boolean DokanGetMountPointList(long fileAttributes, long length, boolean uncOnly, long nbRead);
 
 	/**

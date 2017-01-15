@@ -31,7 +31,7 @@ public final class DokanyDriver {
 	/**
 	 * Get driver version.
 	 *
-	 * @see {@link com.dokany.java.NativeMethods#DokanDriverVersion()}
+	 * @see {@link NativeMethods#DokanDriverVersion()}
 	 *
 	 * @return
 	 */
@@ -42,7 +42,7 @@ public final class DokanyDriver {
 	/**
 	 * Get Dokany version.
 	 *
-	 * @see {@link com.dokany.java.NativeMethods#DokanVersion()}
+	 * @see {@link NativeMethods#DokanVersion()}
 	 * @return
 	 */
 	public final long getVersion() {
@@ -90,7 +90,7 @@ public final class DokanyDriver {
 	}
 
 	/**
-	 * Calls {@link com.dokany.java.NativeMethods#DokanUnmount(char)} and {@link com.dokany.java.NativeMethods#DokanRemoveMountPoint(WString)}
+	 * Calls {@link NativeMethods#DokanUnmount(char)} and {@link NativeMethods#DokanRemoveMountPoint(WString)}
 	 *
 	 * @param mountPoint
 	 */

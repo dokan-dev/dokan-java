@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.dokany.java.constants.FileSystemFeatures;
+import com.dokany.java.constants.FileSystemFeature;
 import com.dokany.java.constants.NtStatus;
 import com.dokany.java.structure.ByHandleFileInfo;
 import com.dokany.java.structure.DokanyFileInfo;
@@ -208,7 +208,7 @@ public class DokanyOperations extends Structure {
 	 * Neither this method nor {@link DokanyOperations.GetVolumeInformation} save the {@link com.dokany.java.structure.DokanyFileInfo#_context}. Before these methods are called,
 	 * {@link DokanyOperations.CreateFile} may not be called. (ditto @{link DokanyOperations.CloseFile} and @{link DokanyOperations.Cleanup}).
 	 *
-	 * @see {@link FileSystemFeatures#READ_ONLY_VOLUME} is automatically added to the <paramref name="features"/> if <see cref="DokanOptions.WriteProtection"/> was specified when
+	 * @see {@link FileSystemFeature#READ_ONLY_VOLUME} is automatically added to the <paramref name="features"/> if <see cref="DokanOptions.WriteProtection"/> was specified when
 	 *      the volume was mounted.
 	 *
 	 *      If {@link NtStatus#NotImplemented} is returned, the Dokany kernel driver use following settings by default:
@@ -481,7 +481,7 @@ public class DokanyOperations extends Structure {
 
 	/**
 	 *
-	 * Retrieve all NTFS Streams informations on the file. This is only called if {@link com.dokany.java.constants.MountOptions#ALT_STREAM} is enabled.
+	 * Retrieve all NTFS Streams informations on the file. This is only called if {@link com.dokany.java.constants.MountOption#ALT_STREAM} is enabled.
 	 */
 	@FunctionalInterface
 	interface FindStreams extends Callback {
@@ -671,7 +671,7 @@ public class DokanyOperations extends Structure {
 
 	/**
 	 *
-	 * Lock file at a specific offset and data length. This is only used if {@link com.dokany.java.constants.MountOptions#FILELOCK_USER_MODE} is enabled.
+	 * Lock file at a specific offset and data length. This is only used if {@link com.dokany.java.constants.MountOption#FILELOCK_USER_MODE} is enabled.
 	 */
 	@FunctionalInterface
 	interface LockFile extends Callback {
@@ -692,7 +692,7 @@ public class DokanyOperations extends Structure {
 
 	/**
 	 *
-	 * Unlock file at a specific offset and data length. This is only used if {@link com.dokany.java.constants.MountOptions#FILELOCK_USER_MODE} is enabled.
+	 * Unlock file at a specific offset and data length. This is only used if {@link com.dokany.java.constants.MountOption#FILELOCK_USER_MODE} is enabled.
 	 */
 	@FunctionalInterface
 	interface UnlockFile extends Callback {
