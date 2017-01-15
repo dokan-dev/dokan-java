@@ -1,7 +1,7 @@
 package com.dokany.java;
 
-import static com.dokany.java.constants.ErrorCodes.ERROR_ALREADY_EXISTS;
-import static com.dokany.java.constants.ErrorCodes.ERROR_FILE_NOT_FOUND;
+import static com.dokany.java.constants.ErrorCode.ERROR_ALREADY_EXISTS;
+import static com.dokany.java.constants.ErrorCode.ERROR_FILE_NOT_FOUND;
 import static com.dokany.java.constants.NtStatus.Unsuccessful;
 
 import java.io.File;
@@ -21,13 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dokany.java.constants.EnumInteger;
+import com.dokany.java.structure.DokanyFileInfo;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 
-public class Utils {
+public class DokanyUtils {
 	public static final String FORWARD_SLASH = "/";
-	private final static Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyUtils.class);
 
 	public static String trimTailSlash(final String str) {
 		String toReturn = str;
@@ -191,5 +192,13 @@ public class Utils {
 			}
 		}
 		throw new IllegalArgumentException("Invalid int value: " + val);
+	}
+
+	public static void setDeleteStatus(final File fileOrDirectory, final DokanyFileInfo dokanyFileInfo) {
+		final boolean canDelete = fileOrDirectory.renameTo(fileOrDirectory);
+
+		if (canDelete) {
+			dokanyFileInfo._deleteOnClose = 1;
+		}
 	}
 }

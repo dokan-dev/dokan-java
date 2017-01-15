@@ -1,6 +1,6 @@
 package com.dokany.java.constants;
 
-public enum ErrorCodes {
+public enum ErrorCode {
 
 	SUCCESS(0),
 
@@ -22,7 +22,7 @@ public enum ErrorCodes {
 		return val;
 	}
 
-	private ErrorCodes(final int val) {
+	private ErrorCode(final int val) {
 		this.val = val;
 	}
 }

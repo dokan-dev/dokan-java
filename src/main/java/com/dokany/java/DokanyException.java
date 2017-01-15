@@ -2,7 +2,7 @@ package com.dokany.java;
 
 import java.io.IOException;
 
-import com.dokany.java.constants.ErrorCodes;
+import com.dokany.java.constants.ErrorCode;
 import com.dokany.java.constants.WinError;
 
 public class DokanyException extends RuntimeException {
@@ -26,7 +26,7 @@ public class DokanyException extends RuntimeException {
 		this(errorCode.val, exception);
 	}
 
-	public DokanyException(final ErrorCodes errorCode, final IOException exception) {
+	public DokanyException(final ErrorCode errorCode, final IOException exception) {
 		this(errorCode.val, exception);
 	}
 }

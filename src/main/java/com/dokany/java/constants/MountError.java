@@ -1,6 +1,6 @@
 package com.dokany.java.constants;
 
-import com.dokany.java.Utils;
+import com.dokany.java.DokanyUtils;
 
 public enum MountError implements EnumInteger {
 
@@ -34,6 +34,6 @@ public enum MountError implements EnumInteger {
 	}
 
 	public final static MountError fromInt(final int val) {
-		return Utils.enumFromInt(val, values());
+		return DokanyUtils.enumFromInt(val, values());
 	}
 }

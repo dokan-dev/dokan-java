@@ -16,7 +16,7 @@ import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_SYSTEM;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_TEMPORARY;
 import static com.sun.jna.platform.win32.WinNT.FILE_ATTRIBUTE_VIRTUAL;
 
-import com.dokany.java.Utils;
+import com.dokany.java.DokanyUtils;
 import com.sun.jna.ptr.IntByReference;
 
 public enum FileAttribute implements EnumInteger {
@@ -77,13 +77,13 @@ public enum FileAttribute implements EnumInteger {
 	}
 
 	public final static int fromAttributesAndFlags(final IntByReference attributesAndFlags) {
-		if (Utils.isNull(attributesAndFlags)) {
+		if (DokanyUtils.isNull(attributesAndFlags)) {
 			return NORMAL.val;
 		}
 		return (attributesAndFlags.getValue() & MASK);
 	}
 
 	public static FileAttribute fromInt(final int val) {
-		return Utils.enumFromInt(val, values());
+		return DokanyUtils.enumFromInt(val, values());
 	}
 }

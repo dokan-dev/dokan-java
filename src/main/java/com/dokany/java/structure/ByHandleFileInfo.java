@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.dokany.java.Utils;
+import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.FileAttribute;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
@@ -106,7 +106,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void copyTo(final ByHandleFileInfo infoToReceive) {
-		if (Utils.isNull(infoToReceive)) {
+		if (DokanyUtils.isNull(infoToReceive)) {
 			throw new IllegalStateException("infoToReceive cannot be null");
 		}
 
@@ -126,26 +126,26 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 
 	public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
 		int toSet = FileAttribute.NORMAL.val;
-		if (Utils.isNotNull(this)) {
+		if (DokanyUtils.isNotNull(this)) {
 			toSet = attributes.toInt();
 		}
 		dwFileAttributes = toSet;
 	}
 
 	public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
-		final FILETIME now = Utils.getCurrentTime();
+		final FILETIME now = DokanyUtils.getCurrentTime();
 
-		ftCreationTime = creationTime == 0 ? now : Utils.getTime(creationTime);
-		ftLastAccessTime = lastAccessTime == 0 ? now : Utils.getTime(lastAccessTime);
-		ftLastWriteTime = lastWriteTime == 0 ? now : Utils.getTime(lastWriteTime);
+		ftCreationTime = creationTime == 0 ? now : DokanyUtils.getTime(creationTime);
+		ftLastAccessTime = lastAccessTime == 0 ? now : DokanyUtils.getTime(lastAccessTime);
+		ftLastWriteTime = lastWriteTime == 0 ? now : DokanyUtils.getTime(lastWriteTime);
 	}
 
 	void setTimes(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
-		final FILETIME now = Utils.getCurrentTime();
+		final FILETIME now = DokanyUtils.getCurrentTime();
 
-		ftCreationTime = Utils.isNull(creationTime) ? now : creationTime;
-		ftLastAccessTime = Utils.isNull(lastAccessTime) ? now : lastAccessTime;
-		ftLastWriteTime = Utils.isNull(lastWriteTime) ? now : lastWriteTime;
+		ftCreationTime = DokanyUtils.isNull(creationTime) ? now : creationTime;
+		ftLastAccessTime = DokanyUtils.isNull(lastAccessTime) ? now : lastAccessTime;
+		ftLastWriteTime = DokanyUtils.isNull(lastWriteTime) ? now : lastWriteTime;
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * @return
 	 */
 	public void setLastWriteTime(final long lastWriteTime) {
-		ftLastWriteTime = lastWriteTime == 0 ? Utils.getCurrentTime() : Utils.getTime(lastWriteTime);
+		ftLastWriteTime = lastWriteTime == 0 ? DokanyUtils.getCurrentTime() : DokanyUtils.getTime(lastWriteTime);
 		ftLastAccessTime = ftLastWriteTime;
 	}
 
@@ -166,7 +166,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * @return
 	 */
 	public void setCreationTime(final long creationTime) {
-		ftCreationTime = creationTime == 0 ? Utils.getCurrentTime() : Utils.getTime(creationTime);
+		ftCreationTime = creationTime == 0 ? DokanyUtils.getCurrentTime() : DokanyUtils.getTime(creationTime);
 	}
 
 	public void setSize(final long sizeToSet) {
@@ -176,7 +176,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setSize(final long size, final int sizeHigh, final int sizeLow) {
 		fileSize = size;
 
-		final LARGE_INTEGER largeInt = Utils.getLargeInt(size, sizeHigh, sizeLow);
+		final LARGE_INTEGER largeInt = DokanyUtils.getLargeInt(size, sizeHigh, sizeLow);
 
 		nFileSizeHigh = ((size != 0) && (sizeHigh == 0)) ? largeInt.getHigh().intValue() : (int) size;
 		nFileSizeLow = ((size != 0) && (sizeLow == 0)) ? largeInt.getLow().intValue() : (int) size;
@@ -194,7 +194,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setIndex(final long index, final int indexHigh, final int indexLow) {
 		fileIndex = index;
 
-		final LARGE_INTEGER largeInt = Utils.getLargeInt(index, indexHigh, indexLow);
+		final LARGE_INTEGER largeInt = DokanyUtils.getLargeInt(index, indexHigh, indexLow);
 
 		nFileIndexHigh = ((index != 0) && (indexHigh == 0)) ? largeInt.getHigh().intValue() : (int) index;
 		nFileIndexLow = ((index != 0) && (indexLow == 0)) ? largeInt.getLow().intValue() : (int) index;
