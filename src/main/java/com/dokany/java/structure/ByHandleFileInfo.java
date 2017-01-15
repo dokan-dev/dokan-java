@@ -124,10 +124,10 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 		infoToReceive.dwVolumeSerialNumber = dwVolumeSerialNumber;
 	}
 
-	public void setAttributes(final FileAttribute attributes) {
+	public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
 		int toSet = FileAttribute.NORMAL.val;
 		if (Utils.isNotNull(this)) {
-			toSet = attributes.val;
+			toSet = attributes.toInt();
 		}
 		dwFileAttributes = toSet;
 	}

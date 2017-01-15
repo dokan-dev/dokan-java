@@ -4,17 +4,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.dokany.java.Utils;
+import com.dokany.java.constants.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
 
 /**
- * Dokan mount options used to describe dokan device behavior. This is the same structure as PDOKAN_OPTIONS (dokan.h) in the C++ version of Dokany.
+ * Dokany mount options used to describe Dokany device behavior. This is the same structure as PDOKAN_OPTIONS (dokan.h) in the C++ version of Dokany.
  *
  */
 public class DeviceOptions extends Structure implements Structure.ByReference {
 
 	/**
-	 * Version of the dokan features requested (version "123" is equal to Dokan version 1.2.3). Currently is 100.
+	 * Version of the Dokany features requested (version "123" is equal to Dokany version 1.2.3). Currently is 100.
 	 */
 	public short Version = 100;
 
@@ -26,9 +27,10 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Features enable for the mount.
 	 *
-	 * @see {@link com.dokany.java.constants.MountOptions}
+	 * @see {@link com.dokany.java.constants.MountOption}
 	 */
 	public int Options;
+	private final EnumIntegerSet<MountOption> mountOptions;
 
 	/**
 	 * FileSystem can store anything here
@@ -36,7 +38,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public long GlobalContext = 0L;
 
 	/**
-	 * Mount point. Can be M:\\ (drive letter) or C:\\mount\\dokan (path in NTFS).
+	 * Mount point. Can be M:\\ (drive letter) or C:\\mount\\dokany (path in NTFS).
 	 */
 	public WString MountPoint;
 
@@ -46,7 +48,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public WString UNCName;
 
 	/**
-	 * Max timeout in milliseconds of each request before Dokan give up.
+	 * Max timeout in milliseconds of each request before Dokany gives up.
 	 */
 	public long Timeout;
 
@@ -63,7 +65,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	public DeviceOptions(
 	        final String mountPoint,
 	        final short threadCount,
-	        final int dokanyOptions,
+	        final EnumIntegerSet<MountOption> mountOptions,
 	        final String uncName,
 	        final long timeout,
 	        final long allocationUnitSize,
@@ -71,7 +73,8 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
-		Options = dokanyOptions;
+		this.mountOptions = mountOptions;
+		Options = mountOptions.toInt();
 		if (Utils.isNotNull(uncName)) {
 			UNCName = new WString(uncName);
 		} else {
@@ -80,6 +83,10 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 		Timeout = timeout;
 		AllocationUnitSize = allocationUnitSize;
 		SectorSize = sectorSize;
+	}
+
+	public EnumIntegerSet<MountOption> getMountOptions() {
+		return mountOptions;
 	}
 
 	@Override

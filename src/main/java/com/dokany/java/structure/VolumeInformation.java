@@ -1,8 +1,6 @@
 package com.dokany.java.structure;
 
-import static com.dokany.java.constants.FileSystemFeatures.CASE_PRESERVED_NAMES;
-
-import com.dokany.java.constants.FileSystemFeatures;
+import com.dokany.java.constants.FileSystemFeature;
 
 public class VolumeInformation {
 
@@ -10,14 +8,21 @@ public class VolumeInformation {
 	private final int serialNumber;
 	private final String volumeName;
 	private final String fileSystemName;
-	private final FileSystemFeatures fileSystemFeatures;
+	private final EnumIntegerSet<FileSystemFeature> fileSystemFeatures;
+
+	public static final int DEFAULT_MAX_COMPONENT_LENGTH = 256;
+	public static final int DEFAULT_SERIAL_NUMBER = 0x12345678;
+	public static final String DEFAULT_VOLUME_NAME = "VOLUME1";
+	public static final String DEFAULT_FS_NAME = "DOKANY";
+	public static final EnumIntegerSet<FileSystemFeature> DEFAULT_FS_FEATURES = new EnumIntegerSet<>(FileSystemFeature.CASE_PRESERVED_NAMES);
 
 	public VolumeInformation(
 	        final int maxComponentLength,
 	        final String volumeName,
 	        final int serialNumber,
 	        final String fileSystemName,
-	        final FileSystemFeatures fileSystemFeatures) {
+	        final EnumIntegerSet<FileSystemFeature> fileSystemFeatures) {
+
 		this.maxComponentLength = maxComponentLength;
 		this.volumeName = volumeName;
 		this.serialNumber = serialNumber;
@@ -25,12 +30,22 @@ public class VolumeInformation {
 		this.fileSystemFeatures = fileSystemFeatures;
 	}
 
-	public VolumeInformation() {
-		this(256, "VOLUME", 0x12345678, "DOKANY", CASE_PRESERVED_NAMES);
+	/**
+	 * Provides default values for maxComponentLength and fileSystemFeatures.
+	 *
+	 * @param volumeName
+	 * @param serialNumber
+	 * @param fileSystemName
+	 */
+	public VolumeInformation(final String volumeName, final int serialNumber, final String fileSystemName) {
+		this(DEFAULT_MAX_COMPONENT_LENGTH, volumeName, serialNumber, fileSystemName, DEFAULT_FS_FEATURES);
 	}
 
-	public VolumeInformation(final String volumeName, final int serialNumber, final String fileSystemName) {
-		this(256, volumeName, serialNumber, fileSystemName, CASE_PRESERVED_NAMES);
+	/**
+	 * Provides default values for all values.
+	 */
+	public VolumeInformation() {
+		this(DEFAULT_MAX_COMPONENT_LENGTH, DEFAULT_VOLUME_NAME, DEFAULT_SERIAL_NUMBER, DEFAULT_FS_NAME, DEFAULT_FS_FEATURES);
 	}
 
 	public int getMaxComponentLength() {
@@ -47,7 +62,7 @@ public class VolumeInformation {
 	}
 
 	/**
-	 * Default is VOLUME;
+	 * Default is VOLUME1;
 	 *
 	 * @return
 	 */
@@ -65,11 +80,11 @@ public class VolumeInformation {
 	}
 
 	/**
-	 * Default is FileSystemFeatures.CasePreservedNames
+	 * Default is FileSystemFeature.CasePreservedNames
 	 *
 	 * @return
 	 */
-	public FileSystemFeatures getFileSystemFeatures() {
+	public EnumIntegerSet<FileSystemFeature> getFileSystemFeatures() {
 		return fileSystemFeatures;
 	}
 

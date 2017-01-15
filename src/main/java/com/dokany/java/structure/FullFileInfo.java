@@ -44,7 +44,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 	public FullFileInfo(
 	        @NotNull final String path,
 	        final long index,
-	        final FileAttribute attributes,
+	        final EnumIntegerSet<FileAttribute> attributes,
 	        final int volumeSerialNumber) throws FileNotFoundException {
 
 		// times automatically set to now by ByHandleFileInfo constructors
@@ -55,7 +55,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 	public FullFileInfo(
 	        @NotNull final String path,
 	        final long index,
-	        final FileAttribute attributes,
+	        final EnumIntegerSet<FileAttribute> attributes,
 	        final int volumeSerialNumber,
 	        final FILETIME creationTime,
 	        final FILETIME lastAccessTime,
