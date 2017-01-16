@@ -1,7 +1,11 @@
 plugins {
-  id 'java'
+  id 'application'
   id 'eclipse'
   id 'maven-publish'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
 }
 
 repositories {
@@ -19,8 +23,8 @@ dependencies {
   compile 'commons-io:commons-io:2.5'
   compile 'org.slf4j:slf4j-api:1.7.22'
   compile 'ch.qos.logback:logback-classic:1.1.8'
-  compile 'net.java.dev.jna:jna:4.3.0-SNAPSHOT'
-  compile 'net.java.dev.jna:jna-platform:4.3.0-SNAPSHOT'
+  compile 'net.java.dev.jna:jna:4.3.0'
+  compile 'net.java.dev.jna:jna-platform:4.3.0'
   compile 'org.jetbrains.xodus:xodus-vfs:1.0.2'
   testCompile 'com.google.jimfs:jimfs:1.0'
   testCompile 'junit:junit:4.12'
@@ -34,10 +38,12 @@ eclipse {
 // TODO: change this back to true when documentation is added
 javadoc.failOnError = false
 
+mainClassName = "com.dokany.java.examples.mirrorfs.MountMirrorFS"
+
 jar {
     doFirst {
         manifest {
-                attributes 'Main-Class': 'com.dokany.java.examples.memoryfs.Mount'
+                attributes 'Main-Class': 'com.dokany.java.examples.mirrorfs.MountMirrorFS'
             if (!configurations.runtime.isEmpty()) {
                 attributes('Class-Path': configurations.runtime.collect{it.name}.join(' '))
             }
