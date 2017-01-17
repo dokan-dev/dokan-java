@@ -26,9 +26,6 @@ dependencies {
   compile 'net.java.dev.jna:jna:4.3.0'
   compile 'net.java.dev.jna:jna-platform:4.3.0'
   compile 'org.jetbrains.xodus:xodus-vfs:1.0.2'
-  testCompile 'com.google.jimfs:jimfs:1.0'
-  testCompile 'junit:junit:4.12'
-  testCompile 'com.google.truth:truth:0.25'
 }
 
 eclipse {
