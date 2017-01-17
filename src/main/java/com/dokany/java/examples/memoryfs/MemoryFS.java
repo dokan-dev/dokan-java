@@ -12,19 +12,19 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dokany.java.DokanyException;
-import com.dokany.java.FileSystem;
-import com.dokany.java.Utils;
+import com.dokany.java.DokanyFileSystem;
 import com.dokany.java.Win32FindStreamData;
 import com.dokany.java.constants.FileAttribute;
-import com.dokany.java.constants.MountError;
 import com.dokany.java.structure.DeviceOptions;
+import com.dokany.java.structure.DokanyFileInfo;
+import com.dokany.java.structure.EnumIntegerSet;
 import com.dokany.java.structure.FileData;
 import com.dokany.java.structure.FreeSpace;
 import com.dokany.java.structure.FullFileInfo;
@@ -45,7 +45,7 @@ import jetbrains.exodus.vfs.File;
 import jetbrains.exodus.vfs.VfsInputStream;
 import jetbrains.exodus.vfs.VirtualFileSystem;
 
-public class MemoryFS extends FileSystem {
+public class MemoryFS extends DokanyFileSystem {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(MemoryFS.class);
 
@@ -60,9 +60,13 @@ public class MemoryFS extends FileSystem {
 	private final VirtualFileSystem vfs;
 	private final Store infoStore;
 
-	public MemoryFS(final DeviceOptions deviceOptions) throws IOException {
-		super(deviceOptions, new VolumeInformation(256, "Volume1", 234234, "MemoryFS", FileSystemFeatures.CASE_PRESERVED_NAMES),
-		        new FreeSpace(1024L * 1024L * 256L, 1024L * 1024L), new Date(), "/");
+	public MemoryFS(
+	        @NotNull final DeviceOptions deviceOptions,
+	        @NotNull final VolumeInformation volumeInfo,
+	        @NotNull final FreeSpace freeSpace,
+	        @NotNull final Date rootCreationDate,
+	        @NotNull final String rootPath) throws IOException {
+		super(deviceOptions, volumeInfo, freeSpace, rootCreationDate, rootPath);
 
 		// Try to create store location in temp directory
 		final Path fileStorePath = Files.createTempDirectory("dokany-java_");
@@ -78,21 +82,22 @@ public class MemoryFS extends FileSystem {
 		// must not be read only so that store can be created
 		infoStore = env.computeInTransaction((@NotNull final Transaction txn) -> env.openStore(fileStoreName, StoreConfig.WITHOUT_DUPLICATES, txn));
 
+		createSampleItems();
 	}
 
 	@Override
 	public void mounted() {
-		try {
-			createSampleItems();
-		} catch (final IOException e) {
-			throw new DokanyException(MountError.DOKAN_START_ERROR.val);
-		}
+		// try {
+		// } catch (final IOException e) {
+		// throw new DokanyException(MountError.DOKAN_START_ERROR.val, e);
+		// }
 	}
 
 	@Override
 	public void unmounted() {
-		vfs.shutdown();
-		env.close();
+		/*
+		 * vfs.shutdown(); if (env.isOpen()) { env.close(); }
+		 */
 	}
 
 	/**
@@ -102,7 +107,7 @@ public class MemoryFS extends FileSystem {
 	 */
 	@Override
 	public boolean doesPathExist(@NotNull final String path) {
-		return Utils.isNotNull(getExistingFile(path));
+		return Objects.nonNull(getExistingFile(path));
 	}
 
 	/**
@@ -136,12 +141,13 @@ public class MemoryFS extends FileSystem {
 	 */
 	private File getExistingFileWithException(@NotNull final String path, @NotNull final Transaction txn) throws FileNotFoundException {
 		final File file = getExistingFile(path, txn);
-		if (Utils.isNull(file)) {
+		if (Objects.isNull(file)) {
 			throw new FileNotFoundException("Could not find file for path: " + path);
 		}
 		return file;
 	}
 
+	/*-
 	@Override
 	public Set<WIN32_FIND_DATA> findFiles(@NotNull final String pathToSearch) {
 		final Set<WIN32_FIND_DATA> files = new HashSet<>();
@@ -162,6 +168,7 @@ public class MemoryFS extends FileSystem {
 		});
 		return files;
 	}
+	*/
 
 	@Override
 	public Set<WIN32_FIND_DATA> findFilesWithPattern(@NotNull final String pathToSearch, @NotNull final String pattern) {
@@ -169,7 +176,7 @@ public class MemoryFS extends FileSystem {
 
 		LOGGER.debug("findFilesWithPattern memoryfs:   path  {};     pattern {}", pathToSearch, pattern);
 		// Only use if pattern is not null
-		final PathMatcher pathMatcher = DEFAULT_FS.getPathMatcher(GLOB + rootPath + pattern);
+		final PathMatcher pathMatcher = DEFAULT_FS.getPathMatcher(GLOB + root + pattern);
 
 		env.executeInReadonlyTransaction((@NotNull final Transaction txn) -> {
 			vfs.getFiles(txn).forEach(file -> {
@@ -196,12 +203,12 @@ public class MemoryFS extends FileSystem {
 	}
 
 	@Override
-	public void deleteFile(@NotNull final String path) throws IOException {
+	public void deleteFile(@NotNull final String path, final DokanyFileInfo dokanyFileInfo) throws IOException {
 		delete(path);
 	}
 
 	@Override
-	public void deleteDirectory(@NotNull final String path) throws IOException {
+	public void deleteDirectory(@NotNull final String path, final DokanyFileInfo dokanyFileInfo) throws IOException {
 		delete(path);
 	}
 
@@ -232,7 +239,7 @@ public class MemoryFS extends FileSystem {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	private FullFileInfo getNewInfo(@NotNull final File file, final FileAttribute attributes) throws FileNotFoundException {
+	private FullFileInfo getNewInfo(@NotNull final File file, final EnumIntegerSet<FileAttribute> attributes) throws FileNotFoundException {
 		return new FullFileInfo(file.getPath(), file.getDescriptor(), attributes, getVolumeInfo().getVolumeSerialNumber());
 	}
 
@@ -255,7 +262,7 @@ public class MemoryFS extends FileSystem {
 			return toReturn;
 		});
 
-		if (Utils.isNull(result)) {
+		if (Objects.isNull(result)) {
 			throw new IOException();
 		}
 		return result;
@@ -267,12 +274,12 @@ public class MemoryFS extends FileSystem {
 	 * @throws FileNotFoundException
 	 */
 	private FullFileInfo getInfo(@NotNull final String path, @NotNull final Transaction txn) throws FileNotFoundException {
-		if (Utils.isNull(path)) {
+		if (Objects.isNull(path)) {
 			throw new IllegalArgumentException("path cannot be null");
 		}
 		final ArrayByteIterable pathKey = StringBinding.stringToEntry(path);
 		final ByteIterable iterable = infoStore.get(txn, pathKey);
-		if (Utils.isNull(iterable)) {
+		if (Objects.isNull(iterable)) {
 			throw new FileNotFoundException("iterable was null and thus file info could not be created");
 		}
 		return new FullFileInfo(path, iterable);
@@ -284,7 +291,7 @@ public class MemoryFS extends FileSystem {
 	 * @throws IOException
 	 */
 	@Override
-	public void createEmptyFile(@NotNull final String path, final long options, final FileAttribute attributes) throws IOException {
+	public void createEmptyFile(@NotNull final String path, final long options, final EnumIntegerSet<FileAttribute> attributes) throws IOException {
 		final IOException error = env.computeInTransaction((@NotNull final Transaction txn) -> {
 			IOException toReturn = null;
 			try {
@@ -295,7 +302,7 @@ public class MemoryFS extends FileSystem {
 			return toReturn;
 		});
 
-		if (Utils.isNotNull(error)) {
+		if (Objects.nonNull(error)) {
 			throw error;
 		}
 	}
@@ -305,7 +312,8 @@ public class MemoryFS extends FileSystem {
 	 *
 	 * @throws FileNotFoundException
 	 */
-	private void createEmptyFile(@NotNull final String path, final long options, final FileAttribute attributes, @NotNull final Transaction txn) throws FileNotFoundException {
+	private void createEmptyFile(@NotNull final String path, final long options, final EnumIntegerSet<FileAttribute> attributes, @NotNull final Transaction txn)
+	        throws FileNotFoundException {
 		final File file = createFile(path, txn);
 		final FullFileInfo info = getNewInfo(file, attributes);
 		setInfo(path, info, txn);
@@ -317,7 +325,7 @@ public class MemoryFS extends FileSystem {
 	 * @throws IOException
 	 */
 	@Override
-	public void createEmptyDirectory(@NotNull final String path, final long options, final FileAttribute attributes) throws IOException {
+	public void createEmptyDirectory(@NotNull final String path, final long options, final EnumIntegerSet<FileAttribute> attributes) throws IOException {
 		createEmptyFile(path, options, attributes);
 	}
 
@@ -326,8 +334,8 @@ public class MemoryFS extends FileSystem {
 	 */
 	private File createFile(@NotNull final String path, @NotNull final Transaction txn) {
 		final String updatedPath;
-		if (!path.startsWith(rootPath)) {
-			updatedPath = rootPath + path;
+		if (!path.startsWith(root)) {
+			updatedPath = root + path;
 		} else {
 			updatedPath = path;
 		}
@@ -343,8 +351,8 @@ public class MemoryFS extends FileSystem {
 			throw new IOException("readLength cannot be empty");
 		}
 
-		if (Utils.isNull(path)) {
-			throw new FileNotFoundException("path was null");
+		if (Objects.isNull(path)) {
+			throw new FileNotFoundException("path cannot be null");
 		}
 
 		final FileData fileData = env.computeInTransaction((@NotNull final Transaction txn) -> {
@@ -354,7 +362,7 @@ public class MemoryFS extends FileSystem {
 			final long fileSize = vfs.getFileLength(txn, file);
 
 			if (fileSize > 0) {
-				if (Utils.isNotNull(file)) {
+				if (Objects.nonNull(file)) {
 					final VfsInputStream inputStream = vfs.readFile(txn, file);
 					try {
 						final byte[] data = new byte[readLength];
@@ -366,12 +374,13 @@ public class MemoryFS extends FileSystem {
 				}
 			} else {
 				// initialize empty so IOException is not thrown
+				LOGGER.debug("fileSize was 0; sending back empty FileData");
 				toReturn = new FileData(new byte[0], 0);
 			}
 			return toReturn;
 		});
 
-		if (Utils.isNull(fileData)) {
+		if (Objects.isNull(fileData)) {
 			throw new IOException("Error reading file");
 		}
 		return fileData;
@@ -401,7 +410,7 @@ public class MemoryFS extends FileSystem {
 	 */
 	@Override
 	public int write(@NotNull final String path, final int offset, final byte[] data, final int writeLength) throws IOException {
-		if (Utils.isNull(path)) {
+		if (Objects.isNull(path)) {
 			throw new FileNotFoundException("Path was null");
 		}
 
@@ -416,7 +425,7 @@ public class MemoryFS extends FileSystem {
 			return toReturn;
 		});
 
-		if (Utils.isNotNull(error)) {
+		if (Objects.nonNull(error)) {
 			throw error;
 		}
 
@@ -434,9 +443,12 @@ public class MemoryFS extends FileSystem {
 		LOGGER.debug("wrote file: {}", file.getPath());
 
 		FullFileInfo newInfo = info;
-		if (Utils.isNull(info)) {
+		if (Objects.isNull(info)) {
 			// Figure out how to properly set attribute
-			newInfo = getNewInfo(file, FileAttribute.NORMAL);
+			final EnumIntegerSet<FileAttribute> attributes = new EnumIntegerSet<>(FileAttribute.class);
+			attributes.add(FileAttribute.NORMAL);
+			newInfo = getNewInfo(file, attributes);
+
 			newInfo.setCreationTime(file.getCreated());
 			newInfo.setSize(fileSize);
 		}
@@ -452,8 +464,8 @@ public class MemoryFS extends FileSystem {
 	 */
 	private void setInfo(@NotNull final String path, @NotNull final FullFileInfo info, @NotNull final Transaction txn) {
 		final ArrayByteIterable pathKey = StringBinding.stringToEntry(path);
-		LOGGER.debug("set info for {} to {}", path, info);
 		infoStore.put(txn, pathKey, info.toByteIterable());
+		LOGGER.debug("Stored info for {}", path);
 	}
 
 	/**
@@ -472,15 +484,15 @@ public class MemoryFS extends FileSystem {
 	/**
 	 * Sets attributes on path.
 	 */
-	public void setAttributes(@NotNull final String path, final FileAttribute attributes) throws IOException {
-		int toSet = FILE_ATTRIBUTE_NORMAL;
+	public void setAttributes(@NotNull final String path, final EnumIntegerSet<FileAttribute> attributes) throws IOException {
+		int attributeAsInt = FILE_ATTRIBUTE_NORMAL;
 		// Will be null if coming from findExisting method
-		if (Utils.isNotNull(attributes)) {
-			toSet = attributes.val;
+		if (Objects.nonNull(attributes)) {
+			attributeAsInt = attributes.toInt();
 		}
 
 		final FullFileInfo info = getInfo(path);
-		info.dwFileAttributes = toSet;
+		info.dwFileAttributes = attributeAsInt;
 		setInfo(path, info);
 	}
 
@@ -544,23 +556,13 @@ public class MemoryFS extends FileSystem {
 	}
 
 	@Override
-	public void cleanup(@NotNull final String path) {
+	public void cleanup(@NotNull final String path, final DokanyFileInfo dokanyFileInfo) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void close(@NotNull final String path) {
+	public void close(@NotNull final String path, final DokanyFileInfo dokanyFileInfo) {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean isDebug() {
-		return true;
-	}
-
-	@Override
-	public boolean isDebugStderrOutput() {
-		return true;
 	}
 
 	/**
@@ -575,20 +577,27 @@ public class MemoryFS extends FileSystem {
 			IOException toReturn = null;
 			try {
 				// Root - must be created
-				File file = createFile(rootPath, txn);
-				final FullFileInfo info = new FullFileInfo(rootPath, file.getDescriptor(), FileAttribute.DEVICE, volumeInfo.getVolumeSerialNumber());
+				File file = createFile(root, txn);
+				final EnumIntegerSet<FileAttribute> attributes = new EnumIntegerSet<>(FileAttribute.class);
+				attributes.add(FileAttribute.DEVICE);
+				final FullFileInfo info = new FullFileInfo(root, file.getDescriptor(), attributes,
+				        volumeInfo.getVolumeSerialNumber());
 				info.setSize(freeSpace.getTotalBytes());
-				setInfo(rootPath, info, txn);
+				setInfo(root, info, txn);
 
 				// File 1 - empty
-				createEmptyFile(rootPath + "1.txt", 0, FileAttribute.NORMAL, txn);
+				attributes.clear();
+				attributes.add(FileAttribute.NORMAL);
+				createEmptyFile(root + "1.txt", 0, attributes, txn);
 
 				// File 2 - 5 bytes
-				file = createFile(rootPath + "2.txt", txn);
+				file = createFile(root + "2.txt", txn);
 				writeAll(file, new byte[] { 'H', 'E', 'L', 'L', 'O' }, txn);
 
 				// Directory - empty
-				createEmptyFile(rootPath + "testFolder", 0, FileAttribute.DIRECTORY, txn);
+				attributes.clear();
+				attributes.add(FileAttribute.DIRECTORY);
+				createEmptyFile(root + "testFolder", 0, attributes, txn);
 
 				// File 3 - several bytes
 				file = createFile("testFolder/3.TXT", txn);
@@ -600,7 +609,7 @@ public class MemoryFS extends FileSystem {
 			return toReturn;
 		});
 
-		if (Utils.isNotNull(error)) {
+		if (Objects.nonNull(error)) {
 			throw error;
 		}
 	}
