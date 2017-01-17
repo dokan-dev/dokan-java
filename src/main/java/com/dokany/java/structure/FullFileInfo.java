@@ -1,6 +1,7 @@
 package com.dokany.java.structure;
 
 import java.io.FileNotFoundException;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 
 		super(creationTime, lastAccessTime, lastWriteTime);
 
-		if (DokanyUtils.isNull(path)) {
+		if (Objects.isNull(path)) {
 			throw new FileNotFoundException("path was null and thus file info could not be created");
 		}
 
@@ -75,7 +76,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 
 	@NotNull
 	public FullFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) throws FileNotFoundException {
-		if (DokanyUtils.isNull(path) || DokanyUtils.isNull(iterable)) {
+		if (Objects.isNull(path) || Objects.isNull(iterable)) {
 			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
 		}
 
@@ -148,7 +149,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 	 */
 	@NotNull
 	public WIN32_FIND_DATA toWin32FindData() {
-		final char[] cFileName = DokanyUtils.trimFrontSlash(DokanyUtils.trimStrToSize(filePath, 260)).toCharArray();
+		final char[] cFileName = DokanyUtils.trimFrontSeparator(DokanyUtils.trimStrToSize(filePath, 260)).toCharArray();
 		final char[] cAlternateFileName = new char[1];
 		// final char[] cAlternateFileName = Utils.trimFrontSlash(Utils.trimStrToSize(path, 14)).toCharArray();
 		// TODO: Why does setting alternate name cause file name to show up twice??

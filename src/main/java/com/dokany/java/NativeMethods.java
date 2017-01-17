@@ -84,7 +84,7 @@ final class NativeMethods {
 	final static native IntByReference DokanOpenRequestorToken(DokanyFileInfo dokanyFileInfo);
 
 	/**
-	 * Convert {@link com.dokany.java.DokanyOperations.CreateFile} parameters to CreateFile parameters.
+	 * Convert {@link com.dokany.java.DokanyOperations.ZwCreateFile} parameters to CreateFile parameters.
 	 *
 	 * @param fileAttributes FileAttributes
 	 * @param createOptions CreateOptions

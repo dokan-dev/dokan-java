@@ -2,8 +2,8 @@ package com.dokany.java.structure;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
@@ -75,7 +75,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 		ThreadCount = threadCount;
 		this.mountOptions = mountOptions;
 		Options = mountOptions.toInt();
-		if (DokanyUtils.isNotNull(uncName)) {
+		if (Objects.nonNull(uncName)) {
 			UNCName = new WString(uncName);
 		} else {
 			UNCName = null;
