@@ -1,6 +1,8 @@
 package com.dokany.java.structure;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +33,8 @@ import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
  *
  */
 public class ByHandleFileInfo extends Structure implements Structure.ByReference {
+
+	AtomicLong counter = new AtomicLong();
 
 	// private final static Logger LOGGER = LoggerFactory.getLogger(ByHandleFileInfo.class);
 
@@ -106,7 +110,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void copyTo(final ByHandleFileInfo infoToReceive) {
-		if (DokanyUtils.isNull(infoToReceive)) {
+		if (Objects.isNull(infoToReceive)) {
 			throw new IllegalStateException("infoToReceive cannot be null");
 		}
 
@@ -125,8 +129,8 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
-		int toSet = FileAttribute.NORMAL.val;
-		if (DokanyUtils.isNotNull(this)) {
+		int toSet = FileAttribute.NORMAL.mask();
+		if (Objects.nonNull(attributes)) {
 			toSet = attributes.toInt();
 		}
 		dwFileAttributes = toSet;
@@ -143,9 +147,9 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	void setTimes(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
 		final FILETIME now = DokanyUtils.getCurrentTime();
 
-		ftCreationTime = DokanyUtils.isNull(creationTime) ? now : creationTime;
-		ftLastAccessTime = DokanyUtils.isNull(lastAccessTime) ? now : lastAccessTime;
-		ftLastWriteTime = DokanyUtils.isNull(lastWriteTime) ? now : lastWriteTime;
+		ftCreationTime = Objects.isNull(creationTime) ? now : creationTime;
+		ftLastAccessTime = Objects.isNull(lastAccessTime) ? now : lastAccessTime;
+		ftLastWriteTime = Objects.isNull(lastWriteTime) ? now : lastWriteTime;
 	}
 
 	/**
@@ -188,6 +192,9 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void setIndex(final long indexToSet) {
+		if (indexToSet == 0) {
+			counter.getAndIncrement();
+		}
 		setIndex(indexToSet, 0, 0);
 	}
 
