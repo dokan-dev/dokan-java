@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dokany.java.constants.FileAttribute;
 import com.dokany.java.constants.MountOption;
@@ -29,9 +31,11 @@ public abstract class DokanyFileSystem {
 	protected final long sectorSize;
 	protected final long timeout;
 	protected final Date rootCreationDate;
-	protected final String rootPath;
+	protected final String root;
 	protected final boolean isDebug;
 	protected final boolean isDebugStdErr;
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyFileSystem.class);
 
 	public DokanyFileSystem(
 	        @NotNull final DeviceOptions deviceOptions,
@@ -47,8 +51,8 @@ public abstract class DokanyFileSystem {
 		allocationUnitSize = deviceOptions.AllocationUnitSize;
 		sectorSize = deviceOptions.SectorSize;
 		this.rootCreationDate = rootCreationDate;
-		this.rootPath = rootPath;
 
+		root = DokanyUtils.normalizeWithTrailingSlash(rootPath);
 		isDebug = deviceOptions.getMountOptions().contains(MountOption.DEBUG_MODE);
 		isDebugStdErr = deviceOptions.getMountOptions().contains(MountOption.STD_ERR_OUTPUT);
 	}
@@ -88,12 +92,12 @@ public abstract class DokanyFileSystem {
 		return timeout;
 	}
 
-	public final String getRootPath() {
-		return rootPath;
-	}
-
 	public final Date getRootCreateDate() {
 		return rootCreationDate;
+	}
+
+	public final String getRoot() {
+		return root;
 	}
 
 	public final boolean isDebugStderrOutput() {
@@ -113,8 +117,6 @@ public abstract class DokanyFileSystem {
 	public abstract void unmounted() throws IOException;
 
 	public abstract boolean doesPathExist(final String path) throws IOException;
-
-	public abstract Set<WIN32_FIND_DATA> findFiles(final String pathToSearch) throws IOException;
 
 	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(final String pathToSearch, final String pattern) throws IOException;
 

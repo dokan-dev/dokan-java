@@ -14,7 +14,11 @@ public class VolumeInformation {
 	public static final int DEFAULT_SERIAL_NUMBER = 0x12345678;
 	public static final String DEFAULT_VOLUME_NAME = "VOLUME1";
 	public static final String DEFAULT_FS_NAME = "DOKANY";
-	public static final EnumIntegerSet<FileSystemFeature> DEFAULT_FS_FEATURES = new EnumIntegerSet<>(FileSystemFeature.CASE_PRESERVED_NAMES);
+	public static final EnumIntegerSet<FileSystemFeature> DEFAULT_FS_FEATURES = new EnumIntegerSet<>(FileSystemFeature.class);
+
+	static {
+		DEFAULT_FS_FEATURES.add(FileSystemFeature.CASE_PRESERVED_NAMES);
+	}
 
 	public VolumeInformation(
 	        final int maxComponentLength,

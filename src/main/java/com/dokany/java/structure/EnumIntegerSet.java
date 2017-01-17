@@ -3,8 +3,8 @@ package com.dokany.java.structure;
 import java.util.AbstractSet;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.Objects;
 
-import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.EnumInteger;
 
 /**
@@ -14,48 +14,51 @@ import com.dokany.java.constants.EnumInteger;
  */
 public class EnumIntegerSet<T extends Enum<T>> extends AbstractSet<T> {
 
-	private final EnumSet<T> values;
+	private final EnumSet<T> elements;
+
+	public EnumIntegerSet(final Class<T> clazz) {
+		if (!EnumInteger.class.isAssignableFrom(clazz)) {
+			throw new IllegalArgumentException("Items must all implement EnumInteger");
+		}
+		elements = EnumSet.noneOf(clazz);
+	}
 
 	@SafeVarargs
-	public EnumIntegerSet(final T... items) {
-		if (DokanyUtils.isNull(items) || (items.length < 1) || DokanyUtils.isNull(items[0])) {
+	public final void add(final T... items) {
+		if (Objects.isNull(items) || (items.length < 1)) {
 			throw new IllegalArgumentException("items array cannot be empty");
 		}
 
-		values = EnumSet.noneOf(items[0].getDeclaringClass());
-
 		for (final T item : items) {
-			if (DokanyUtils.isNull(item)) {
-				throw new IllegalArgumentException("Item cannot be null");
+			if (Objects.isNull(item)) {
+				System.out.println("added");
+				elements.add(item);
 			}
-			if (!EnumInteger.class.isInstance(item)) {
-				throw new IllegalArgumentException("Items must all implement EnumInteger");
-			}
-			values.add(item);
 		}
 	}
 
 	public final int toInt() {
-		int toReturn = -1;
-		for (final T current : values) {
+		int toReturn = 0;
+		for (final T current : elements) {
 			// Already checked (in constructor) to ensure only objects which implement EnumInteger are stored in values
 			final EnumInteger enumInt = (EnumInteger) current;
-			if (toReturn == -1) {
-				toReturn = enumInt.getVal();
-			} else {
-				toReturn = toReturn | enumInt.getVal();
-			}
+			toReturn |= enumInt.mask();
 		}
 		return toReturn;
 	}
 
 	@Override
+	public boolean add(final T e) {
+		return elements.add(e);
+	}
+
+	@Override
 	public Iterator<T> iterator() {
-		return values.iterator();
+		return elements.iterator();
 	}
 
 	@Override
 	public int size() {
-		return values.size();
+		return elements.size();
 	}
 }
