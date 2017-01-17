@@ -16,13 +16,13 @@ public enum ErrorCode {
 
 	ERROR_ALREADY_EXISTS(183);
 
-	public final int val;
+	private final int mask;
 
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
-	private ErrorCode(final int val) {
-		this.val = val;
+	private ErrorCode(final int i) {
+		mask = i;
 	}
 }

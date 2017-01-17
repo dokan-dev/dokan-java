@@ -1,8 +1,9 @@
 package com.dokany.java.constants;
 
-public enum MountOption implements EnumInteger {
+import com.dokany.java.DokanyUtils;
+import com.dokany.java.structure.EnumIntegerSet;
 
-	FIXED_DRIVE(0, "Use fixed drive"),
+public enum MountOption implements EnumInteger {
 
 	DEBUG_MODE(1, "Enable ouput debug message"),
 
@@ -22,25 +23,30 @@ public enum MountOption implements EnumInteger {
 
 	FILELOCK_USER_MODE(256, "Enable Lockfile/Unlockfile operations. Otherwise Dokan will take care of it");
 
-	public final int val;
+	public final int mask;
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
-	public final String description;
+	private final String description;
+
+	public String description() {
+		return description;
+	}
+
 	public final boolean isReadonly;
 
-	private MountOption(final int val, final String description) {
-		this.val = val;
-		this.description = description;
+	private MountOption(final int i, final String desc) {
+		mask = i;
+		description = desc;
 
 		// TODO: is this proper logic?
-		isReadonly = (val == 8);
+		isReadonly = (mask == 8);
 	}
 
-	public String getDescription() {
-		return description;
+	public static EnumIntegerSet<MountOption> fromInt(final int value) {
+		return DokanyUtils.enumSetFromInt(value, values());
 	}
 }

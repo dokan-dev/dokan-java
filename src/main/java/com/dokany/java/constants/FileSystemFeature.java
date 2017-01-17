@@ -1,5 +1,7 @@
 package com.dokany.java.constants;
 
+import com.dokany.java.DokanyUtils;
+import com.dokany.java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
 
 public enum FileSystemFeature implements EnumInteger {
@@ -36,14 +38,18 @@ public enum FileSystemFeature implements EnumInteger {
 
 	SUPPORTS_TRANSACTIONS(WinNT.FILE_SUPPORTS_TRANSACTIONS);
 
-	public final int val;
+	private final int mask;
 
-	private FileSystemFeature(final int val) {
-		this.val = val;
+	private FileSystemFeature(final int i) {
+		mask = i;
 	}
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
+	}
+
+	public static EnumIntegerSet<FileSystemFeature> fromInt(final int value) {
+		return DokanyUtils.enumSetFromInt(value, values());
 	}
 }

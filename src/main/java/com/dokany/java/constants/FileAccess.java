@@ -1,5 +1,7 @@
 package com.dokany.java.constants;
 
+import com.dokany.java.DokanyUtils;
+import com.dokany.java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
 
 /**
@@ -118,14 +120,14 @@ public enum FileAccess implements EnumInteger {
 	 * Obsolete, use {@link #ACCESS_SYSTEM_SECURITY} instead.
 	 */
 	@Deprecated
-	RESERVED(ACCESS_SYSTEM_SECURITY.val),
+	RESERVED(ACCESS_SYSTEM_SECURITY.mask),
 
 	/**
 	 * All the access rights that are valid for the caller.
 	 *
 	 * nativeconst{MAXIMUM_ALLOWED,0x02000000}
 	 */
-	MAXIMUM_ALLOWED(1 << 25),
+	MAXIMUM_ALLOWED(0x02000000),
 
 	/**
 	 * All possible access rights.
@@ -155,30 +157,23 @@ public enum FileAccess implements EnumInteger {
 	 */
 	GENERIC_READ(WinNT.GENERIC_READ);
 
-	public final int val;
+	private final int mask;
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
 	private FileAccess(final int i) {
-		val = i;
+		mask = i;
 	}
 
-	public final static long MASK;
+	/*-
+	public final static int fromAttributesAndFlags(final int rawDesiredAccess) {
+		return (rawDesiredAccess & FileAccess.mask);
+	}*/
 
-	static {
-		MASK = READ_DATA.val | WRITE_DATA.val | APPEND_DATA.val
-		        | READ_EXTENDED_ATTRIBUTES.val | WRITE_EXTENDED_ATTRIBUTES.val | EXECUTE.val
-		        | DELETE_CHILD.val | READ_ATTRIBUTES.val | WRITE_ATTRIBUTES.val
-		        | DELETE.val | READ_PERMISSIONS.val | CHANGE_PERMISSIONS.val
-		        | SET_OWNERSHIP.val | SYNCHRONIZE.val | ACCESS_SYSTEM_SECURITY.val
-		        | MAXIMUM_ALLOWED.val | GENERIC_ALL.val | GENERIC_EXECUTE.val
-		        | GENERIC_WRITE.val | GENERIC_READ.val;
-	}
-
-	public final static long fromAttributesAndFlags(final int rawDesiredAccess) {
-		return (rawDesiredAccess & MASK);
+	public static EnumIntegerSet<FileAccess> fromInt(final int i) {
+		return DokanyUtils.enumSetFromInt(i, values());
 	}
 }

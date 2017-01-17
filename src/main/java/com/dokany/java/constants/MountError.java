@@ -20,20 +20,25 @@ public enum MountError implements EnumInteger {
 
 	VERSION_ERROR(-7, "Mount failed: Requested an incompatible version.");
 
-	public final int val;
-	public final String name;
-
-	private MountError(final int val, final String name) {
-		this.val = val;
-		this.name = name;
-	}
+	private final int mask;
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
-	public final static MountError fromInt(final int val) {
-		return DokanyUtils.enumFromInt(val, values());
+	private final String description;
+
+	public String description() {
+		return description;
+	}
+
+	private MountError(final int i, final String desc) {
+		mask = i;
+		description = desc;
+	}
+
+	public static MountError fromInt(final int value) {
+		return DokanyUtils.enumFromInt(value, values());
 	}
 }

@@ -17,40 +17,41 @@ import com.sun.jna.platform.win32.WinNT;
  *
  */
 public enum SecurityInformation implements EnumInteger {
-    // The owner identifier of the object is being referenced.
-	OWNER_SECURITY_INFORMATION(WinNT.OWNER_SECURITY_INFORMATION),
+	OWNER_SECURITY_INFORMATION(WinNT.OWNER_SECURITY_INFORMATION, "The owner identifier of the object is being referenced"),
 
-    // The primary group identifier of the object is being referenced.
-	GROUP_SECURITY_INFORMATION(WinNT.GROUP_SECURITY_INFORMATION),
+	GROUP_SECURITY_INFORMATION(WinNT.GROUP_SECURITY_INFORMATION, "The primary group identifier of the object is being referenced"),
 
-    // The DACL of the object is being referenced.
-	DACL_SECURITY_INFORMATION(WinNT.DACL_SECURITY_INFORMATION),
+	DACL_SECURITY_INFORMATION(WinNT.DACL_SECURITY_INFORMATION, "The DACL of the object is being referenced"),
 
-    // The SACL of the object is being referenced.
-	SACL_SECURITY_INFORMATION(WinNT.SACL_SECURITY_INFORMATION),
+	SACL_SECURITY_INFORMATION(WinNT.SACL_SECURITY_INFORMATION, "The SACL of the object is being referenced"),
 
-	LABEL_SECURITY_INFORMATION(WinNT.LABEL_SECURITY_INFORMATION),
+	LABEL_SECURITY_INFORMATION(WinNT.LABEL_SECURITY_INFORMATION, "The mandatory integrity label is being referenced"),
 
-    // The SACL inherits ACEs from the parent object. Dokan may not be passing Label ?? 0x00000010
-	UNPROTECTED_SACL_SECURITY_INFORMATION(WinNT.UNPROTECTED_SACL_SECURITY_INFORMATION),
+	UNPROTECTED_SACL_SECURITY_INFORMATION(
+	        WinNT.UNPROTECTED_SACL_SECURITY_INFORMATION,
+	        "The SACL inherits ACEs from the parent object. Dokany may not be passing Label ?? 0x00000010"),
 
-    // The DACL inherits ACEs from the parent object.
-	UNPROTECTED_DACL_SECURITY_INFORMATION(WinNT.UNPROTECTED_DACL_SECURITY_INFORMATION),
+	UNPROTECTED_DACL_SECURITY_INFORMATION(WinNT.UNPROTECTED_DACL_SECURITY_INFORMATION, "The DACL inherits ACEs from the parent object"),
 
-    // The SACL cannot inherit ACEs.
-	PROTECTED_SACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION),
+	PROTECTED_SACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION, "The SACL cannot inherit ACEs"),
 
-    // The DACL cannot inherit access control entries (ACEs).
-	PROTECTED_DACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION);
+	PROTECTED_DACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION, "The DACL cannot inherit access control entries (ACEs)");
 
-	public final int val;
+	private final int mask;
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
-	private SecurityInformation(final int i) {
-		val = i;
+	private final String description;
+
+	public String description() {
+		return description;
+	}
+
+	private SecurityInformation(final int i, final String desc) {
+		mask = i;
+		description = desc;
 	}
 }

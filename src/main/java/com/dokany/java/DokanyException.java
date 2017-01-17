@@ -13,7 +13,11 @@ public class DokanyException extends RuntimeException {
 	/**
 	*
 	*/
-	public final int val;
+	private final int val;
+
+	public int val() {
+		return val;
+	}
 
 	public DokanyException(final long errorCode, final IOException exception) {
 		if ((errorCode < 0) || (errorCode > 4294967295L)) {
@@ -23,10 +27,10 @@ public class DokanyException extends RuntimeException {
 	}
 
 	public DokanyException(final WinError errorCode, final IOException exception) {
-		this(errorCode.val, exception);
+		this(errorCode.mask(), exception);
 	}
 
 	public DokanyException(final ErrorCode errorCode, final IOException exception) {
-		this(errorCode.val, exception);
+		this(errorCode.mask(), exception);
 	}
 }

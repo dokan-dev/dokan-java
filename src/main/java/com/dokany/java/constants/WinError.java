@@ -80,14 +80,14 @@ public enum WinError implements EnumInteger {
 
 	ERROR_DIRECTORY(267);
 
-	public final int val;
+	private final int mask;
 
 	@Override
-	public int getVal() {
-		return val;
+	public int mask() {
+		return mask;
 	}
 
-	private WinError(final int val) {
-		this.val = val;
+	private WinError(final int i) {
+		mask = i;
 	}
 }

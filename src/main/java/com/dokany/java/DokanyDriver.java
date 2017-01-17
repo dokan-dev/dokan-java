@@ -67,7 +67,7 @@ public final class DokanyDriver {
 			final int mountStatus = NativeMethods.DokanMain(deviceOptions, new DokanyOperationsProxy(fileSystem));
 
 			if (mountStatus < 0) {
-				throw new IllegalStateException(MountError.fromInt(mountStatus).name);
+				throw new IllegalStateException(MountError.fromInt(mountStatus).description());
 			}
 
 			Runtime.getRuntime().addShutdownHook(new Thread() {
