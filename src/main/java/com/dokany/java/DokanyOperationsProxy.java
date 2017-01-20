@@ -5,12 +5,9 @@ import static com.dokany.java.constants.ErrorCode.ERROR_READ_FAULT;
 import static com.dokany.java.constants.ErrorCode.ERROR_WRITE_FAULT;
 import static com.dokany.java.constants.WinError.ERROR_NOT_SUPPORTED;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dokany.java.constants.CreationDisposition;
 import com.dokany.java.constants.ErrorCode;
@@ -31,9 +28,12 @@ import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Implementation of {@link DokanyOperations} which connects to {@link DokanyFileSystem}.
  */
+@Slf4j
 final class DokanyOperationsProxy extends DokanyOperations {
 
 	final DokanyFileSystem fileSystem;
@@ -41,7 +41,6 @@ final class DokanyOperationsProxy extends DokanyOperations {
 	final FreeSpace freeSpace;
 
 	public final static int MAX_PATH = 260;
-	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyOperationsProxy.class);
 
 	DokanyOperationsProxy(@NotNull final DokanyFileSystem fileSystem) {
 		this.fileSystem = fileSystem;
@@ -235,9 +234,9 @@ final class DokanyOperationsProxy extends DokanyOperations {
 				CloseFile.callback(path, dokanyFileInfo);
 				fileSystem.cleanup(normalizedPath, dokanyFileInfo);
 
-				LOGGER.trace("Cleaned up: {}", normalizedPath);
+				log.trace("Cleaned up: {}", normalizedPath);
 			} catch (final Throwable t) {
-				LOGGER.warn("Error in clearning up file: {}", path, t);
+				log.warn("Error in clearning up file: {}", path, t);
 			}
 		}
 	}
@@ -253,13 +252,13 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 			try {
 				// TODO: Can close always be done here not matter the FS?
-				dokanyFileInfo._context = 0;
+				dokanyFileInfo.Context = 0;
 				final String normalizedPath = DokanyUtils.normalize(path);
 				// fileSystem.close(normalizedPath, dokanyFileInfo);
 
-				LOGGER.trace("Closed file: {}", normalizedPath);
+				log.trace("Closed file: {}", normalizedPath);
 			} catch (final Throwable e) {
-				LOGGER.warn("Error in closing file: {}", path, e);
+				log.warn("Error in closing file: {}", path, e);
 			}
 		}
 	}
@@ -283,20 +282,19 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String pathToSearch = DokanyUtils.normalize(path);
-			final String pattern = Objects.isNull(searchPattern) ? null : searchPattern.toString();
-			LOGGER.trace("FindFilesWithPattern {} with pattern {}", pathToSearch, pattern);
+			log.trace("FindFilesWithPattern {}", pathToSearch);
 
 			try {
-				final Set<WIN32_FIND_DATA> filesFound = fileSystem.findFilesWithPattern(pathToSearch, pattern);
-				LOGGER.debug("Found {} paths", filesFound.size());
-				LOGGER.debug("rawFillFindData: {}", rawFillFindData);
+				final Set<WIN32_FIND_DATA> filesFound = fileSystem.findFilesWithPattern(pathToSearch, DokanyUtils.wStrToStr(searchPattern));
+				log.debug("Found {} paths", filesFound.size());
+				log.debug("rawFillFindData: {}", rawFillFindData);
 				try {
 					filesFound.forEach(file -> {
-						LOGGER.trace("file in find: {}", file.getFileName());
+						log.trace("file in find: {}", file.getFileName());
 						rawFillFindData.fillWin32FindData(file, dokanyFileInfo);
 					});
 				} catch (final Error e) {
-					LOGGER.warn("Error filling Win32FindData", e);
+					log.warn("Error filling Win32FindData", e);
 				}
 				return ErrorCode.SUCCESS.mask();
 			} catch (final Throwable t) {
@@ -316,16 +314,16 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.debug("ReadFile: {} with readLength ", normalizedPath, bufferLength);
+			log.debug("ReadFile: {} with readLength ", normalizedPath, bufferLength);
 
 			try {
 				final FileData data = fileSystem.read(normalizedPath, (int) offset, bufferLength);
 				final int numRead = data.getLength();
-				LOGGER.debug("numRead: {}", numRead);
+				log.debug("numRead: {}", numRead);
 
 				if (numRead > 0) {
 					buffer.write(0, data.getBytes(), 0, numRead);
-					LOGGER.debug("wrote data length: {}", data.getBytes().length);
+					log.debug("wrote data length: {}", data.getBytes().length);
 				}
 
 				readLengthRef.setValue(numRead);
@@ -347,14 +345,14 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.debug("WriteFile: {}", normalizedPath);
+			log.debug("WriteFile: {}", normalizedPath);
 
 			try {
 				final byte[] data = new byte[numberOfBytesToWrite];
 				buffer.read(0L, data, 0, numberOfBytesToWrite);
 				final int written = fileSystem.write(normalizedPath, (int) offset, data, numberOfBytesToWrite);
 				numberOfBytesWritten.setValue(written);
-				LOGGER.debug("Wrote this number of bytes: {}", written);
+				log.debug("Wrote this number of bytes: {}", written);
 				return ErrorCode.SUCCESS.mask();
 			} catch (final Throwable t) {
 				return DokanyUtils.exceptionToErrorCode(t, ERROR_WRITE_FAULT.mask());
@@ -369,7 +367,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("FlushFileBuffers: {}", normalizedPath);
+			log.trace("FlushFileBuffers: {}", normalizedPath);
 			try {
 				fileSystem.flushFileBuffers(normalizedPath);
 				return ErrorCode.SUCCESS.mask();
@@ -387,7 +385,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.debug("GetFileInformation: {}", normalizedPath);
+			log.debug("GetFileInformation: {}", normalizedPath);
 
 			if (isSkipFile(path)) {
 				return NtStatus.FILE_INVALID.mask();
@@ -397,7 +395,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 				retrievedInfo.copyTo(info);
 				return ErrorCode.SUCCESS.mask();
 			} catch (final Throwable t) {
-				LOGGER.warn("Error reading info: {}", t.getMessage());
+				log.warn("Error reading info: {}", t.getMessage());
 				return DokanyUtils.exceptionToErrorCode(t, ERROR_WRITE_FAULT.mask());
 			}
 		}
@@ -413,7 +411,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 			final String normalizedPath = DokanyUtils.normalize(path);
 			// TODO: fix
 			final EnumIntegerSet<FileAttribute> attribs = null;// FileAttribute.fromInt(attributes);
-			LOGGER.trace("SetFileAttributes as {} for {}", attribs, normalizedPath);
+			log.trace("SetFileAttributes as {} for {}", attribs, normalizedPath);
 
 			try {
 				fileSystem.setAttributes(normalizedPath, attribs);
@@ -434,7 +432,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("SetFileTime for {}; creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", normalizedPath, creationTime, lastAccessTime, lastWriteTime);
+			log.trace("SetFileTime for {}; creationTime = {}; lastAccessTime = {}; lastWriteTime = {}", normalizedPath, creationTime, lastAccessTime, lastWriteTime);
 
 			try {
 				fileSystem.setTime(DokanyUtils.normalize(path), creationTime, lastAccessTime, lastWriteTime);
@@ -452,7 +450,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("DeleteFile: {}", normalizedPath);
+			log.trace("DeleteFile: {}", normalizedPath);
 
 			try {
 				fileSystem.deleteFile(normalizedPath, dokanyFileInfo);
@@ -471,7 +469,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("DeleteDirectory: {}", normalizedPath);
+			log.trace("DeleteDirectory: {}", normalizedPath);
 
 			try {
 				fileSystem.deleteDirectory(normalizedPath, dokanyFileInfo);
@@ -493,7 +491,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 			final String oldNormalizedPath = DokanyUtils.normalize(oldPath);
 			final String newNormalizedPath = DokanyUtils.normalize(newPath);
-			LOGGER.debug("trace: {} to {}; replace existing? ", oldNormalizedPath, newNormalizedPath, replaceIfExisting);
+			log.debug("trace: {} to {}; replace existing? ", oldNormalizedPath, newNormalizedPath, replaceIfExisting);
 
 			try {
 				fileSystem.move(oldNormalizedPath, newNormalizedPath, replaceIfExisting);
@@ -513,7 +511,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("SetEndOfFile: {}", normalizedPath);
+			log.trace("SetEndOfFile: {}", normalizedPath);
 
 			try {
 				fileSystem.setEndOfFile(normalizedPath, (int) offset);
@@ -532,7 +530,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("SetAllocationSize: {}", normalizedPath);
+			log.trace("SetAllocationSize: {}", normalizedPath);
 
 			try {
 				fileSystem.setAllocationSize(normalizedPath, (int) length);
@@ -552,7 +550,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("LockFile: {}", normalizedPath);
+			log.trace("LockFile: {}", normalizedPath);
 
 			try {
 				fileSystem.lock(normalizedPath, (int) offset, (int) length);
@@ -573,7 +571,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("UnlockFile: {}", normalizedPath);
+			log.trace("UnlockFile: {}", normalizedPath);
 			try {
 				fileSystem.unlock(normalizedPath, (int) offset, (int) length);
 
@@ -592,10 +590,10 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final LongByReference rawTotalNumberOfFreeBytes,
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
-			LOGGER.trace("GetDiskFreeSpace");
-			LOGGER.trace("rawFreeBytesAvailable: {}", rawFreeBytesAvailable.getValue());
-			LOGGER.debug("rawTotalNumberOfBytes", rawTotalNumberOfBytes);
-			LOGGER.debug("rawTotalNumberOfFreeBytes", rawTotalNumberOfFreeBytes);
+			log.trace("GetDiskFreeSpace");
+			log.trace("rawFreeBytesAvailable: {}", rawFreeBytesAvailable.getValue());
+			log.debug("rawTotalNumberOfBytes", rawTotalNumberOfBytes);
+			log.debug("rawTotalNumberOfFreeBytes", rawTotalNumberOfFreeBytes);
 
 			// rawTotalNumberOfBytes.setValue(new LONGLONG(freeSpace.getTotalBytes()));
 
@@ -604,7 +602,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 			// If per-user quotas are being used, this value may be less than the total number of free bytes on a disk
 			rawFreeBytesAvailable.setValue(freeSpace.getFreeBytes());
-			LOGGER.trace("new rawFreeBytesAvailable: {}", rawFreeBytesAvailable.getValue());
+			log.trace("new rawFreeBytesAvailable: {}", rawFreeBytesAvailable.getValue());
 
 			return 0;
 		}
@@ -622,12 +620,12 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        final int rawFileSystemNameSize,
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
-			LOGGER.trace("GetVolumeInformation");
+			log.trace("GetVolumeInformation");
 
 			try {
-				volumeNameBuffer.setWideString(0L, DokanyUtils.trimStrToSize(fileSystem.getVolumeInfo().getVolumeName(), volumeNameSize));
+				volumeNameBuffer.setWideString(0L, DokanyUtils.trimStrToSize(fileSystem.getVolumeInfo().getName(), volumeNameSize));
 
-				rawVolumeSerialNumber.setValue(fileSystem.getVolumeInfo().getVolumeSerialNumber());
+				rawVolumeSerialNumber.setValue(fileSystem.getVolumeInfo().getSerialNumber());
 
 				rawMaximumComponentLength.setValue(fileSystem.getVolumeInfo().getMaxComponentLength());
 
@@ -647,7 +645,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		public long mounted(final DokanyFileInfo dokanyFileInfo) {
 			try {
 				fileSystem.mounted();
-				LOGGER.info("Dokany File System mounted");
+				log.info("Dokany File System mounted");
 				return ErrorCode.SUCCESS.mask();
 			} catch (final Throwable t) {
 				return DokanyUtils.exceptionToErrorCode(t);
@@ -661,7 +659,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 			try {
 				fileSystem.unmounted();
-				LOGGER.info("Dokany File System unmounted");
+				log.info("Dokany File System unmounted");
 				return ErrorCode.SUCCESS.mask();
 			} catch (final Throwable t) {
 				return DokanyUtils.exceptionToErrorCode(t);
@@ -680,7 +678,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
+			log.trace("SetFileSecurity: {}", normalizedPath);
 
 			try {
 				final byte[] out = new byte[rawSecurityDescriptorLength];
@@ -705,7 +703,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("SetFileSecurity: {}", normalizedPath);
+			log.trace("SetFileSecurity: {}", normalizedPath);
 
 			try {
 				final byte[] data = new byte[rawSecurityDescriptorLength];
@@ -727,11 +725,11 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        @NotNull final DokanyFileInfo dokanyFileInfo) {
 
 			final String normalizedPath = DokanyUtils.normalize(path);
-			LOGGER.trace("FindStreams: {}", normalizedPath);
+			log.trace("FindStreams: {}", normalizedPath);
 
 			try {
 				final Set<Win32FindStreamData> streams = fileSystem.findStreams(normalizedPath);
-				LOGGER.debug("Found {} streams", streams.size());
+				log.debug("Found {} streams", streams.size());
 				streams.forEach(file -> {
 					rawFillFindData.callback(file, dokanyFileInfo);
 				});
@@ -776,7 +774,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        || pathLowerCase.endsWith("autorun.inf")
 		        || pathLowerCase.endsWith("folder.jpg")
 		        || pathLowerCase.endsWith("folder.gif")) {
-			LOGGER.trace("Skipping file: " + pathLowerCase);
+			log.trace("Skipping file: " + pathLowerCase);
 			toReturn = true;
 		}
 		// TODO: change back to toReturn
@@ -784,11 +782,4 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		// return false;
 	}
 
-	/**
-	 * @see {@link com.dokany.java.DokanyFileSystem#isDefaultLog()}
-	 * @return true if default file system log is enabled.
-	 */
-	private boolean isDefaultLog() {
-		return fileSystem.isDefaultLog();
-	}
 }

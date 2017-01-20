@@ -1,18 +1,11 @@
 package com.dokany.java;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class StreamInfo {
 	public String name;
 	public long length;
-
-	/**
-	 *
-	 * @param name
-	 * @param length
-	 */
-	StreamInfo(final String name, final long length) {
-		this.name = name;
-		this.length = length;
-	}
 
 	/**
 	 *

@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.FileAttribute;
@@ -18,13 +16,16 @@ import jetbrains.exodus.ByteIterator;
 import jetbrains.exodus.bindings.IntegerBinding;
 import jetbrains.exodus.bindings.LongBinding;
 import jetbrains.exodus.util.LightOutputStream;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * Combines {@link FullFileInfo} and {@link WIN32_FIND_DATA}. This object will be stored in the Xodus fileInfo store.
  */
+@Slf4j
+@ToString
 public class FullFileInfo extends ByHandleFileInfo {
-	private final static Logger LOGGER = LoggerFactory.getLogger(FullFileInfo.class);
 
 	/**
 	 * If the dwFileAttributes member includes the FILE_ATTRIBUTE_REPARSE_POINT attribute, this member specifies the reparse point tag. Otherwise, this value is undefined and
@@ -82,7 +83,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 
 		final ByteIterator iterator = iterable.iterator();
 
-		LOGGER.debug("Creating FullFileInfo from infoStore: {}", path);
+		log.debug("Creating FullFileInfo from infoStore: {}", path);
 
 		filePath = path;
 
@@ -159,20 +160,5 @@ public class FullFileInfo extends ByHandleFileInfo {
 		        nFileSizeHigh, nFileSizeLow,
 		        dwReserved0, dwReserved1,
 		        cFileName, cAlternateFileName);
-	}
-
-	@Override
-	public String toString() {
-		return "{" +
-		        "fileName='" + filePath + '/' +
-		        ", fileSize=" + fileSize +
-		        ", fileIndex=" + fileIndex +
-		        ", attributes=" + dwFileAttributes +
-		        ", creationTime=" + ftCreationTime +
-		        ", lastAccessTime=" + ftLastAccessTime +
-		        ", lastWriteTime=" + ftLastWriteTime +
-		        ", numberOfLinks=" + dwNumberOfLinks +
-		        ", volumeSerialNumber=" + dwVolumeSerialNumber +
-		        '}';
 	}
 }

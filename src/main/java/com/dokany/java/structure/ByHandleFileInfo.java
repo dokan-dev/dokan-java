@@ -12,6 +12,8 @@ import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 
+import lombok.ToString;
+
 /**
  *
  * Contains information that the {@link com.dokany.java.DokanyOperations.GetFileInformation} function retrieves.
@@ -32,11 +34,10 @@ import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
  *
  *
  */
+@ToString
 public class ByHandleFileInfo extends Structure implements Structure.ByReference {
 
 	AtomicLong counter = new AtomicLong();
-
-	// private final static Logger LOGGER = LoggerFactory.getLogger(ByHandleFileInfo.class);
 
 	// Used to store actual values (instead of high/low) which can be retrieved using getter method
 	@NotNull
@@ -205,20 +206,6 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 
 		nFileIndexHigh = ((index != 0) && (indexHigh == 0)) ? largeInt.getHigh().intValue() : (int) index;
 		nFileIndexLow = ((index != 0) && (indexLow == 0)) ? largeInt.getLow().intValue() : (int) index;
-	}
-
-	@Override
-	public String toString() {
-		return "{attributes=" + dwFileAttributes +
-		        ", creationTime=" + ftCreationTime +
-		        ", lastAccessTime=" + ftLastAccessTime +
-		        ", lastWriteTime=" + ftLastWriteTime +
-		        ", fileSize=" + fileSize +
-		        ", fileName='" + filePath + '\'' +
-		        ", fileIndex=" + fileIndex +
-		        ", numberOfLinks=" + dwNumberOfLinks +
-		        ", volumeSerialNumber=" + dwVolumeSerialNumber +
-		        '}';
 	}
 
 	@Override

@@ -1,31 +1,32 @@
 package com.dokany.java;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dokany.java.constants.MountError;
 import com.dokany.java.structure.DeviceOptions;
 import com.sun.jna.WString;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Main class to start and stop Dokany file system.
  *
  */
+@Slf4j
 public final class DokanyDriver {
-	@NotNull
+	@NonNull
 	private final DokanyFileSystem fileSystem;
-	@NotNull
+	@NonNull
 	private final DeviceOptions deviceOptions;
-	private final static Logger LOGGER = LoggerFactory.getLogger(DokanyDriver.class);
 
-	public DokanyDriver(@NotNull final DeviceOptions deviceOptions, @NotNull final DokanyFileSystem fileSystem) {
+	public DokanyDriver(@NonNull final DeviceOptions deviceOptions, @NonNull final DokanyFileSystem fileSystem) {
 
 		this.deviceOptions = deviceOptions;
 		this.fileSystem = fileSystem;
 
-		LOGGER.info("Dokany version: {}", getVersion());
-		LOGGER.info("Dokany driver version: {}", getDriverVersion());
+		log.info("Dokany version: {}", getVersion());
+		log.info("Dokany driver version: {}", getDriverVersion());
 	}
 
 	/**
@@ -77,7 +78,7 @@ public final class DokanyDriver {
 				}
 			});
 		} catch (final Throwable t) {
-			LOGGER.warn("Error mounting", t);
+			log.warn("Error mounting", t);
 			throw t;
 		}
 	}
@@ -95,7 +96,7 @@ public final class DokanyDriver {
 	 * @param mountPoint
 	 */
 	public final static void stop(@NotNull final String mountPoint) {
-		LOGGER.info("Unmount and shutdown: {}", mountPoint);
+		log.info("Unmount and shutdown: {}", mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));
 	}

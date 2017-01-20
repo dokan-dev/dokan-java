@@ -1,21 +1,21 @@
 package com.dokany.java;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dokany.java.structure.DeviceOptions;
 import com.dokany.java.structure.DokanyFileInfo;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Native API to the kernel Dokany driver. This is an internal class and should not used directly by code outside com.dokany.java.
  *
  */
+@Slf4j
 final class NativeMethods {
 	private final static String DOKAN_DLL = "dokan1";
-	private final static Logger LOGGER = LoggerFactory.getLogger(NativeMethods.class);
 
 	static {
 		Native.register(DOKAN_DLL);
@@ -28,7 +28,7 @@ final class NativeMethods {
 	 * @param operations Instance of {@link com.dokany.java.DokanyOperations} that will be called for each request made by the kernel.
 	 * @return {@link com.dokany.java.constants.MountError}.
 	 */
-	final static native int DokanMain(DeviceOptions options, DokanyOperations operations);
+	final static native int DokanMain(@NonNull DeviceOptions options, @NonNull DokanyOperations operations);
 
 	/**
 	 * Get the version of Dokan.
@@ -73,7 +73,7 @@ final class NativeMethods {
 	 * @param dokanyFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation to extend.
 	 * @return if the operation was successful or not.
 	 */
-	static native boolean DokanResetTimeout(long timeout, DokanyFileInfo dokanyFileInfo);
+	static native boolean DokanResetTimeout(long timeout, @NonNull DokanyFileInfo dokanyFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
@@ -81,7 +81,7 @@ final class NativeMethods {
 	 * @param rawFileInfo {@link com.dokany.java.structure.DokanyFileInfo} of the operation.
 	 * @return A handle to the account token for the user on whose behalf the code is running.
 	 */
-	final static native IntByReference DokanOpenRequestorToken(DokanyFileInfo dokanyFileInfo);
+	final static native IntByReference DokanOpenRequestorToken(@NonNull DokanyFileInfo dokanyFileInfo);
 
 	/**
 	 * Convert {@link com.dokany.java.DokanyOperations.ZwCreateFile} parameters to CreateFile parameters.
@@ -117,7 +117,7 @@ final class NativeMethods {
 	 * @param ignoreCase - Case sensitive or not
 	 * @return result if name matches the expression
 	 */
-	final static native boolean DokanIsNameInExpression(String expression, String name, boolean ignoreCase);
+	final static native boolean DokanIsNameInExpression(@NonNull String expression, String name, boolean ignoreCase);
 
 	/**
 	 *
@@ -126,14 +126,14 @@ final class NativeMethods {
 	 * @param serviceFullPath
 	 * @return
 	 */
-	final static native boolean DokanServiceInstall(String serviceName, int serviceType, String serviceFullPath);
+	final static native boolean DokanServiceInstall(@NonNull String serviceName, int serviceType, @NonNull String serviceFullPath);
 
 	/**
 	 *
 	 * @param serviceName
 	 * @return
 	 */
-	final static native boolean DokanServiceDelete(String serviceName);
+	final static native boolean DokanServiceDelete(@NonNull String serviceName);
 
 	/**
 	 *

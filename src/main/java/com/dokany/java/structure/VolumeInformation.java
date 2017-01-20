@@ -2,11 +2,16 @@ package com.dokany.java.structure;
 
 import com.dokany.java.constants.FileSystemFeature;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class VolumeInformation {
 
 	private final int maxComponentLength;
+	private final String name;
 	private final int serialNumber;
-	private final String volumeName;
 	private final String fileSystemName;
 	private final EnumIntegerSet<FileSystemFeature> fileSystemFeatures;
 
@@ -18,20 +23,6 @@ public class VolumeInformation {
 
 	static {
 		DEFAULT_FS_FEATURES.add(FileSystemFeature.CASE_PRESERVED_NAMES);
-	}
-
-	public VolumeInformation(
-	        final int maxComponentLength,
-	        final String volumeName,
-	        final int serialNumber,
-	        final String fileSystemName,
-	        final EnumIntegerSet<FileSystemFeature> fileSystemFeatures) {
-
-		this.maxComponentLength = maxComponentLength;
-		this.volumeName = volumeName;
-		this.serialNumber = serialNumber;
-		this.fileSystemName = fileSystemName;
-		this.fileSystemFeatures = fileSystemFeatures;
 	}
 
 	/**
@@ -50,55 +41,5 @@ public class VolumeInformation {
 	 */
 	public VolumeInformation() {
 		this(DEFAULT_MAX_COMPONENT_LENGTH, DEFAULT_VOLUME_NAME, DEFAULT_SERIAL_NUMBER, DEFAULT_FS_NAME, DEFAULT_FS_FEATURES);
-	}
-
-	public int getMaxComponentLength() {
-		return maxComponentLength;
-	}
-
-	/**
-	 * Default is 0x00000000
-	 *
-	 * @return
-	 */
-	public int getVolumeSerialNumber() {
-		return serialNumber;
-	}
-
-	/**
-	 * Default is VOLUME1;
-	 *
-	 * @return
-	 */
-	public String getVolumeName() {
-		return volumeName;
-	}
-
-	/**
-	 * Default is DOKANY.
-	 *
-	 * @return
-	 */
-	public String getFileSystemName() {
-		return fileSystemName;
-	}
-
-	/**
-	 * Default is FileSystemFeature.CasePreservedNames
-	 *
-	 * @return
-	 */
-	public EnumIntegerSet<FileSystemFeature> getFileSystemFeatures() {
-		return fileSystemFeatures;
-	}
-
-	@Override
-	public String toString() {
-		return "{maxComponentLength: " + maxComponentLength + System.lineSeparator()
-		        + "   serialNumber: " + serialNumber + System.lineSeparator()
-		        + "   volumeName: " + volumeName + System.lineSeparator()
-		        + "   fileSystemName: " + fileSystemName + System.lineSeparator()
-		        + "   fileSystemFeatures: " + fileSystemFeatures
-		        + "}";
 	}
 }
