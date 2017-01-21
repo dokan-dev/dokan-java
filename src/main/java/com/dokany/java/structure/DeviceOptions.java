@@ -33,7 +33,7 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	 * @see {@link com.dokany.java.constants.MountOption}
 	 */
 	public int Options;
-	private final EnumIntegerSet<MountOption> mountOptions;
+	private EnumIntegerSet<MountOption> mountOptions;
 
 	/**
 	 * FileSystem can store anything here
@@ -63,7 +63,10 @@ public class DeviceOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Sector Size of the volume.
 	 */
-	public final long SectorSize;
+	public long SectorSize;
+
+	public DeviceOptions() {
+	}
 
 	public DeviceOptions(
 	        final String mountPoint,
