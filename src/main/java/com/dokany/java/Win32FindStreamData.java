@@ -21,6 +21,8 @@ public class Win32FindStreamData extends Structure implements DokanyOperations.W
 
 	@Override
 	protected List<String> getFieldOrder() {
-		return Arrays.asList("length", "cFileName");
+		return Arrays.asList(
+				"length", 
+				"cFileName");
 	}
 }

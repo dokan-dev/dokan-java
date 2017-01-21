@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.sun.jna.Structure;
 
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -14,6 +15,7 @@ import lombok.ToString;
  *
  */
 @ToString
+@RequiredArgsConstructor
 public class DokanyFileInfo extends Structure implements Structure.ByReference {
 	/**
 	 * This can be used to carry information between operation. HANDLE This can be whatever type such as {@link com.sun.jna.platform.win32.WinNT.HANDLE},
