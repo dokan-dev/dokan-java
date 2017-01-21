@@ -2,6 +2,13 @@ package com.dokany.java.constants;
 
 import com.dokany.java.DokanyUtils;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum MountError implements EnumInteger {
 
 	SUCCESS(0, "Successfully mounted"),
@@ -20,23 +27,11 @@ public enum MountError implements EnumInteger {
 
 	VERSION_ERROR(-7, "Mount failed: Requested an incompatible version.");
 
-	private final int mask;
+	@Getter
+	int mask;
 
-	@Override
-	public int mask() {
-		return mask;
-	}
-
-	private final String description;
-
-	public String description() {
-		return description;
-	}
-
-	private MountError(final int i, final String desc) {
-		mask = i;
-		description = desc;
-	}
+	@Getter
+	String description;
 
 	public static MountError fromInt(final int value) {
 		return DokanyUtils.enumFromInt(value, values());

@@ -2,11 +2,18 @@ package com.dokany.java.constants;
 
 import com.sun.jna.platform.win32.NTStatus;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 /**
  *
  * @see {@linkplain https://msdn.microsoft.com/en-us/library/cc704588.aspx}
  *
  */
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum NtStatus implements EnumInteger {
 	SUCCESS(NTStatus.STATUS_SUCCESS),
 
@@ -392,14 +399,6 @@ public enum NtStatus implements EnumInteger {
 	TRANSACTIONS_NOT_FROZEN(0xc0190045),
 	MAXIMUM_NT_STATUS(0xffffffff);
 
-	private final int mask;
-
-	@Override
-	public int mask() {
-		return mask;
-	}
-
-	private NtStatus(final int i) {
-		mask = i;
-	}
+	@Getter
+	int mask;
 }

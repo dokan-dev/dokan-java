@@ -3,8 +3,6 @@ package com.dokany.java.structure;
 import java.io.FileNotFoundException;
 import java.util.Objects;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.FileAttribute;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
@@ -12,11 +10,12 @@ import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
 import jetbrains.exodus.ArrayByteIterable;
 import jetbrains.exodus.ByteIterable;
-import jetbrains.exodus.ByteIterator;
 import jetbrains.exodus.bindings.IntegerBinding;
 import jetbrains.exodus.bindings.LongBinding;
 import jetbrains.exodus.util.LightOutputStream;
+import lombok.NonNull;
 import lombok.ToString;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,9 +41,8 @@ public class FullFileInfo extends ByHandleFileInfo {
 	 */
 	private int dwReserved1;
 
-	@NotNull
 	public FullFileInfo(
-	        @NotNull final String path,
+	        @NonNull final String path,
 	        final long index,
 	        final EnumIntegerSet<FileAttribute> attributes,
 	        final int volumeSerialNumber) throws FileNotFoundException {
@@ -53,9 +51,8 @@ public class FullFileInfo extends ByHandleFileInfo {
 		this(path, index, attributes, volumeSerialNumber, null, null, null);
 	}
 
-	@NotNull
 	public FullFileInfo(
-	        @NotNull final String path,
+	        @NonNull final String path,
 	        final long index,
 	        final EnumIntegerSet<FileAttribute> attributes,
 	        final int volumeSerialNumber,
@@ -75,13 +72,12 @@ public class FullFileInfo extends ByHandleFileInfo {
 		dwVolumeSerialNumber = volumeSerialNumber;
 	}
 
-	@NotNull
-	public FullFileInfo(@NotNull final String path, @NotNull final ByteIterable iterable) throws FileNotFoundException {
+	public FullFileInfo(@NonNull final String path, @NonNull final ByteIterable iterable) throws FileNotFoundException {
 		if (Objects.isNull(path) || Objects.isNull(iterable)) {
 			throw new FileNotFoundException("path or iterable was null and thus file info could not be created");
 		}
 
-		final ByteIterator iterator = iterable.iterator();
+		val iterator = iterable.iterator();
 
 		log.debug("Creating FullFileInfo from infoStore: {}", path);
 
@@ -106,7 +102,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 	}
 
 	public ArrayByteIterable toByteIterable() {
-		final LightOutputStream output = new LightOutputStream();
+		val output = new LightOutputStream();
 
 		LongBinding.writeCompressed(output, fileSize);
 		IntegerBinding.writeCompressed(output, nFileSizeHigh);
@@ -139,7 +135,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 	 *
 	 * @return this (cast as ByHandleFileInfo)
 	 */
-	@NotNull
+	@NonNull
 	public ByHandleFileInfo toByHandleFileInfo() {
 		return this;
 	}
@@ -148,11 +144,11 @@ public class FullFileInfo extends ByHandleFileInfo {
 	 *
 	 * @return WIN32_FIND_DATA
 	 */
-	@NotNull
+	@NonNull
 	public WIN32_FIND_DATA toWin32FindData() {
-		final char[] cFileName = DokanyUtils.trimFrontSeparator(DokanyUtils.trimStrToSize(filePath, 260)).toCharArray();
-		final char[] cAlternateFileName = new char[1];
-		// final char[] cAlternateFileName = Utils.trimFrontSlash(Utils.trimStrToSize(path, 14)).toCharArray();
+		val cFileName = DokanyUtils.trimFrontSeparator(DokanyUtils.trimStrToSize(filePath, 260)).toCharArray();
+		val cAlternateFileName = new char[1];
+		// val cAlternateFileName = Utils.trimFrontSlash(Utils.trimStrToSize(path, 14)).toCharArray();
 		// TODO: Why does setting alternate name cause file name to show up twice??
 		return new WIN32_FIND_DATA(
 		        dwFileAttributes,

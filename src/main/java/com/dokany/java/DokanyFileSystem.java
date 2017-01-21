@@ -16,24 +16,31 @@ import com.dokany.java.structure.VolumeInformation;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 
 /**
  * This should be extended by file system providers.
  */
 @Data
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public abstract class DokanyFileSystem {
 
-	@NonNull protected final VolumeInformation volumeInfo;
-	@NonNull protected final FreeSpace freeSpace;
-	protected final long allocationUnitSize;
-	protected final long sectorSize;
-	protected final long timeout;
-	@NonNull protected final Date rootCreationDate;
-	@NonNull protected final String root;
-	protected final boolean isDebug;
-	protected final boolean isDebugStdErr;
+	@NonNull
+	VolumeInformation volumeInfo;
+	@NonNull
+	FreeSpace freeSpace;
+	long allocationUnitSize;
+	long sectorSize;
+	long timeout;
+	@NonNull
+	Date rootCreationDate;
+	@NonNull
+	String root;
+	boolean isDebug;
+	boolean isDebugStdErr;
 
 	public DokanyFileSystem(
 	        @NonNull final DeviceOptions deviceOptions,

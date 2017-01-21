@@ -1,12 +1,13 @@
 package com.dokany.java;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.dokany.java.constants.MountError;
 import com.dokany.java.structure.DeviceOptions;
 import com.sun.jna.WString;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,11 +15,12 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public final class DokanyDriver {
 	@NonNull
-	private final DokanyFileSystem fileSystem;
+	DeviceOptions deviceOptions;
 	@NonNull
-	private final DeviceOptions deviceOptions;
+	DokanyFileSystem fileSystem;
 
 	public DokanyDriver(@NonNull final DeviceOptions deviceOptions, @NonNull final DokanyFileSystem fileSystem) {
 
@@ -36,7 +38,7 @@ public final class DokanyDriver {
 	 *
 	 * @return
 	 */
-	public final long getDriverVersion() {
+	public long getDriverVersion() {
 		return NativeMethods.DokanDriverVersion();
 	}
 
@@ -46,7 +48,7 @@ public final class DokanyDriver {
 	 * @see {@link NativeMethods#DokanVersion()}
 	 * @return
 	 */
-	public final long getVersion() {
+	public long getVersion() {
 		return NativeMethods.DokanVersion();
 	}
 
@@ -55,20 +57,20 @@ public final class DokanyDriver {
 	 *
 	 * @return
 	 */
-	@NotNull
-	public final DokanyFileSystem getFileSystem() {
+	@NonNull
+	public DokanyFileSystem getFileSystem() {
 		return fileSystem;
 	}
 
 	/**
 	 * Calls {@link com.dokany.java.NativeMethods#DokanMain(DeviceOptions, Operations)}. Has {@link java.lang.Runtime#addShutdownHook(Thread)} which calls {@link #shutdown()}
 	 */
-	public final void start() {
+	public void start() {
 		try {
-			final int mountStatus = NativeMethods.DokanMain(deviceOptions, new DokanyOperationsProxy(fileSystem));
+			val mountStatus = NativeMethods.DokanMain(deviceOptions, new DokanyOperationsProxy(fileSystem));
 
 			if (mountStatus < 0) {
-				throw new IllegalStateException(MountError.fromInt(mountStatus).description());
+				throw new IllegalStateException(MountError.fromInt(mountStatus).getDescription());
 			}
 
 			Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -86,7 +88,7 @@ public final class DokanyDriver {
 	/**
 	 * Calls {@link #stop(String)}.
 	 */
-	public final void shutdown() {
+	public void shutdown() {
 		stop(deviceOptions.MountPoint.toString());
 	}
 
@@ -95,7 +97,7 @@ public final class DokanyDriver {
 	 *
 	 * @param mountPoint
 	 */
-	public final static void stop(@NotNull final String mountPoint) {
+	public static void stop(@NonNull final String mountPoint) {
 		log.info("Unmount and shutdown: {}", mountPoint);
 		NativeMethods.DokanUnmount(mountPoint.charAt(0));
 		NativeMethods.DokanRemoveMountPoint(new WString(mountPoint));

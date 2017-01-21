@@ -1,12 +1,15 @@
 package com.dokany.java.structure;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Value
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class FreeSpace {
-	private final long totalBytes;
-	private final long totalUsed;
-
+	long totalBytes;
+	long totalUsed;
+ 
 	public long getFreeBytes() {
 		return totalBytes - totalUsed;
 	}

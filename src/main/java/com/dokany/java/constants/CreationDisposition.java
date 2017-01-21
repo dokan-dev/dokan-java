@@ -3,6 +3,11 @@ package com.dokany.java.constants;
 import com.dokany.java.DokanyUtils;
 import com.sun.jna.platform.win32.WinNT;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum CreationDisposition implements EnumInteger {
 	CREATE_NEW(WinNT.CREATE_NEW, "Create New"),
 	CREATE_ALWAYS(WinNT.CREATE_ALWAYS, "Create Always"),
@@ -10,20 +15,14 @@ public enum CreationDisposition implements EnumInteger {
 	OPEN_ALWAYS(WinNT.OPEN_ALWAYS, "Open Always"),
 	TRUNCATE_EXISTING(WinNT.TRUNCATE_EXISTING, "Truncate Existing");
 
-	private final int mask;
+	@Getter
+	int mask;
 
-	@Override
-	public int mask() {
-		return mask;
-	}
+	@Getter
+	String description;
 
-	private final String description;
-
-	public String description() {
-		return description;
-	}
-
-	public final boolean isReadonly;
+	@Getter
+	boolean isReadonly;
 
 	private CreationDisposition(final int i, final String desc) {
 		mask = i;

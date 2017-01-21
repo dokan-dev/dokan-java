@@ -1,5 +1,12 @@
 package com.dokany.java.constants;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum ErrorCode {
 
 	SUCCESS(0),
@@ -16,13 +23,6 @@ public enum ErrorCode {
 
 	ERROR_ALREADY_EXISTS(183);
 
-	private final int mask;
-
-	public int mask() {
-		return mask;
-	}
-
-	private ErrorCode(final int i) {
-		mask = i;
-	}
+	@Getter
+	int mask;
 }

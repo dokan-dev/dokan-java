@@ -1,9 +1,12 @@
 package com.dokany.java.structure;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Value
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public final class FileData {
-	private final byte[] bytes;
-	private final int length;
+	byte[] bytes;
+	int length;
 }

@@ -1,17 +1,21 @@
 package com.dokany.java.constants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dokany.java.DokanyUtils;
 import com.dokany.java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 /**
  *
  * @see {@linkplain https://msdn.microsoft.com/en-us/library/gg258117(v=vs.85).aspx}
  *
  */
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum FileAttribute implements EnumInteger {
 
 	ARCHIVE(WinNT.FILE_ATTRIBUTE_ARCHIVE),
@@ -48,18 +52,8 @@ public enum FileAttribute implements EnumInteger {
 
 	VIRTUAL(WinNT.FILE_ATTRIBUTE_VIRTUAL);
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(FileAttribute.class);
-
-	private final int mask;
-
-	@Override
-	public int mask() {
-		return mask;
-	}
-
-	private FileAttribute(final int i) {
-		mask = i;
-	}
+	@Getter
+	int mask;
 
 	public static EnumIntegerSet<FileAttribute> fromInt(final int value) {
 		return DokanyUtils.enumSetFromInt(value, values());

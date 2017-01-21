@@ -4,6 +4,11 @@ import com.dokany.java.DokanyUtils;
 import com.dokany.java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 /**
  *
  * Defines standard, specific, and generic rights. These rights are used in access control entries (ACEs) and are the primary means of specifying the requested or granted access to
@@ -12,6 +17,8 @@ import com.sun.jna.platform.win32.WinNT;
  * @see @{linkplain https://msdn.microsoft.com/en-us/library/windows/desktop/aa374896(v=vs.85).aspx}
  * @see @{linkplain https://msdn.microsoft.com/en-us/library/windows/desktop/aa374892(v=vs.85).aspx}
  */
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum FileAccess implements EnumInteger {
 
 	/**
@@ -157,16 +164,8 @@ public enum FileAccess implements EnumInteger {
 	 */
 	GENERIC_READ(WinNT.GENERIC_READ);
 
-	private final int mask;
-
-	@Override
-	public int mask() {
-		return mask;
-	}
-
-	private FileAccess(final int i) {
-		mask = i;
-	}
+	@Getter
+	int mask;
 
 	/*-
 	public final static int fromAttributesAndFlags(final int rawDesiredAccess) {

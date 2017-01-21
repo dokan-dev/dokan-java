@@ -1,5 +1,12 @@
 package com.dokany.java.constants;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum WinError implements EnumInteger {
 
 	ERROR_INVALID_FUNCTION(1),
@@ -80,14 +87,6 @@ public enum WinError implements EnumInteger {
 
 	ERROR_DIRECTORY(267);
 
-	private final int mask;
-
-	@Override
-	public int mask() {
-		return mask;
-	}
-
-	private WinError(final int i) {
-		mask = i;
-	}
+	@Getter
+	int mask;
 }

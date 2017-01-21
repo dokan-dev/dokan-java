@@ -5,19 +5,16 @@ import java.io.IOException;
 import com.dokany.java.constants.ErrorCode;
 import com.dokany.java.constants.WinError;
 
-public class DokanyException extends RuntimeException {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -862591089502909563L;
-	/**
-	*
-	*/
-	private final int val;
+import lombok.AccessLevel;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
-	public int val() {
-		return val;
-	}
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Value
+public final class DokanyException extends RuntimeException {
+	final static long serialVersionUID = -862591089502909563L;
+
+	int val;
 
 	public DokanyException(final long errorCode, final IOException exception) {
 		if ((errorCode < 0) || (errorCode > 4294967295L)) {
@@ -27,10 +24,10 @@ public class DokanyException extends RuntimeException {
 	}
 
 	public DokanyException(final WinError errorCode, final IOException exception) {
-		this(errorCode.mask(), exception);
+		this(errorCode.getMask(), exception);
 	}
 
 	public DokanyException(final ErrorCode errorCode, final IOException exception) {
-		this(errorCode.mask(), exception);
+		this(errorCode.getMask(), exception);
 	}
 }

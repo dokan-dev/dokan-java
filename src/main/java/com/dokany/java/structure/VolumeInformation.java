@@ -2,18 +2,21 @@ package com.dokany.java.structure;
 
 import com.dokany.java.constants.FileSystemFeature;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Value
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class VolumeInformation {
 
-	private final int maxComponentLength;
-	private final String name;
-	private final int serialNumber;
-	private final String fileSystemName;
-	private final EnumIntegerSet<FileSystemFeature> fileSystemFeatures;
+	int maxComponentLength;
+	String name;
+	int serialNumber;
+	String fileSystemName;
+	EnumIntegerSet<FileSystemFeature> fileSystemFeatures;
 
 	public static final int DEFAULT_MAX_COMPONENT_LENGTH = 256;
 	public static final int DEFAULT_SERIAL_NUMBER = 0x12345678;

@@ -7,12 +7,16 @@ import java.util.Objects;
 
 import com.dokany.java.constants.EnumInteger;
 
+import lombok.ToString;
+import lombok.val;
+
 /**
  * Used to store multiple enum values such as {@link com.dokany.java.constants.FileSystemFeature} and {@link com.dokany.java.constants.MountOption}.
  *
  * @param <T> Type of enum
  */
-public class EnumIntegerSet<T extends Enum<T>> extends AbstractSet<T> {
+@ToString
+public final class EnumIntegerSet<T extends Enum<T>> extends AbstractSet<T> {
 
 	private final EnumSet<T> elements;
 
@@ -29,20 +33,19 @@ public class EnumIntegerSet<T extends Enum<T>> extends AbstractSet<T> {
 			throw new IllegalArgumentException("items array cannot be empty");
 		}
 
-		for (final T item : items) {
-			if (Objects.isNull(item)) {
-				System.out.println("added");
+		for (val item : items) {
+			if (Objects.nonNull(item)) {
 				elements.add(item);
 			}
 		}
 	}
 
-	public final int toInt() {
+	public int toInt() {
 		int toReturn = 0;
-		for (final T current : elements) {
+		for (val current : elements) {
 			// Already checked (in constructor) to ensure only objects which implement EnumInteger are stored in values
-			final EnumInteger enumInt = (EnumInteger) current;
-			toReturn |= enumInt.mask();
+			val enumInt = (EnumInteger) current;
+			toReturn |= enumInt.getMask();
 		}
 		return toReturn;
 	}

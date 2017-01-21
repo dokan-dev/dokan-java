@@ -2,6 +2,11 @@ package com.dokany.java.constants;
 
 import com.sun.jna.platform.win32.WinNT;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 /**
  * Identifies the object-related security information being set or queried. This security information includes:
  * <ul>
@@ -16,6 +21,8 @@ import com.sun.jna.platform.win32.WinNT;
  * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa379573(v=vs.85).aspx">SECURITY_INFORMATION (MSDN)</a>
  *
  */
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public enum SecurityInformation implements EnumInteger {
 	OWNER_SECURITY_INFORMATION(WinNT.OWNER_SECURITY_INFORMATION, "The owner identifier of the object is being referenced"),
 
@@ -37,21 +44,9 @@ public enum SecurityInformation implements EnumInteger {
 
 	PROTECTED_DACL_SECURITY_INFORMATION(WinNT.PROTECTED_SACL_SECURITY_INFORMATION, "The DACL cannot inherit access control entries (ACEs)");
 
+	@Getter
 	private final int mask;
 
-	@Override
-	public int mask() {
-		return mask;
-	}
-
+	@Getter
 	private final String description;
-
-	public String description() {
-		return description;
-	}
-
-	private SecurityInformation(final int i, final String desc) {
-		mask = i;
-		description = desc;
-	}
 }

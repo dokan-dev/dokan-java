@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.dokany.java.DokanyUtils;
 import com.dokany.java.constants.FileAttribute;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
-import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 
+import lombok.NonNull;
 import lombok.ToString;
+import lombok.val;
 
 /**
  *
@@ -40,8 +39,8 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	AtomicLong counter = new AtomicLong();
 
 	// Used to store actual values (instead of high/low) which can be retrieved using getter method
-	@NotNull
-	String filePath = "";
+	@NonNull
+	String filePath;
 	long fileIndex;
 	long fileSize;
 
@@ -65,7 +64,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	/**
 	 * A FILETIME structure that specifies when a file or directory was created. If the underlying file system does not support creation time, this member is zero.
 	 */
-	@NotNull
+	@NonNull
 	public FILETIME ftCreationTime;
 
 	/**
@@ -73,7 +72,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * specifies when the directory is created. If the underlying file system does not support last access time, this member is zero. On the FAT file system, the specified date for
 	 * both files and directories is correct, but the time of day is always set to midnight.
 	 */
-	@NotNull
+	@NonNull
 	public FILETIME ftLastAccessTime;
 
 	/**
@@ -81,7 +80,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	 * The date and time are not updated when file attributes or security descriptors are changed. For a directory, the structure specifies when the directory is created. If the
 	 * underlying file system does not support last write time, this member is zero.
 	 */
-	@NotNull
+	@NonNull
 	public FILETIME ftLastWriteTime;
 
 	/**
@@ -130,15 +129,11 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
-		int toSet = FileAttribute.NORMAL.mask();
-		if (Objects.nonNull(attributes)) {
-			toSet = attributes.toInt();
-		}
-		dwFileAttributes = toSet;
+		dwFileAttributes = Objects.nonNull(attributes) ? attributes.toInt() : FileAttribute.NORMAL.getMask();
 	}
 
 	public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
-		final FILETIME now = DokanyUtils.getCurrentTime();
+		val now = DokanyUtils.getCurrentTime();
 
 		ftCreationTime = creationTime == 0 ? now : DokanyUtils.getTime(creationTime);
 		ftLastAccessTime = lastAccessTime == 0 ? now : DokanyUtils.getTime(lastAccessTime);
@@ -146,7 +141,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	}
 
 	void setTimes(final FILETIME creationTime, final FILETIME lastAccessTime, final FILETIME lastWriteTime) {
-		final FILETIME now = DokanyUtils.getCurrentTime();
+		val now = DokanyUtils.getCurrentTime();
 
 		ftCreationTime = Objects.isNull(creationTime) ? now : creationTime;
 		ftLastAccessTime = Objects.isNull(lastAccessTime) ? now : lastAccessTime;
@@ -181,7 +176,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setSize(final long size, final int sizeHigh, final int sizeLow) {
 		fileSize = size;
 
-		final LARGE_INTEGER largeInt = DokanyUtils.getLargeInt(size, sizeHigh, sizeLow);
+		val largeInt = DokanyUtils.getLargeInt(size, sizeHigh, sizeLow);
 
 		nFileSizeHigh = ((size != 0) && (sizeHigh == 0)) ? largeInt.getHigh().intValue() : (int) size;
 		nFileSizeLow = ((size != 0) && (sizeLow == 0)) ? largeInt.getLow().intValue() : (int) size;
@@ -202,7 +197,7 @@ public class ByHandleFileInfo extends Structure implements Structure.ByReference
 	final void setIndex(final long index, final int indexHigh, final int indexLow) {
 		fileIndex = index;
 
-		final LARGE_INTEGER largeInt = DokanyUtils.getLargeInt(index, indexHigh, indexLow);
+		val largeInt = DokanyUtils.getLargeInt(index, indexHigh, indexLow);
 
 		nFileIndexHigh = ((index != 0) && (indexHigh == 0)) ? largeInt.getHigh().intValue() : (int) index;
 		nFileIndexLow = ((index != 0) && (indexLow == 0)) ? largeInt.getLow().intValue() : (int) index;
