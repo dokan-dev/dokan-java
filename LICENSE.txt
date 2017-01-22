@@ -2,7 +2,7 @@ Dokany-Java is a Java (JNA) wrapper for Dokany 1.x+ releases.
 Copyright (C) 2008 Yu Kobayashi http://yukoba.accelart.jp/
               2015 Simon Herter <sim.herter@gmail.com>
               2016 Carlos Ballesteros Velasco http://cballesterosvelasco.es/
-              2016 Jonathan Hult https://jonathanhult.com/
+              2016-2017 Jonathan Hult https://jonathanhult.com/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
