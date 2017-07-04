@@ -20,13 +20,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-  compileOnly 'org.projectlombok:lombok:1.16.12'
+  compileOnly 'org.projectlombok:lombok:1.16.16'
   compile 'commons-io:commons-io:2.5'
-  compile 'org.slf4j:slf4j-api:1.7.22'
-  compile 'ch.qos.logback:logback-classic:1.1.8'
-  compile 'net.java.dev.jna:jna:4.3.0'
-  compile 'net.java.dev.jna:jna-platform:4.3.0'
-  compile 'org.jetbrains.xodus:xodus-vfs:1.0.2'
+  compile 'org.slf4j:slf4j-api:1.7.25'
+  compile 'ch.qos.logback:logback-classic:1.2.3'
+  compile 'net.java.dev.jna:jna:4.4.0'
+  compile 'net.java.dev.jna:jna-platform:4.4.0'
+  compile 'org.jetbrains.xodus:xodus-vfs:1.0.4'
 }
 
 eclipse {
