@@ -282,7 +282,7 @@ final class DokanyOperationsProxy extends DokanyOperations {
 			log.trace("FindFilesWithPattern {}", pathToSearch);
 
 			try {
-				val filesFound = fileSystem.findFilesWithPattern(pathToSearch, DokanyUtils.wStrToStr(searchPattern));
+				val filesFound = fileSystem.findFilesWithPattern(pathToSearch, dokanyFileInfo, DokanyUtils.wStrToStr(searchPattern));
 				log.debug("Found {} paths", filesFound.size());
 				try {
 					filesFound.forEach(file -> {
@@ -311,7 +311,6 @@ final class DokanyOperationsProxy extends DokanyOperations {
 
 			val normalizedPath = DokanyUtils.normalize(path);
 			log.debug("ReadFile: {} with readLength ", normalizedPath, bufferLength);
-			log.trace("dokanyFileInfo: {}", dokanyFileInfo);
 
 			if (dokanyFileInfo.isDirectory()) {
 				log.trace("isDir:will throw file not found error");
@@ -777,7 +776,8 @@ final class DokanyOperationsProxy extends DokanyOperations {
 		        || pathLowerCase.endsWith("autorun.inf")
 		        || pathLowerCase.endsWith("folder.jpg")
 		        || pathLowerCase.endsWith("folder.gif")) {
-			log.trace("Skipping file: " + pathLowerCase);
+			// log.trace("Skipping file: " + pathLowerCase);
+			// TODO: re-enable logging
 			toReturn = true;
 		}
 		return toReturn;

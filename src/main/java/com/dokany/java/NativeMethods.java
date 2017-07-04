@@ -115,7 +115,7 @@ class NativeMethods {
 	native long DokanMapStandardToGenericAccess(long desiredAccess);
 
 	/**
-	 * Checks whether Name can match Expression
+	 * Checks whether Name can match Expression.
 	 *
 	 * @param expression - Expression can contain wildcard characters (? and *)
 	 * @param name - Name to check
@@ -156,7 +156,7 @@ class NativeMethods {
 	 * Determine if Dokany debug mode is enabled.
 	 *
 	 * @param mode
-	 * @return
+	 * @return true if Dokany debug mode is enabled
 	 */
 	native boolean DokanSetDebugMode(int mode);
 

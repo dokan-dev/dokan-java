@@ -7,20 +7,21 @@ import com.dokany.java.constants.WinError;
 
 import lombok.AccessLevel;
 import lombok.Value;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Value
 public final class DokanyException extends RuntimeException {
-	final static long serialVersionUID = -862591089502909563L;
+	long serialVersionUID = -862591089502909563L;
 
-	int val;
+	int value;
 
 	public DokanyException(final long errorCode, final IOException exception) {
 		if ((errorCode < 0) || (errorCode > 4294967295L)) {
 			throw new IllegalArgumentException("error code (" + errorCode + ") is not in range [0, 4294967295]", exception);
 		}
-		val = (int) errorCode;
+		value = (int) errorCode;
 	}
 
 	public DokanyException(final WinError errorCode, final IOException exception) {

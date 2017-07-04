@@ -43,6 +43,10 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ *
+ * In memory (virtual) filesystem backed by Xodus
+ */
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
 public class MemoryFS extends DokanyFileSystem {
@@ -102,6 +106,7 @@ public class MemoryFS extends DokanyFileSystem {
 	 * Determines if file exists already or not. Calls {@link #getExistingFile(String)}.
 	 *
 	 * @param path
+	 * @return true if path exists
 	 */
 	@Override
 	public boolean doesPathExist(@NonNull final String path) {
@@ -169,7 +174,7 @@ public class MemoryFS extends DokanyFileSystem {
 	*/
 
 	@Override
-	public Set<WIN32_FIND_DATA> findFilesWithPattern(@NonNull final String pathToSearch, @NonNull final String pattern) {
+	public Set<WIN32_FIND_DATA> findFilesWithPattern(@NonNull final String pathToSearch, @NonNull final DokanyFileInfo dokanyFileInfo, @NonNull final String pattern) {
 		val files = new HashSet<WIN32_FIND_DATA>();
 
 		log.debug("findFilesWithPattern memoryfs:   path  {};     pattern {}", pathToSearch, pattern);
@@ -200,16 +205,27 @@ public class MemoryFS extends DokanyFileSystem {
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
+	/**
+	 * Deletes a file.
+	 */
 	@Override
 	public void deleteFile(@NonNull final String path, final DokanyFileInfo dokanyFileInfo) throws IOException {
 		delete(path);
 	}
 
+	/**
+	 * Deletes a directory.
+	 */
 	@Override
 	public void deleteDirectory(@NonNull final String path, final DokanyFileInfo dokanyFileInfo) throws IOException {
 		delete(path);
 	}
 
+	/**
+	 * Deletes a file or directory.
+	 *
+	 * @param path
+	 */
 	private void delete(@NonNull final String path) {
 		env.executeInTransaction((@NonNull final Transaction txn) -> {
 			vfs.deleteFile(txn, path);
@@ -506,13 +522,13 @@ public class MemoryFS extends DokanyFileSystem {
 
 	@Override
 	public void setSecurity(@NonNull final String path, final int kind, final byte[] data) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	@Override
 	public int getSecurity(@NonNull final String path, final int kind, final byte[] out) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException("Not yet implemented");
+		// return 0;
 	}
 
 	@Override
@@ -526,6 +542,7 @@ public class MemoryFS extends DokanyFileSystem {
 	}
 
 	@Override
+	// TODO: finish implementation
 	public long truncate(@NonNull final String path) throws IOException {
 		// final Node parent = item.getParent();
 
@@ -540,27 +557,27 @@ public class MemoryFS extends DokanyFileSystem {
 
 	@Override
 	public void setAllocationSize(@NonNull final String path, final int length) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	@Override
 	public void setEndOfFile(@NonNull final String path, final int offset) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	@Override
 	public void flushFileBuffers(@NonNull final String path) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	@Override
 	public void cleanup(@NonNull final String path, final DokanyFileInfo dokanyFileInfo) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	@Override
 	public void close(@NonNull final String path, final DokanyFileInfo dokanyFileInfo) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	/**

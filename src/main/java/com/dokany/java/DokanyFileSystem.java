@@ -68,7 +68,7 @@ public abstract class DokanyFileSystem {
 
 	public abstract boolean doesPathExist(@NonNull final String path) throws IOException;
 
-	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(@NonNull final String pathToSearch, final String pattern) throws IOException;
+	public abstract Set<WIN32_FIND_DATA> findFilesWithPattern(@NonNull final String pathToSearch, @NonNull DokanyFileInfo dokanyFileInfo, final String pattern) throws IOException;
 
 	public abstract Set<Win32FindStreamData> findStreams(@NonNull final String pathToSearch) throws IOException;
 

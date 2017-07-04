@@ -70,6 +70,7 @@ public class FullFileInfo extends ByHandleFileInfo {
 		setIndex(index);
 		setAttributes(attributes);
 		dwVolumeSerialNumber = volumeSerialNumber;
+		log.trace(super.toString());
 	}
 
 	public FullFileInfo(@NonNull final String path, @NonNull final ByteIterable iterable) throws FileNotFoundException {

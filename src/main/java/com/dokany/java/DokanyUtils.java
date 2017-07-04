@@ -57,11 +57,21 @@ public class DokanyUtils {
 	}
 
 	// TODO: can this return null?
+	/**
+	 *
+	 * @param path
+	 * @return
+	 */
 	public Path getPath(@NonNull final String path) {
 		return Paths.get(path);
 	}
 
 	// TODO: can this return null?
+	/**
+	 *
+	 * @param path
+	 * @return
+	 */
 	public File toFile(@NonNull final String path) {
 		return getPath(path).toFile();
 	}
@@ -139,7 +149,7 @@ public class DokanyUtils {
 		log.warn(t.getMessage(), t);
 
 		if (t instanceof DokanyException) {
-			return ((DokanyException) t).getVal();
+			return ((DokanyException) t).getValue();
 		}
 		if (t instanceof FileNotFoundException) {
 			return ErrorCode.ERROR_FILE_NOT_FOUND.getMask();
@@ -171,6 +181,13 @@ public class DokanyUtils {
 		return getTime(new Date());
 	}
 
+	/**
+	 *
+	 * @param val
+	 * @param high
+	 * @param low
+	 * @return
+	 */
 	public LARGE_INTEGER getLargeInt(final long val, final int high, final int low) {
 		LARGE_INTEGER largeInt = null;
 		if ((val != 0) && ((high == 0) || (low == 0))) {
@@ -229,6 +246,12 @@ public class DokanyUtils {
 		throw new IllegalArgumentException("Invalid int value: " + value);
 	}
 
+	/**
+	 * Set DokanyFileInfo.DeleteOnClose based on whether file or directory can be deleted.
+	 *
+	 * @param fileOrDirectory
+	 * @param dokanyFileInfo
+	 */
 	public void setDeleteStatus(@NonNull final File fileOrDirectory, @NonNull final DokanyFileInfo dokanyFileInfo) {
 		val canDelete = fileOrDirectory.renameTo(fileOrDirectory);
 

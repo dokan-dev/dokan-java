@@ -9,6 +9,18 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum CreationDisposition implements EnumInteger {
+
+    /*-
+     *                          |                    When the file...
+    This argument:           |             Exists            Does not exist
+    -------------------------+------------------------------------------------------
+    CREATE_ALWAYS            |            Truncates             Creates
+    CREATE_NEW         +-----------+        Fails               Creates
+    OPEN_ALWAYS     ===| does this |===>    Opens               Creates
+    OPEN_EXISTING      +-----------+        Opens                Fails
+    TRUNCATE_EXISTING        |            Truncates              Fails
+     */
+
 	CREATE_NEW(WinNT.CREATE_NEW, "Create New"),
 	CREATE_ALWAYS(WinNT.CREATE_ALWAYS, "Create Always"),
 	OPEN_EXISTING(WinNT.OPEN_EXISTING, "Open Existing"),
