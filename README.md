@@ -1,38 +1,40 @@
-_**!!! not maintained !!!**_  please contact @Liryna or @Maxhy if you wan't to bring this project to live again
-
-Dokan-Java [![Build status](https://ci.appveyor.com/api/projects/status/52nkbt94kirwaxsc/branch/master?svg=true)](https://ci.appveyor.com/project/sherter/jdokan/branch/master)
+Dokany-Java
 ======
 
-Dokan-Java is a Java wrapper for Dokan 0.6.0 and above using JNI.
-The original version is no longer maintained. I made this fork 
-in order to clean the library up and improve the build process (with gradle).
+## Introduction
+Dokany-Java is a Java wrapper for [Dokany 1.x release](https://github.com/dokan-dev/dokany/releases) and above.
 
-For an example on how to use this library see 
-[opendedup](http://code.google.com/p/opendedup/source/browse/trunk/src/org/opendedup/sdfs/windows/fs/WinSDFS.java).
+## Runtime Dependencies
+- [Java JRE 1.8](https://java.com/en/download/manual.jsp)
 
-## Download
-Snapshot versions are available on sonatype snapshot [repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/dokan-dev/dokan-java/dokan-java/).
+All dependencies can be seen [here](build.gradle).
 
+- [JNA](https://github.com/java-native-access/jna) - provides access to [native Dokany functions](https://dokan-dev.github.io/dokany-doc/html/struct_d_o_k_a_n___o_p_e_r_a_t_i_o_n_s.html)
+- [Project Lombok](https://projectlombok.org/) - reduces boilerplate code
+	- [Eclipse installation instructions](https://stackoverflow.com/questions/3418865/cannot-make-project-lombok-work-on-eclipse-helios/)
+- [Commons IO](https://commons.apache.org/proper/commons-io/)
+- [SLF4J](https://www.slf4j.org/)
+- [Logback](https://logback.qos.ch/)
+	
+## How to Build
+Requires [Java JDK 1.8](http://www.azul.com/downloads/zulu/)
+
+### Gradle
 Add the following to your `build.gradle`:
 
 ```groovy
 repositories {
   maven {
-    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    url 'https://dl.bintray.com/jhult/maven/'
   }
 }
 dependencies {
-  compile 'com.github.dokan-dev.dokan-java:dokan-java:0.1-SNAPSHOT'
+  compile 'com.dokany:dokany-java:0.1'
 }
 ```
 
-## Building
-This project uses [gradle](http://gradle.org/) as build tool.
+### Binaries
+Builds (as JAR files) will soon be available on [this Bintray repository](https://bintray.com/jhult/maven/com.dokany%3Adokany-java).
 
-1. Make sure `JAVA_HOME` env variable is pointing to your JDK installation
-2. Download and install the latest [Dokany](https://github.com/Maxhy/dokany/releases) release
-3. Point `DOKAN_HOME` env variable to the installation directory 
-(e.g. `C:\Program Files (x86)\Dokan\DokanLibrary`)
-
-Now you should be able to use gradle as usually.
-
+## Development Examples
+For an example on how to develop using this library, see the examples package [com.dokany.java.examples](src//main/java/com/dokany/java/examples/).
