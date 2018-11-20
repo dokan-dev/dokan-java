@@ -1,6 +1,11 @@
 Dokany-Java
 ======
 
+# Important Notice
+This project will switch to a new architecture with a new interface. Therefore the current main-branch will be moved to a deprecated branch and then deleted after 6 months. The information provided below is valid for this deprecated adapter. 
+
+The migration will take some time but if you are already interested int the "new" java-wrapper, have a look [here](https://github.com/infeo/dokan-java).
+
 ## Introduction
 Dokany-Java is a Java wrapper for [Dokany 1.x release](https://github.com/dokan-dev/dokany/releases) and above.
 
@@ -19,7 +24,7 @@ All dependencies can be seen [here](build.gradle).
 ## How to Build
 Requires [Java JDK 1.8](http://www.azul.com/downloads/zulu/)
 
-### Gradle
+<!---### Gradle
 Add the following to your `build.gradle`:
 
 ```groovy
@@ -32,9 +37,7 @@ dependencies {
   compile 'com.dokany:dokany-java:0.1'
 }
 ```
-
-### Binaries
-Builds (as JAR files) will soon be available on [this Bintray repository](https://bintray.com/jhult/maven/com.dokany%3Adokany-java).
+-->
 
 ## Development Examples
 For an example on how to develop using this library, see the examples package [com.dokany.java.examples](src//main/java/com/dokany/java/examples/).
