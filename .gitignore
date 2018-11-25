@@ -1,16 +1,37 @@
 #build directory
 build/
 
-#IntelliJ IDEA directory
-.idea/*
+# IntelliJ IDEA
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
 
-# Compiled class file
+## Generated files
+.idea/**/contentModel.xml
+
+## Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+.idea/modules.xml
+.idea/*.iml
+.idea/modules
+
+# Java
+## Compiled class file
 *.class
 
-# Log file
-*.log
+## virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
-# Package Files #
+## Package Files #
 *.jar
 *.war
 *.nar
@@ -19,9 +40,12 @@ build/
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Misc
+## Log file
+*.log
 
-#gradle directory
+
+# Gradle
+# gradle directory
 .gradle/*
 !gradle/
