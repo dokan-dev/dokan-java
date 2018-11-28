@@ -2,7 +2,7 @@ Dokany-Java
 ======
 
 # Important Notice
-This project will switch to a new architecture with a new interface. Therefore the current main-branch will be moved to a deprecated branch and then deleted after 6 months. The information provided below is valid for this deprecated adapter. 
+This project will switch to a new architecture with a new interface. Therefore the current main-branch will be moved to a deprecated branch and then deleted after 6 months.
 
 The migration will take some time but if you are already interested int the "new" java-wrapper, have a look [here](https://github.com/infeo/dokan-java).
 
