@@ -57,6 +57,9 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
      */
     public FILETIME ftLastWriteTime;
 
+    /**
+     * The serial number of the volume that contains a file.
+     */
     public int dwVolumeSerialNumber;
 
     /**
