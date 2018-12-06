@@ -195,12 +195,8 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
                     return null;
                 }
             }).forEach(file -> {
-                try {
-                    if (file != null) {
-                        rawFillFindData.fillWin32FindData(file, dokanFileInfo);
-                    }
-                } catch (Error e) {
-                    //TODO: invalid memory access can happen, which is an Java.Lang.Error
+                if (file != null) {
+                    rawFillFindData.fillWin32FindData(file, dokanFileInfo);
                 }
             });
             return Win32ErrorCodes.ERROR_SUCCESS;
