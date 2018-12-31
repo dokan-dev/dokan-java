@@ -2,8 +2,8 @@ package com.dokan.java;
 
 import com.dokan.java.constants.dokany.MountOption;
 import com.dokan.java.constants.microsoft.CreationDisposition;
-import com.dokan.java.constants.microsoft.NtStatuses;
 import com.dokan.java.constants.microsoft.FileSystemFlag;
+import com.dokan.java.constants.microsoft.NtStatuses;
 import com.dokan.java.structure.ByHandleFileInformation;
 import com.dokan.java.structure.DokanFileInfo;
 import com.dokan.java.structure.DokanOptions;
@@ -17,7 +17,7 @@ import com.sun.jna.ptr.LongByReference;
 
 
 /**
- *  Main interface to implement. These methods will be registered in the dokany kernel driver to handle filesystem requests.
+ * Main interface to implement. These methods will be registered in the dokany kernel driver to handle filesystem requests.
  */
 public interface DokanyFileSystem extends Mountable {
 
@@ -29,8 +29,8 @@ public interface DokanyFileSystem extends Mountable {
      * In case OPEN_ALWAYS &amp; CREATE_ALWAYS are successfully opening an existing file, STATUS_OBJECT_NAME_COLLISION should be returned instead of STATUS_SUCCESS . This will inform Dokan that the file has been opened
      * and not created during the request.
      * <p>
-     * If the file is a directory, CreateFile is also called. In this case, CreateFile should return {@link NtStatuses#STATUS_SUCCESS} when that directory can be opened and {@link DokanFileInfo#IsDirectory} has to be set to TRUE.
-     * On the other hand, if {@link DokanFileInfo#IsDirectory} is set to TRUE but the path targets a file, {@link NtStatuses#STATUS_NOT_A_DIRECTORY} must be returned.
+     * If the file is a directory, CreateFile is also called. In this case, CreateFile should return {@link NtStatuses#STATUS_SUCCESS} when that directory can be opened and {@link DokanFileInfo#IsDirectory} has to be set
+     * to TRUE. On the other hand, if {@link DokanFileInfo#IsDirectory} is set to TRUE but the path targets a file, {@link NtStatuses#STATUS_NOT_A_DIRECTORY} must be returned.
      * <p>
      * {@link DokanFileInfo#Context} can be used to store Data (like a filehandle) that can be retrieved in all other requests related to the Context. To avoid memory leak, Context needs to be released in {@link
      * DokanyFileSystem#cleanup(WString, DokanFileInfo)} .
@@ -43,7 +43,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawCreateDisposition Specifies the action to perform if the file does or does not exist. Can be translated into a readable thing via {@link CreationDisposition}
      * @param rawCreateOptions Specifies the options to apply when the driver creates or opens the file. (see also in the .NET API <a href="https://docs.microsoft.com/de-de/dotnet/api/system.io.fileoptions">System.IO.FileOptions</a>)
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return integer code of a {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      *
      * @see <a href="https://dokan-dev.github.io/dokany-doc/html/struct_d_o_k_a_n___o_p_e_r_a_t_i_o_n_s.html#a40c2f61e1287237f5fd5c2690e795183">Dokany documentation of ZwCreateFile</a>
      * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/ntifs/nf-ntifs-ntcreatefile">Microsoft documentation of zwCreateFile</a>
@@ -94,7 +94,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawReadLength
      * @param rawOffset
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int readFile(
             WString rawPath,
@@ -114,7 +114,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawNumberOfBytesWritten
      * @param rawOffset
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int writeFile(
             WString rawPath,
@@ -130,7 +130,7 @@ public interface DokanyFileSystem extends Mountable {
      *
      * @param rawPath
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int flushFileBuffers(
             WString rawPath,
@@ -142,7 +142,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param fileName
      * @param handleFileInfo
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int getFileInformation(
             WString fileName,
@@ -155,7 +155,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawPath
      * @param rawFillFindData
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int findFiles(
             WString rawPath,
@@ -169,7 +169,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param searchPattern
      * @param rawFillFindData
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int findFilesWithPattern(
             WString fileName,
@@ -183,7 +183,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawPath
      * @param rawAttributes
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int setFileAttributes(
             WString rawPath,
@@ -198,7 +198,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawLastAccessTime time of last access
      * @param rawLastWriteTime time of last modification
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int setFileTime(
             WString rawPath,
@@ -210,18 +210,18 @@ public interface DokanyFileSystem extends Mountable {
     /**
      * Check if it is possible to delete a file.
      * <p>
-     * You should NOT delete the file in this method, but instead you must only check whether you can delete the file or not, and return {@link NtStatuses#STATUS_SUCCESS} (when you can delete it) or appropriate error codes such
-     * as {@link NtStatuses#STATUS_ACCESS_DENIED}, {@link NtStatuses#STATUS_OBJECT_NO_LONGER_EXISTS}, {@link NtStatuses#STATUS_OBJECT_NAME_NOT_FOUND}.
+     * You should NOT delete the file in this method, but instead you must only check whether you can delete the file or not, and return {@link NtStatuses#STATUS_SUCCESS} (when you can delete it) or appropriate error
+     * codes such as {@link NtStatuses#STATUS_ACCESS_DENIED}, {@link NtStatuses#STATUS_OBJECT_NO_LONGER_EXISTS}, {@link NtStatuses#STATUS_OBJECT_NAME_NOT_FOUND}.
      * <p>
      * {@link DokanyFileSystem#deleteFile(WString, DokanFileInfo)} will also be called with {@link DokanFileInfo#DeleteOnClose} set to <i>false</i> to notify the driver when the file is no longer requested to be
      * deleted.
      * <p>
-     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanyFileSystem#cleanup(WString, DokanFileInfo)} call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you have to
-     * actually delete the file being closed.
+     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanyFileSystem#cleanup(WString, DokanFileInfo)} call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you
+     * have to actually delete the file being closed.
      *
      * @param rawPath
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      *
      * @see #deleteDirectory(WString, DokanFileInfo)
      */
@@ -234,7 +234,7 @@ public interface DokanyFileSystem extends Mountable {
      *
      * @param rawPath
      * @param dokanFileInfo {@link DokanFileInfo} with information about the directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      *
      * @see #deleteFile(WString, DokanFileInfo)
      */
@@ -249,7 +249,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawNewFileName
      * @param rawReplaceIfExisting
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int moveFile(
             WString rawPath,
@@ -263,7 +263,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawPath
      * @param rawByteOffset
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int setEndOfFile(
             WString rawPath,
@@ -276,7 +276,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawPath
      * @param rawLength
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int setAllocationSize(
             WString rawPath,
@@ -290,7 +290,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawByteOffset
      * @param rawLength
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int lockFile(
             WString rawPath,
@@ -305,7 +305,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawByteOffset
      * @param rawLength
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int unlockFile(
             WString rawPath,
@@ -325,7 +325,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param totalNumberOfBytes
      * @param totalNumberOfFreeBytes
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int getDiskFreeSpace(
             LongByReference freeBytesAvailable,
@@ -359,7 +359,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawFileSystemNameBuffer
      * @param rawFileSystemNameSize
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int getVolumeInformation(
             Pointer rawVolumeNameBuffer,
@@ -373,12 +373,18 @@ public interface DokanyFileSystem extends Mountable {
 
     /**
      * Is called when Dokany succeeded mounting the volume.
+     *
+     * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int mounted(
             DokanFileInfo dokanFileInfo);
 
     /**
      * Is called when Dokany succeeded unmounting the volume.
+     *
+     * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int unmounted(
             final DokanFileInfo dokanFileInfo);
@@ -394,7 +400,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawSecurityDescriptorLength
      * @param rawSecurityDescriptorLengthNeeded
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int getFileSecurity(
             WString rawPath,
@@ -414,7 +420,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawSecurityDescriptor
      * @param rawSecurityDescriptorLength
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int setFileSecurity(
             WString rawPath,
@@ -425,6 +431,8 @@ public interface DokanyFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
+     * TODO: add description
+     *
      * @param rawFillFindData
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
      */
@@ -438,7 +446,7 @@ public interface DokanyFileSystem extends Mountable {
      * @param rawPath
      * @param rawFillFindData
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
-     * @return {@link NtStatuses}
+     * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
      */
     int findStreams(
             WString rawPath,

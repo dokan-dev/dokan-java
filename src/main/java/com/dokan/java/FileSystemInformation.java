@@ -9,20 +9,21 @@ import com.dokan.java.structure.EnumIntegerSet;
  */
 public final class FileSystemInformation {
 
-	public static final int DEFAULT_MAX_COMPONENT_LENGTH = 256;
-	public static final String DEFAULT_FS_NAME = "NTFS";
+    public static final int DEFAULT_MAX_COMPONENT_LENGTH = 256;
+    public static final String DEFAULT_FS_NAME = "NTFS";
 
-	private final int maxComponentLength;
-	private final String fileSystemName;
-	private final EnumIntegerSet<FileSystemFlag> fileSystemFeatures;
+    private final int maxComponentLength;
+    private final String fileSystemName;
+    private final EnumIntegerSet<FileSystemFlag> fileSystemFeatures;
 
-	/**
-	 * Provides default values for maxComponentLength and Filesystem name.
-     * TODO: add checks to assert filesystemflags is not null!
-	 */
-	public FileSystemInformation(EnumIntegerSet<FileSystemFlag> fileSystemFlags) {
-		this(DEFAULT_MAX_COMPONENT_LENGTH, DEFAULT_FS_NAME, fileSystemFlags);
-	}
+    /**
+     * Provides default values for maxComponentLength and Filesystem name. TODO: add checks to assert filesystemflags is not null!
+     *
+     * @param fileSystemFlags An {@link EnumIntegerSet} of features the file system supports. For possible values, see the {@link FileSystemFlag} enum.
+     */
+    public FileSystemInformation(EnumIntegerSet<FileSystemFlag> fileSystemFlags) {
+        this(DEFAULT_MAX_COMPONENT_LENGTH, DEFAULT_FS_NAME, fileSystemFlags);
+    }
 
     public FileSystemInformation(final int maxComponentLength, final String fileSystemName, final EnumIntegerSet<FileSystemFlag> fileSystemFeatures) {
         this.maxComponentLength = maxComponentLength;
@@ -30,21 +31,21 @@ public final class FileSystemInformation {
         this.fileSystemFeatures = fileSystemFeatures;
     }
 
-	public int getMaxComponentLength() {
-		return this.maxComponentLength;
-	}
+    public int getMaxComponentLength() {
+        return this.maxComponentLength;
+    }
 
-	public String getFileSystemName() {
-		return this.fileSystemName;
-	}
+    public String getFileSystemName() {
+        return this.fileSystemName;
+    }
 
-	public EnumIntegerSet<FileSystemFlag> getFileSystemFeatures() {
-		return this.fileSystemFeatures;
-	}
+    public EnumIntegerSet<FileSystemFlag> getFileSystemFeatures() {
+        return this.fileSystemFeatures;
+    }
 
-	@Override
-	public String toString() {
-		return "VolumeInformation(maxComponentLength=" + this.getMaxComponentLength() + ", fileSystemName=" + this.getFileSystemName() + ", fileSystemFeatures=" + this.getFileSystemFeatures() + ")";
-	}
+    @Override
+    public String toString() {
+        return "VolumeInformation(maxComponentLength=" + this.getMaxComponentLength() + ", fileSystemName=" + this.getFileSystemName() + ", fileSystemFeatures=" + this.getFileSystemFeatures() + ")";
+    }
 
 }
