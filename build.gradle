@@ -41,10 +41,13 @@ bintray{
     publications = ['release']
     pkg {
         version {
-            name = project.name
+            name = project.version
             desc = project.description
             released = new Date()
             vcsTag = project.version
+            gpg {
+                sign = true
+            }
         }
         repo = 'maven'
         name = project.name
