@@ -1,11 +1,12 @@
 Dokan-Java
 ======
 
-# Important Notice
+Dokan-Java is a Java wrapper for [Dokany 1.x release](https://github.com/dokan-dev/dokany/releases) and above.
+## Important Notice
 This project has switched to a new architecture. The _old_ dokan-java can be found under the deprecated branch and will be deleted after 6 months.
 
 ## Introduction
-Dokan-Java is a Java wrapper for [Dokany 1.x release](https://github.com/dokan-dev/dokany/releases) and above.
+Dokany is a device driver providing an interface to develop and run your own filesystem on Windows (similar to FUSE). But using the library directly you need to write your filesystem code in C... but fortunately there is an escape from the pointer hell: dokan-java. Using this project you are able to write your filesystem in Java!
 
 ## Runtime Dependencies
 - [Java JRE 11](https://jdk.java.net/11/)
@@ -28,10 +29,10 @@ Building Jar :
 
 To publish to the local maven repository, execute as the third step `./gradlew.bat publishToMavenLocal`
 
-##Download
-The first release can be found here: https://bintray.com/infeo/maven/dokan-java
+## Download
+The first stable release can be found here: https://bintray.com/infeo/maven/dokan-java
 
-A publication to MavenCentral is in progress.
+A publication to JCenter and MavenCentral is in progress.
 
 ## Development Examples
 Example user filesystems using this library, see the examples package [com.dokan.java.examples](https://github.com/dokan-dev/dokan-java/tree/develop/src/main/java/com/dokan/java/examples).
