@@ -13,6 +13,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
 }
 
+
 dependencies {
     implementation (group:'com.google.guava', name:'guava', version:guavaVersion)
     implementation (group:'net.java.dev.jna', name:'jna', version:jnaVersion)
@@ -92,13 +93,21 @@ task showBintrayInfo() {
     }
 }
 
+task showProjectInfo(){
+    doLast() {
+        println project.name
+        println project.version
+        println project.description
+    }
+}
+
 tasks {
     jar {
         manifest {
             attributes(
                     'Implementation-Title': project.name,
                     'Implementation-Version': project.version,
-                    'Specification-Title': 'Java Wrapper for Dokany',
+                    'Specification-Title': project.description,
                     'Specification-Version': project.version,
             )
         }
@@ -133,6 +142,7 @@ publishing {
         release(MavenPublication) {
             from components.java
             groupId group
+            artifactId artifact
             artifact sourcesJar
             artifact javadocJar
             pom.withXml {
