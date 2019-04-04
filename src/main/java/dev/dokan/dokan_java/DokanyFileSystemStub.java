@@ -8,7 +8,7 @@ import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
-public class DokanyFileSystemStub extends AbstractDokanyFileSystem{
+public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
 
     public DokanyFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
         super(fileSystemInformation, usesKernelFlagsAndCodes);

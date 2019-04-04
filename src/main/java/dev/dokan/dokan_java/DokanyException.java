@@ -2,21 +2,21 @@ package dev.dokan.dokan_java;
 
 public final class DokanyException extends RuntimeException {
 
-	private final int value;
-	private final String message;
-	private final Throwable cause;
+    private final int value;
+    private final String message;
+    private final Throwable cause;
 
-	public DokanyException(Exception e) {
-		this.value = Integer.MIN_VALUE;
-		this.message = "";
-		this.cause = e;
-	}
+    public DokanyException(Exception e) {
+        this.value = Integer.MIN_VALUE;
+        this.message = "";
+        this.cause = e;
+    }
 
-	public DokanyException(String message, int errorCode) {
-	    this.value = errorCode;
-	    this.message = message;
-	    this.cause = null;
-	}
+    public DokanyException(String message, int errorCode) {
+        this.value = errorCode;
+        this.message = message;
+        this.cause = null;
+    }
 
     public DokanyException(String message, Throwable cause) {
         this.value = Integer.MIN_VALUE;
@@ -24,16 +24,16 @@ public final class DokanyException extends RuntimeException {
         this.cause = cause;
     }
 
-	public int getValue() {
-		return value;
-	}
-
-
-	public Throwable getCause(){
-	    return this.cause;
+    public int getValue() {
+        return value;
     }
 
-    public String getMessage(){
-	    return message;
+
+    public Throwable getCause() {
+        return this.cause;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
