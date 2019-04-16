@@ -4,12 +4,20 @@ import dev.dokan.dokan_java.FileSystemInformation;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class DirListingFSTest {
+
+    static {
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "info");
+        System.setProperty(SimpleLogger.LOG_FILE_KEY, "System.out");
+        System.setProperty(SimpleLogger.SHOW_DATE_TIME_KEY, "true");
+        System.setProperty(SimpleLogger.DATE_TIME_FORMAT_KEY, "HH:mm:ss:SSS");
+    }
 
     public static void main(String[] args) {
         System.out.println("Starting Dokany MirrorFS");
