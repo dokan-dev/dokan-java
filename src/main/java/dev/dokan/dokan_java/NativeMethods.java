@@ -172,7 +172,6 @@ class NativeMethods {
      * @param nbRead         - Number of instances successfully retrieved
      * @return List retrieved or not.
      */
-    // TODO: Does this have proper params?
     static native boolean DokanGetMountPointList(long fileAttributes, long length, boolean uncOnly, long nbRead);
 
     /**
@@ -182,6 +181,6 @@ class NativeMethods {
      * @return NtStatus associated to the error
      * @see <a href="https://support.microsoft.com/en-us/kb/113996">kb113996</a>
      */
-    // TODO: Switch to NtStatus return type
     static native long DokanNtStatusFromWin32(int error);
+
 }
