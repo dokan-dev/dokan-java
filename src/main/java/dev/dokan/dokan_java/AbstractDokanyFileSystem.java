@@ -1,13 +1,11 @@
 package dev.dokan.dokan_java;
 
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
-import com.sun.jna.WString;
-import com.sun.jna.ptr.IntByReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -16,16 +14,17 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDokanyFileSystem.class);
     private static final int TIMEOUT = 3000;
 
     protected final FileSystemInformation fileSystemInformation;
     protected final DokanyOperations dokanyOperations;
     protected final boolean usesKernelFlagsAndCodes;
+    protected final AtomicBoolean isMounted;
 
     protected Path mountPoint;
     protected String volumeName;
@@ -37,6 +36,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     public AbstractDokanyFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
         this.fileSystemInformation = fileSystemInformation;
         this.usesKernelFlagsAndCodes = usesKernelFlagsAndCodes;
+        this.isMounted = new AtomicBoolean(false);
         this.dokanyOperations = new DokanyOperations();
         init(dokanyOperations);
     }
@@ -221,20 +221,23 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     }
 
     @Override
-    public void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
+    public synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
         this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
         this.mountPoint = mountPoint;
         this.volumeName = volumeName; //TODO: add checks for mountPoint, volumeName and volumeSerialNumber
         this.volumeSerialnumber = volumeSerialnumber;
 
-        LOG.info("Detected Dokan Kernel Driver Version is {}.", NativeMethods.DokanDriverVersion());
-        LOG.info("Detected Dokan Version is {}.", NativeMethods.DokanVersion());
         try {
             int mountStatus;
 
             if (DokanyUtils.canHandleShutdownHooks()) {
-                Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    if (isMounted.get()) {
+                        this.unmount();
+                    }
+                }));
             }
+
             if (blocking) {
                 mountStatus = execMount(dokanOptions);
             } else {
@@ -248,17 +251,11 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
                 }
             }
             if (mountStatus < 0) {
-                throw new DokanyException("Error while mounting. Error message:" + MountError.fromInt(mountStatus).getDescription(), mountStatus);
+                throw new RuntimeException("Negative result of mount operation. Code" + mountStatus + " -- " + MountError.fromInt(mountStatus).getDescription());
             }
-        } catch (UnsatisfiedLinkError err) {
-            LOG.error("Unable to find dokany driver.", err);
-            throw new LibraryNotFoundException(err.getMessage());
-        } catch (DokanyException e) {
-            LOG.warn("Unable to mount filesystem.", e);
-            throw e;
-        } catch (Exception e) {
-            LOG.warn("Unable to mount Filesystem.", e);
-            throw new DokanyException(e);
+            isMounted.set(true);
+        } catch (UnsatisfiedLinkError | Exception e) {
+            throw new MountFailedException("Unable to mount filesystem.", e);
         }
     }
 
@@ -284,18 +281,19 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     }
 
     @Override
-    public void unmount() {
-        //TODO: add check if this object is mounted at all and throw otherwise IllegalState exception
-        LOG.info("Start to unmount volume {} at {} and shutdown.", this.volumeName, this.mountPoint);
-        if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
-            LOG.info("Unmount operation successful.");
-        } else {
-            LOG.error("Unable to unmount filesystem from {}. Please use `dokanctl.exe` to unmount manually.", mountPoint);
+    public synchronized void unmount() {
+        if (isMounted.get()) {
+            if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
+                isMounted.set(false);
+            } else {
+                throw new UnmountFailedException("Unmount of " + volumeName + "(" + mountPoint + ") failed. Try again, shut down JVM or use `dokanctl.exe to unmount manually.");
+            }
         }
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         unmount();
     }
+
 }
