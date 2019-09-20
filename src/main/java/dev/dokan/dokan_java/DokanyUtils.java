@@ -1,10 +1,15 @@
 package dev.dokan.dokan_java;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
+import dev.dokan.dokan_java.structure.DokanControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static com.sun.jna.platform.win32.WinError.*;
 import static dev.dokan.dokan_java.constants.microsoft.NtStatuses.*;
@@ -52,6 +57,22 @@ public class DokanyUtils {
             return true;
         } catch (final SecurityException e) {
             return false;
+        }
+    }
+
+    public static List<DokanControl> getDokanControlList(Pointer start, long length) {
+        List<DokanControl> list = new ArrayList<>();
+        if(length == 0){
+            return list;
+        }else if(length<0) {
+            //TODO length is actually an unsigned long! -> java always treats them as signed
+            return list;
+        }else {
+            list.add(new DokanControl(start));
+            for(int i=1; i<length; i++){
+                list.add(new DokanControl(start,i*list.get(0).size()));
+            }
+            return list;
         }
     }
 

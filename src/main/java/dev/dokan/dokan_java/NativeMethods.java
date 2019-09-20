@@ -1,11 +1,14 @@
 package dev.dokan.dokan_java;
 
-import dev.dokan.dokan_java.constants.dokany.MountError;
-import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.structure.DokanFileInfo;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
+import dev.dokan.dokan_java.constants.dokany.MountError;
+import dev.dokan.dokan_java.structure.DokanControl;
+import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanOptions;
 
 /**
  * Native API to the kernel Dokany driver. This is an internal class and should not be used directly by code outside com.dokany.java.
@@ -161,15 +164,20 @@ class NativeMethods {
     static native void DokanDebugMode(boolean status);
 
     /**
-     * Get active Dokany mount points.
+     * Get active Dokany mount points. Returned array need to be released by calling {@link #DokanReleaseMountPointList}.
      *
-     * @param fileAttributes - Allocate array of DOKAN_CONTROL
-     * @param length         - Number of DOKAN_CONTROL instance in list.
-     * @param uncOnly        - Get only instances that have UNC Name.
-     * @param nbRead         - Number of instances successfully retrieved
-     * @return List retrieved or not.
+     * @param uncOnly - Get only instances that have UNC Name.
+     * @param nbRead  - Number of instances successfully retrieved
+     * @return a pointer to the start of the allocated array of {@link DokanControl} elemets. The actual list can be retrieved with {@link DokanyUtils#getDokanControlList(Pointer, long)}.
      */
-    static native boolean DokanGetMountPointList(long fileAttributes, long length, boolean uncOnly, long nbRead);
+    static native Pointer DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
+
+    /**
+     * Release Mount point list resources from {@link #DokanGetMountPointList}.
+     *
+     * @param startOfList Pointer to the start of the {@link DokanControl} list.
+     */
+    static native void DokanReleaseMountPointList(Pointer startOfList);
 
     /**
      * Convert Win32 error to NtStatus
