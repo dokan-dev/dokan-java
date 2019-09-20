@@ -245,11 +245,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
             int mountStatus;
 
             if (DokanyUtils.canHandleShutdownHooks()) {
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    if (isMounted.get()) {
-                        this.unmount();
-                    }
-                }));
+                Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
             }
 
             if (blocking) {
