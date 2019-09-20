@@ -4,8 +4,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import dev.dokan.dokan_java.structure.DokanControl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,8 +26,6 @@ import static dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes.ERROR_DEV
  * Utilities to do various operations.
  */
 public class DokanyUtils {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DokanyUtils.class);
 
     private DokanyUtils() {
 
