@@ -24,7 +24,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     protected final FileSystemInformation fileSystemInformation;
     protected final DokanyOperations dokanyOperations;
     protected final boolean usesKernelFlagsAndCodes;
-    protected final AtomicBoolean isMounted;
+    private final AtomicBoolean isMounted;
 
     protected Path mountPoint;
     protected String volumeName;
