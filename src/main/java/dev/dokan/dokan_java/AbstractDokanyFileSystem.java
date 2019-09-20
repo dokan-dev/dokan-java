@@ -227,7 +227,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
      * @param mountPoint         Path pointing to an empty Directory or unused drive letter
      * @param volumeName         The displayed name of the volume (only important in combination with a drive letter)
      * @param volumeSerialnumber the serial number of the volume
-     * @param blocking           If true the mount and further file system calls are foreground operations and thus will block this thread
+     * @param blocking           If true the mount and further file system calls are foreground operations and thus will block this thread. To unmount the device you have to use the dokanctl.exe tool.
      * @param timeout            Timeout after which a not processed file system call is canceled
      * @param allocationUnitSize the size of the smallest allocatable space in bytes
      * @param sectorSize         the sector size
@@ -264,11 +264,11 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
                     // ok
                     mountStatus = 0;
                 }
+                isMounted.set(true);
             }
             if (mountStatus < 0) {
                 throw new RuntimeException("Negative result of mount operation. Code" + mountStatus + " -- " + MountError.fromInt(mountStatus).getDescription());
             }
-            isMounted.set(true);
         } catch (UnsatisfiedLinkError | Exception e) {
             throw new MountFailedException("Unable to mount filesystem.", e);
         }
