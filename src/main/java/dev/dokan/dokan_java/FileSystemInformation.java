@@ -17,7 +17,7 @@ public final class FileSystemInformation {
     private final EnumIntegerSet<FileSystemFlag> fileSystemFeatures;
 
     /**
-     * Provides default values for maxComponentLength and Filesystem name. TODO: add checks to assert filesystemflags is not null!
+     * Provides default values for maxComponentLength and Filesystem name.
      *
      * @param fileSystemFlags An {@link EnumIntegerSet} of features the file system supports. For possible values, see the {@link FileSystemFlag} enum.
      */

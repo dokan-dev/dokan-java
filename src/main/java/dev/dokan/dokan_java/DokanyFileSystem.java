@@ -425,7 +425,6 @@ public interface DokanyFileSystem extends Mountable {
     int setFileSecurity(
             WString rawPath,
             int rawSecurityInformation,
-            // @TODO: This is a pointer??
             Pointer rawSecurityDescriptor,
             int rawSecurityDescriptorLength,
             DokanFileInfo dokanFileInfo);

@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants;
 
 /**
- * An EnumInteger is an object that is represented by an 32bit integer value. TODO: Maybe make this an abstract class
+ * An EnumInteger is an object that is represented by an 32bit integer value.
  */
 public interface EnumInteger {
 

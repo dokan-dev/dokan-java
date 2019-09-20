@@ -593,7 +593,6 @@ public class DokanyOperations extends Structure {
         long callback(
                 WString rawPath,
                 int rawSecurityInformation,
-                // @TODO: This is a pointer??
                 Pointer rawSecurityDescriptor,
                 int rawSecurityDescriptorLength,
                 DokanFileInfo dokanFileInfo);
