@@ -222,7 +222,6 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
 
     /**
      * The general mount method. If the underlying system supports shutdown hooks, one is installed in case the JVM is shutting down and the filesystem is still mounted.
-     * TODO: maybe making mount and unmount final to prevent them being overidden? (The user has the Mounted() and Unmounted() method for filesystem specific tasks
      *
      * @param mountPoint         Path pointing to an empty Directory or unused drive letter
      * @param volumeName         The displayed name of the volume (only important in combination with a drive letter)
@@ -236,7 +235,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
      * @param options            an {@link EnumIntegerSet} containing {@link MountOption}s
      */
     @Override
-    public synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
+    public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
         this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
         this.mountPoint = mountPoint;
         this.volumeName = volumeName; //TODO: add checks for mountPoint, volumeName and volumeSerialNumber
@@ -296,7 +295,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     }
 
     @Override
-    public synchronized void unmount() {
+    public final synchronized void unmount() {
         if (isMounted.get()) {
             if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
                 isMounted.set(false);
