@@ -6,15 +6,12 @@ import dev.dokan.dokan_java.structure.DokanFileInfo;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Native API to the kernel Dokany driver. This is an internal class and should not be used directly by code outside com.dokany.java.
  */
 class NativeMethods {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NativeMethods.class);
     private static final String DOKAN_DLL = "dokan1";
 
     static {
