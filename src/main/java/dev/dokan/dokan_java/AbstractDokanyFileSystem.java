@@ -1,15 +1,19 @@
 package dev.dokan.dokan_java;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
+import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -292,6 +296,10 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
 
     @Override
     public final synchronized void unmount() {
+        if (!volumeIsStillMounted()) {
+            isMounted.set(false);
+        }
+
         if (isMounted.get()) {
             if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
                 isMounted.set(false);
@@ -300,6 +308,20 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
             }
         }
     }
+
+    private boolean volumeIsStillMounted() {
+        char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
+        LongByReference length = new LongByReference();
+        Pointer startOfList = NativeMethods.DokanGetMountPointList(false, length);
+        List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
+        // It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
+        boolean mountPointInList = list.stream().anyMatch(entry ->
+                Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
+                        && (entry.MountPoint.length == 12 + mntPtCharArray.length || entry.MountPoint[12 + mntPtCharArray.length] == '\0'));
+        NativeMethods.DokanReleaseMountPointList(startOfList);
+        return mountPointInList;
+    }
+
 
     @Override
     public void close() {
