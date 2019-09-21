@@ -21,6 +21,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+/**
+ * TODO: Add Description to this class
+ */
 public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
 
     private static final int TIMEOUT = 3000;
