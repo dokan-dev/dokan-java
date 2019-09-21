@@ -135,11 +135,10 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         } else {
             if (isImplemented("zwCreateFile")) {
                 dokanyOperations.setZwCreateFile((rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo) -> {
-                    IntByReference createDisposition = new IntByReference();
-                    IntByReference desiredAccess = new IntByReference();
-                    IntByReference fileAttributeFlags = new IntByReference();
-                    NativeMethods.DokanMapKernelToUserCreateFileFlags(rawDesiredAccess, rawFileAttributes, rawCreateOptions, rawCreateDisposition, desiredAccess, fileAttributeFlags, createDisposition);
-                    return DokanyUtils.ntStatusFromWin32ErrorCode(this.zwCreateFile(rawPath, securityContext, desiredAccess.getValue(), fileAttributeFlags.getValue(), rawShareAccess, createDisposition.getValue(), rawCreateOptions, dokanFileInfo));
+                    int creationDisposition = DokanyUtils.convertCreateDispositionToCreationDispostion(rawCreateDisposition);
+                    int desiredAccessGeneric = DokanyUtils.mapFileGenericAccessToGenericAccess(rawDesiredAccess);
+                    int fileAttributesAndFlags = DokanyUtils.addFileFlagsToFileAttributes(rawFileAttributes, rawCreateOptions);
+                    return DokanyUtils.ntStatusFromWin32ErrorCode(this.zwCreateFile(rawPath, securityContext, desiredAccessGeneric, fileAttributesAndFlags, rawShareAccess, creationDisposition, rawCreateOptions, dokanFileInfo));
                 });
             }
             if (isImplemented("cleanup")) {
