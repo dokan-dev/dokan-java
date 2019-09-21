@@ -50,7 +50,6 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
                 .map(Method::getName)
                 .collect(Collectors.toSet());
 
-        AbstractDokanyFileSystem dokanyFS = this;
         if (usesKernelFlagsAndCodes) {
             if (isImplemented("zwCreateFile")) {
                 dokanyOperations.setZwCreateFile(this::zwCreateFile);
