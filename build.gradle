@@ -114,29 +114,6 @@ tasks {
     }
 }
 
-def pomConfig = {
-    licenses {
-        license {
-            name licenseName
-            url licenseUrl
-            distribution "repo"
-        }
-    }
-
-    developers {
-        developer {
-            id maintainerId
-            name maintainer
-            email maintainerMail
-            timezone '+1'
-        }
-    }
-
-    scm {
-        url scmUrl
-    }
-}
-
 publishing {
     publications {
         release(MavenPublication) {
@@ -145,13 +122,36 @@ publishing {
             artifactId artifact
             artifact sourcesJar
             artifact javadocJar
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', project.description)
-                root.appendNode('name', project.name)
-                root.appendNode('url', scmUrl)
-                root.children().last() + pomConfig
+            pom {
+                name  = project.name
+                description = project.description
+                url = scmUrl
+                licenses {
+                    license {
+                        name = licenseName
+                        url = licenseUrl
+                        distribution = "repo"
+                    }
+                }
+                developers {
+                    developer {
+                        id = maintainerId
+                        name = maintainer
+                        email = maintainerMail
+                        timezone = '+1'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/dokan-dev/dokan-java.git'
+                    url = scmUrl
+                }
             }
         }
+    }
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
     }
 }
