@@ -88,7 +88,7 @@ public class AccessControlList implements Byteable {
 				+ 2 // aclSize
 				+ 2 //ace count
 				+ 2 //sbz2
-				+ aces.stream().reduce(0, (sum, ace) -> sum + ace.sizeOfByteArray(), (x, y) -> x + y);
+				+ aces.stream().reduce(0, (sum, ace) -> sum + ace.sizeOfByteArray(), Integer::sum);
 	}
 
 	public static AccessControlList createDaclRevision2(List<? extends AccessControlEntry> aces) {

@@ -13,19 +13,24 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
 }
 
+tasks.withType(JavaCompile) {
+    options.incremental = true
+    options.encoding = 'UTF-8'
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Xlint:deprecation"
+}
 
 dependencies {
-    implementation (group:'com.google.guava', name:'guava', version:guavaVersion)
     implementation (group:'net.java.dev.jna', name:'jna', version:jnaVersion)
-    implementation (group: 'commons-io', name: 'commons-io', version: apacheCommonsIOVersion)
-    
+
     api (group:'net.java.dev.jna', name:'jna-platform', version:jnaVersion)
     api (group:'org.slf4j', name:'slf4j-api', version:slf4jVersion) //is this correct or should it be implementation?
 
-    testImplementation (group:'org.slf4j', name:'slf4j-simple', version:'1.7.25')
-    testImplementation (group:'org.junit.jupiter', name:'junit-jupiter-api', version:'5.3.1')
+    testImplementation (group:'org.slf4j', name:'slf4j-simple', version:slf4jVersion)
+    testImplementation (group:'org.junit.jupiter', name:'junit-jupiter-api', version:junitVersion)
     
-    testRuntimeOnly (group:'org.junit.jupiter', name:'junit-jupiter-engine', version:'5.3.1')
+    testRuntimeOnly (group:'org.junit.jupiter', name:'junit-jupiter-engine', version:junitVersion)
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -75,12 +80,12 @@ test {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
