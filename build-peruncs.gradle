@@ -15,13 +15,8 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation (group:'net.java.dev.jna', name:'jna', version:jnaVersion)
-
     api (group:'net.java.dev.jna', name:'jna-platform', version:jnaVersion)
-    api (group:'org.slf4j', name:'slf4j-api', version:slf4jVersion) //is this correct or should it be implementation?
-
-    testImplementation (group:'org.slf4j', name:'slf4j-simple', version:slf4jVersion)
     testImplementation (group:'org.junit.jupiter', name:'junit-jupiter-api', version:junitVersion)
-    
     testRuntimeOnly (group:'org.junit.jupiter', name:'junit-jupiter-engine', version:junitVersion)
 }
 

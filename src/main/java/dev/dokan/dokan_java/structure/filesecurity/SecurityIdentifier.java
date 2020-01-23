@@ -2,8 +2,6 @@ package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.Byteable;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ import java.util.List;
  */
 public class SecurityIdentifier implements Byteable {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SecurityIdentifier.class);
+//	private static final Logger LOG = LoggerFactory.getLogger(SecurityIdentifier.class);
 
 	private final byte revision = 0x01;
 
@@ -38,7 +36,7 @@ public class SecurityIdentifier implements Byteable {
 			if (subAuthorities.size() <= 15) {
 				this.subAuthorities.addAll(subAuthorities);
 			} else {
-				LOG.warn("Number of subauthorities exceeds the limit of 15. Only taking the first 15 ones.");
+				//LOG.warn("Number of subauthorities exceeds the limit of 15. Only taking the first 15 ones.");
 				int i = 0;
 				for (Integer subAuth : subAuthorities) {
 					this.subAuthorities.add(subAuth);
