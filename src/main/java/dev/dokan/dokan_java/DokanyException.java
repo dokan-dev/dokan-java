@@ -2,38 +2,49 @@ package dev.dokan.dokan_java;
 
 public final class DokanyException extends RuntimeException {
 
-    private final int value;
-    private final String message;
-    private final Throwable cause;
+    private final int errorCode;
 
     public DokanyException(Exception e) {
-        this.value = Integer.MIN_VALUE;
-        this.message = "";
-        this.cause = e;
+        super(e);
+        this.errorCode = Integer.MIN_VALUE;
     }
 
+    public DokanyException(String message) {
+        super(message);
+        this.errorCode = Integer.MIN_VALUE;
+    }
     public DokanyException(String message, int errorCode) {
-        this.value = errorCode;
-        this.message = message;
-        this.cause = null;
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    public DokanyException(Throwable cause, int errorCode) {
+        super(cause);
+        this.errorCode = errorCode;
     }
 
     public DokanyException(String message, Throwable cause) {
-        this.value = Integer.MIN_VALUE;
-        this.message = message;
-        this.cause = cause;
+        super(message, cause);
+        this.errorCode = Integer.MIN_VALUE;
     }
 
+    public DokanyException(String message, Throwable cause, int errorCode) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     * Use #getErrorCode() instead.
+     * @return error code.
+     */
+    @Deprecated
     public int getValue() {
-        return value;
+        return errorCode;
     }
 
 
-    public Throwable getCause() {
-        return this.cause;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }
