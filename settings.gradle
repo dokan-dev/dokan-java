@@ -8,3 +8,4 @@
  */
 
 rootProject.name = 'dokan-java'
+rootProject.buildFileName = 'build-peruncs.gradle'
