@@ -2,7 +2,6 @@ package dev.dokan.dokan_java;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
-import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;

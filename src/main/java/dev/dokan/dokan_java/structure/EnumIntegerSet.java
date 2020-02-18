@@ -21,6 +21,7 @@ public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends Abstr
         this.elements = EnumSet.noneOf(clazz);
     }
 
+    @SafeVarargs
     public EnumIntegerSet(T first, T... others) {
         this.elements = EnumSet.of(first, others);
     }
@@ -49,6 +50,7 @@ public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends Abstr
         return elements;
     }
 
+    @SafeVarargs
     public final void add(T item, T... items) {
         if (item == null) {
             throw new IllegalArgumentException("Adding null is not allowed.");
