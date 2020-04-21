@@ -93,7 +93,7 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
         }
 
         if (Files.isDirectory(p)) {
-            if ((rawCreateOptions & CreateOptions.FILE_NON_DIRECTORY_FILE) == 1) {
+            if ((rawCreateOptions & CreateOptions.FILE_NON_DIRECTORY_FILE) != 0) {
                 return Win32ErrorCodes.ERROR_DIRECTORY;
             } else {
                 dokanFileInfo.IsDirectory = 1;
