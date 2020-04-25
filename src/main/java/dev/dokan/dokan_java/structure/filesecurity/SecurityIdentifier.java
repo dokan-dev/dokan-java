@@ -1,9 +1,8 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.Byteable;
+import dev.dokan.dokan_java.DokanyException;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -16,9 +15,9 @@ import java.util.List;
  */
 public class SecurityIdentifier implements Byteable {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SecurityIdentifier.class);
-
 	private final byte revision = 0x01;
+
+	private final static int MAX_SUB_AUTHORITIES =15 ;
 
 	private SidIdentifierAuthority sidAuth;
 
@@ -33,21 +32,12 @@ public class SecurityIdentifier implements Byteable {
 	 */
 	public SecurityIdentifier(SidIdentifierAuthority sidAuth, List<Integer> subAuthorities) {
 		this.sidAuth = sidAuth;
-		this.subAuthorities = new ArrayList<>(0);
+		this.subAuthorities = new ArrayList<>(MAX_SUB_AUTHORITIES);
 		if (subAuthorities != null) {
-			if (subAuthorities.size() <= 15) {
+			if (subAuthorities.size() <= MAX_SUB_AUTHORITIES) {
 				this.subAuthorities.addAll(subAuthorities);
 			} else {
-				LOG.warn("Number of subauthorities exceeds the limit of 15. Only taking the first 15 ones.");
-				int i = 0;
-				for (Integer subAuth : subAuthorities) {
-					this.subAuthorities.add(subAuth);
-					if (i >= 15) {
-						break;
-					}
-					i++;
-				}
-
+				throw new DokanyException("Number of sub-authorities exceeds the limit of "+MAX_SUB_AUTHORITIES+", it is: "+subAuthorities.size());
 			}
 		}
 	}

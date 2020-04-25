@@ -1,6 +1,5 @@
 package dev.dokan.dokan_java.examples;
 
-import com.google.common.base.CharMatcher;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase;
@@ -94,7 +93,7 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
         }
 
         if (Files.isDirectory(p)) {
-            if ((rawCreateOptions & CreateOptions.FILE_NON_DIRECTORY_FILE) == 1) {
+            if ((rawCreateOptions & CreateOptions.FILE_NON_DIRECTORY_FILE) != 0) {
                 return Win32ErrorCodes.ERROR_DIRECTORY;
             } else {
                 dokanFileInfo.IsDirectory = 1;
@@ -242,7 +241,9 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
 
     private Path getrootedPath(WString rawPath) {
         String unixPath = rawPath.toString().replace('\\', '/');
-        String relativeUnixPath = CharMatcher.is('/').trimLeadingFrom(unixPath);
+        String relativeUnixPath = unixPath;
+        if(unixPath.startsWith("/"))
+            relativeUnixPath =  unixPath.length()==1?"":unixPath.substring(1); // if it is already the root, we return the empty string
         return root.resolve(relativeUnixPath);
     }
 }

@@ -49,3 +49,6 @@ hs_err_pid*
 # gradle directory
 .gradle/*
 !gradle/
+
+# Mac metadata
+.DS_Store

@@ -32,6 +32,7 @@ import com.sun.jna.ptr.LongByReference;
  * <p>
  * This is the same struct as <i>_DOKAN_OPERATIONS</i> (dokan.h) in the C++ version of Dokany.
  */
+@SuppressWarnings("ALL")
 public class DokanyOperations extends Structure {
 
     public DokanyOperations() {
@@ -646,9 +647,9 @@ public class DokanyOperations extends Structure {
 
     interface Win32FindStreamDataInterface {
 
-        public void length(long val);
+        void length(long val);
 
-        public char[] cFileName();
+        char[] cFileName();
     }
 
     public void setZwCreateFile(DokanyOperations.ZwCreateFile zwCreateFile) {
