@@ -28,14 +28,14 @@ To use dokan-java in maven or gradle projects, you have to add jcenter as a repo
 ```xml
 <dependency>
     <groupId>dev.dokan</groupId>
-    <artifactId>dokan_java</artifactId>
+    <artifactId>dokan-java</artifactId>
     <version>1.1.0</version>
 </dependency>
 ```
 * Gradle
 ```groovy
 dependencies {
-    implementation (group:'dev.dokan', name:'dokan_java', version:'1.1.0')
+    implementation (group:'dev.dokan', name:'dokan-java', version:'1.1.0')
 }
 ```
 
