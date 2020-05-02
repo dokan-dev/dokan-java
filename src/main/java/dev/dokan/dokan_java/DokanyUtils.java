@@ -4,6 +4,7 @@ import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.constants.microsoft.CreationDisposition;
 
+import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 import static com.sun.jna.platform.win32.WinError.*;
@@ -48,6 +49,10 @@ public class DokanyUtils {
 
     public static String trimStrToSize(final String str, final int len) {
         return str.substring(0, Math.min(str.length(), len));
+    }
+
+    public static FILETIME toFILETIME(final FileTime time) {
+        return getTime(time.toMillis());
     }
 
     public static FILETIME getTime(final Date date) {
