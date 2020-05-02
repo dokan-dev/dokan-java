@@ -219,7 +219,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         }
     }
 
-    private boolean isImplemented(String funcName) {
+    public boolean isImplemented(String funcName) {
         return !notImplementedMethods.contains(funcName);
     }
 
