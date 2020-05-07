@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.legacy.structure;
+package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.DokanyOperations;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
