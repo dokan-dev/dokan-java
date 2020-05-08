@@ -2,9 +2,6 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import dev.dokan.dokan_java.constants.EnumInteger;
 
-/**
- * [TO BE REPLACED WITH LICENSE NOTE]
- */
 public enum MicrosoftReparsePointTag implements EnumInteger {
 
 	IO_REPARSE_TAG_CSV(0x80000009),

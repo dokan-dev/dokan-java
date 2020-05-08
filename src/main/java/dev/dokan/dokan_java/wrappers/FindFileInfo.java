@@ -10,9 +10,6 @@ import dev.dokan.dokan_java.structure.EnumIntegerSet;
 import java.util.Objects;
 import java.util.function.Function;
 
-/**
- * [TO BE REPLACED WITH LICENSE NOTE]
- */
 public class FindFileInfo extends AbstractFileInfo {
 
 	private static final int MAX_ALTERNATIVE_NAME_LENGTH = 14;

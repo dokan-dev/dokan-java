@@ -2,9 +2,6 @@ package dev.dokan.dokan_java.constants.dokany;
 
 import dev.dokan.dokan_java.constants.EnumInteger;
 
-/**
- * [TO BE REPLACED WITH LICENSE NOTE]
- */
 public enum DokanFileInfoFlag implements EnumInteger {
 
 	DELETE_ON_CLOSE(1),

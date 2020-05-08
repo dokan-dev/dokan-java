@@ -6,9 +6,6 @@ import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.nio.file.Path;
 
-/**
- * [TO BE REPLACED WITH LICENSE NOTE]
- */
 public class EasyFileInfo extends AbstractFileInfo {
 
 	private final Path path;

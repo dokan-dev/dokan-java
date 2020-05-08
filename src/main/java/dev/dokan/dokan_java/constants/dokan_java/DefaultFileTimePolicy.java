@@ -1,8 +1,5 @@
 package dev.dokan.dokan_java.constants.dokan_java;
 
-/**
- * [TO BE REPLACED WITH LICENSE NOTE]
- */
 public enum DefaultFileTimePolicy {
 
 	STATIC_YEAR_1601,
