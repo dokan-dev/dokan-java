@@ -21,7 +21,7 @@ public interface EasyDokanyFileSystem {
 	//		int rawShareAccess,
 	//		int rawCreateDisposition,
 	//		int rawCreateOptions,
-	//		DokanFileInfo dokanFileInfo) { //TODO Return type //TODO Incorporate path into DokanFileHandle
+	//		DokanFileInfo dokanFileInfo) { //TODO Return type //TODO Incorporate path into DokanyFileHandle
 	@NativeName("zwCreateFile")
 	void createHandle(Path absolutePath,
 		String relativePath,
@@ -142,7 +142,7 @@ public interface EasyDokanyFileSystem {
 	//		Pointer rawSecurityDescriptor, //Pointer to Buffer. Buffer gets copy of Security Descriptor. SECURITY_DESCRIPTOR in Self relative secdesc format //SelfRelativeSecurityDescriptor
 	//		int rawSecurityDescriptorLength, //available length for secdesc
 	//		IntByReference rawSecurityDescriptorLengthNeeded, //callback needed length for secdesc //Should be computed by dokany
-	//		DokanFileHandle dokanFileHandle);
+	//		DokanFileInfo dokanFileInfo);
 	@NativeName("getFileSecurity")
 	SelfRelativeSecurityDescriptor getFileSecurity(Path absolutePath, //TODO Return type
 		String relativePath,
