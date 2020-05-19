@@ -290,7 +290,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     }
 
     private int execMount(DokanOptions dokanOptions) {
-        return NativeMethods.DokanMain(dokanOptions, this.dokanyOperations);
+        return DokanNativeMethods.DokanMain(dokanOptions, this.dokanyOperations);
     }
 
     @Override
@@ -300,7 +300,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         }
 
         if (isMounted.get()) {
-            if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
+            if (DokanNativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
                 isMounted.set(false);
             } else {
                 throw new UnmountFailedException("Unmount of " + volumeName + "(" + mountPoint + ") failed. Try again, shut down JVM or use `dokanctl.exe to unmount manually.");
@@ -311,13 +311,13 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     private boolean volumeIsStillMounted() {
         char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
         LongByReference length = new LongByReference();
-        Pointer startOfList = NativeMethods.DokanGetMountPointList(false, length);
+        Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, length);
         List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
         // It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
         boolean mountPointInList = list.stream().anyMatch(entry ->
                 Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
                         && (entry.MountPoint.length == 12 + mntPtCharArray.length || entry.MountPoint[12 + mntPtCharArray.length] == '\0'));
-        NativeMethods.DokanReleaseMountPointList(startOfList);
+        DokanNativeMethods.DokanReleaseMountPointList(startOfList);
         return mountPointInList;
     }
 
