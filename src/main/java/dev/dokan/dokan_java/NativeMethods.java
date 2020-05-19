@@ -7,6 +7,7 @@ import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
+import com.sun.jna.win32.StdCallLibrary;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
@@ -16,7 +17,7 @@ import dev.dokan.dokan_java.structure.DokanOptions;
 /**
  * Native API to the kernel Dokan driver.
  */
-public class NativeMethods {
+public class NativeMethods implements StdCallLibrary {
 
 	private static final String DOKAN_DLL = "dokan1";
 
@@ -46,9 +47,9 @@ public class NativeMethods {
 	 * Mount a new Dokan Volume. This function blocks until the device is unmounted.
 	 * If the mount fails, it will directly return {@link MountError}.
 	 *
-	 * @param options A {@link DokanOptions} object that describe the mount.
+	 * @param options A {@link DokanOptions} object that describes the mount.
 	 * @param operations Instance of {@link DokanyOperations} that will be called for each file system request made by the kernel.
-	 * @return {@link MountError}.
+	 * @return a status code indicating the outcome. For the possible values, see {@link MountError}.
 	 */
 	static native int DokanMain(DokanOptions options, DokanyOperations operations);
 
@@ -74,7 +75,7 @@ public class NativeMethods {
 	 * Unmount a Dokan device from a driver letter.
 	 *
 	 * @param driveLetter Driver letter to unmount.
-	 * @return true if device was unmounted or false (in case of failure or device not found).
+	 * @return {@code true} if device was unmounted or {@code false} in case of failure or device not found.
 	 */
 	static native boolean DokanUnmount(char driveLetter);
 
@@ -88,7 +89,7 @@ public class NativeMethods {
 	 * <li>Z:\\</li>
 	 * <li>Z:\MyMountPoint</li>
 	 * </ul>
-	 * @return true if device was unmounted or false in case of failure or device not foun
+	 * @return {@code true} if device was unmounted or {@code false} in case of failure or device not found.
 	 */
 	static native boolean DokanRemoveMountPoint(WString mountPoint);
 
@@ -103,7 +104,7 @@ public class NativeMethods {
 	 *
 	 * @param timeout Extended time in milliseconds requested.
 	 * @param dokanFileInfo {@link DokanFileInfo} of the operation to extend.
-	 * @return true if the operation was successful, otherwise false.
+	 * @return {@code true} if the operation was successful, otherwise false.
 	 */
 	static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
 
@@ -187,7 +188,7 @@ public class NativeMethods {
 	 * @param expression - Expression, possibly containing any of the above characters
 	 * @param name - Name to check
 	 * @param ignoreCase - Case sensitive or not
-	 * @return true if name matches the expression, otherwise false
+	 * @return {@code true} if name matches the expression, otherwise false
 	 */
 	static native boolean DokanIsNameInExpression(WString expression, WString name, boolean ignoreCase);
 
@@ -202,7 +203,7 @@ public class NativeMethods {
 	 * @param nbRead - Number of instances successfully retrieved
 	 * @return a pointer to the start of the allocated array of {@link DokanControl} elemets.
 	 */
-	static native WinNT.HANDLE DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
+	static native Pointer DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
 
 	/**
 	 * Release Mount point list resources from {@link #DokanGetMountPointList}.
@@ -225,5 +226,51 @@ public class NativeMethods {
 	 */
 	static native long DokanNtStatusFromWin32(int error);
 
-	//TODO: notify methods
+	/**
+	 * Notify Dokan that a file or a directory has been created.
+	 *
+	 * @param FilePath Absolute path to the file or directory, including the mount-point of the file system.
+	 * @param IsDirectory Indicates if the path is a directory.
+	 * @return {@code true} if notification succeeded.
+	 */
+	static native boolean DokanNotifyCreate(WString FilePath, boolean IsDirectory);
+
+	/**
+	 * Notify Dokan that a file or a directory has been deleted.
+	 *
+	 * @param FilePath Absolute path to the file or directory, including the mount-point of the file system.
+	 * @param IsDirectory Indicates if the path was a directory.
+	 * @return {@code true} if notification succeeded.
+	 */
+	static native boolean DokanNotifyDelete(WString FilePath, boolean IsDirectory);
+
+	/**
+	 * Notify Dokan that file or directory attributes have changed.
+	 *
+	 * @param FilePath Absolute path to the file or directory, including the mount-point of the file system.
+	 * @return {@code true} if notification succeeded.
+	 */
+	static native boolean DokanNotifyUpdate(WString FilePath);
+
+	/**
+	 * Notify Dokan that file or directory extended attributes have changed.
+	 *
+	 * @param FilePath Absolute path to the file or directory, including the mount-point of the file system.
+	 * @return {@code true} if notification succeeded.
+	 */
+	static native boolean DokanNotifyXAttrUpdate(WString FilePath);
+
+	/**
+	 * Notify Dokan that a file or a directory has been renamed.
+	 * <p>
+	 * This method supports in-place rename for file/directory within the same parent.
+	 *
+	 * @param OldPath Old, absolute path to the file or directory, including the mount-point of the file system.
+	 * @param NewPath New, absolute path to the file or directory, including the mount-point of the file system.
+	 * @param IsDirectory Indicates if the path is a directory.
+	 * @param IsInSameDirectory Indicates if the file or directory have the same parent directory.
+	 * @return {@code true} if notification succeeded.
+	 */
+	static native boolean DokanNotifyRename(WString OldPath, WString NewPath,
+											boolean IsDirectory, boolean IsInSameDirectory);
 }
