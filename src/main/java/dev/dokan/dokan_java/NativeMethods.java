@@ -1,8 +1,10 @@
 package dev.dokan.dokan_java;
 
+
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 import dev.dokan.dokan_java.constants.dokany.MountError;
@@ -10,8 +12,9 @@ import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanOptions;
 
+
 /**
- * Native API to the kernel Dokany driver.
+ * Native API to the kernel Dokan driver.
  */
 public class NativeMethods {
 
@@ -40,10 +43,11 @@ public class NativeMethods {
 	}
 
 	/**
-	 * Mount a new Dokany Volume. This function block until the device is unmount. If the mount fail, it will directly return {@link MountError}.
+	 * Mount a new Dokan Volume. This function blocks until the device is unmounted.
+	 * If the mount fails, it will directly return {@link MountError}.
 	 *
-	 * @param options A {@link DokanOptions} that describe the mount.
-	 * @param operations Instance of {@link DokanyOperations} that will be called for each request made by the kernel.
+	 * @param options A {@link DokanOptions} object that describe the mount.
+	 * @param operations Instance of {@link DokanyOperations} that will be called for each file system request made by the kernel.
 	 * @return {@link MountError}.
 	 */
 	static native int DokanMain(DokanOptions options, DokanyOperations operations);
@@ -51,27 +55,31 @@ public class NativeMethods {
 	/**
 	 * Get the version of Dokan.
 	 *
-	 * @return The version number without the dots.
+	 * <p>The returned long value is the version number without the dots.</p>
+	 *
+	 * @return The version of Dokan
 	 */
 	static native long DokanVersion();
 
 	/**
-	 * Get the version of the Dokany driver.
+	 * Get the version of the Dokan driver.
 	 *
-	 * @return The version number without the dots.
+	 * <p>The returned long value is the version number without the dots.</p>
+	 *
+	 * @return The version of Dokan driver.
 	 */
 	static native long DokanDriverVersion();
 
 	/**
-	 * Unmount a Dokany device from a driver letter.
+	 * Unmount a Dokan device from a driver letter.
 	 *
 	 * @param driveLetter Driver letter to unmount.
-	 * @return True if device was unmounted or false (in case of failure or device not found).
+	 * @return true if device was unmounted or false (in case of failure or device not found).
 	 */
 	static native boolean DokanUnmount(char driveLetter);
 
 	/**
-	 * Unmount a Dokany device from a mount point
+	 * Unmount a Dokan device from a mount point
 	 *
 	 * @param mountPoint Mount point to unmount
 	 * <ul>
@@ -80,29 +88,41 @@ public class NativeMethods {
 	 * <li>Z:\\</li>
 	 * <li>Z:\MyMountPoint</li>
 	 * </ul>
-	 * @return if successfully unmounted mount point or not.
+	 * @return true if device was unmounted or false in case of failure or device not foun
 	 */
 	static native boolean DokanRemoveMountPoint(WString mountPoint);
+
+
+	/**
+	 * TODO: Does not work. Why?
+	 * static native boolean DokanRemoveMountPointEx(WString mountPoint, boolean safe);
+	 */
 
 	/**
 	 * Extends the time out of the current IO operation in driver.
 	 *
 	 * @param timeout Extended time in milliseconds requested.
 	 * @param dokanFileInfo {@link DokanFileInfo} of the operation to extend.
-	 * @return if the operation was successful or not.
+	 * @return true if the operation was successful, otherwise false.
 	 */
 	static native boolean DokanResetTimeout(long timeout, DokanFileInfo dokanFileInfo);
 
 	/**
 	 * Get the handle to Access Token.
 	 *
-	 * @param dokanFileInfo {@link DokanFileInfo} of the operation.
+	 * <p>
+	 * This method needs be called in <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile</a> callback.
+	 * The caller must call <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx">CloseHandle</a> for the returned handle.
+	 * </p>
+	 *
+	 * @param dokanFileInfo {@link DokanFileInfo} of the operation to extend.
 	 * @return A handle to the account token for the user on whose behalf the code is running.
 	 */
-	static native IntByReference DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
+	static native WinNT.HANDLE DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
 
 	/**
 	 * Convert {@link DokanyOperations.ZwCreateFile} parameters to CreateFile parameters.
+	 * TODO: Improve documentation
 	 *
 	 * @param desiredAccess
 	 * @param fileAttributes FileAttributes
@@ -122,72 +142,75 @@ public class NativeMethods {
 			IntByReference outCreationDisposition);
 
 	/**
-	 * Checks whether Name can match Expression.
+	 * Checks whether name  matches Expression.
+	 * <p>
+	 * Behave like FsRtlIsNameInExpression routine from <a href="https://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx">Microsoft</a>\n
+	 * </p>
+	 * <table class="striped">
+	 * <caption style="display:none">Special character handling</caption>
+	 * <thead>
+	 * <tr>
+	 * <th scope="col">Character</th>
+	 * <th scope="col">Character description</th>
+	 * <th scope="col">Effect</th>
+	 * </tr>
+	 * </thead>
+	 * <tbody>
+	 * <tr>
+	 * <td>*</th>
+	 * <td>asterisk</th>
+	 * <td>Matches zero or more characters.</td>
+	 * </tr>
+	 * <tr>
+	 * <td>?</th>
+	 * <td>question mark</th>
+	 * <td>Matches a single character.</td>
+	 * </tr>
+	 * <tr>
+	 * <td>"</th>
+	 * <td>quotation mark, DOS_DOT</th>
+	 * <td>Matches either a period or zero characters beyond the name string.</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@literal >}</th>
+	 * <td>greater than, DOS_QM</th>
+	 * <td>Matches any single character or, upon encountering a period or end of name string, advances the expression to the end of the set of contiguous DOS_QMs.</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@literal <}</th>
+	 * <td>less than, DOS_STAR</th>
+	 * <td>Matches zero or more characters until encountering and matching the final . in the name.</td>
+	 * </tr>
+	 * </tbody>
+	 * </table>
 	 *
-	 * @param expression - Expression can contain wildcard characters (? and *)
+	 * @param expression - Expression, possibly containing any of the above characters
 	 * @param name - Name to check
 	 * @param ignoreCase - Case sensitive or not
-	 * @return result if name matches the expression
+	 * @return true if name matches the expression, otherwise false
 	 */
-	static native boolean DokanIsNameInExpression(String expression, String name, boolean ignoreCase);
+	static native boolean DokanIsNameInExpression(WString expression, WString name, boolean ignoreCase);
 
 	/**
-	 * @param serviceName
-	 * @param serviceType
-	 * @param serviceFullPath
-	 * @return
-	 */
-	static native boolean DokanServiceInstall(String serviceName, int serviceType, String serviceFullPath);
-
-	/**
-	 * @param serviceName
-	 * @return
-	 */
-	static native boolean DokanServiceDelete(String serviceName);
-
-	/**
-	 * @return
-	 */
-	static native boolean DokanNetworkProviderInstall();
-
-	/**
-	 * @return
-	 */
-	static native boolean DokanNetworkProviderUninstall();
-
-	/**
-	 * Determine if Dokany debug mode is enabled.
+	 * Get active Dokan mount points.
 	 *
-	 * @param mode
-	 * @return true if Dokany debug mode is enabled
-	 */
-	static native boolean DokanSetDebugMode(int mode);
-
-	/**
-	 * Enable or disable standard error output for Dokany.
-	 *
-	 * @param status
-	 */
-	static native void DokanUseStdErr(boolean status);
-
-	/**
-	 * Enable or disable Dokany debug mode.
-	 *
-	 * @param status
-	 */
-	static native void DokanDebugMode(boolean status);
-
-	/**
-	 * Get active Dokany mount points. Returned array need to be released by calling {@link #DokanReleaseMountPointList}.
+	 * <p>
+	 * Returned array need to be released by calling {@link #DokanReleaseMountPointList}.
+	 * </p>
 	 *
 	 * @param uncOnly - Get only instances that have UNC Name.
 	 * @param nbRead - Number of instances successfully retrieved
-	 * @return a pointer to the start of the allocated array of {@link DokanControl} elemets. The actual list can be retrieved with {@link DokanyUtils#getDokanControlList(Pointer, long)}.
+	 * @return a pointer to the start of the allocated array of {@link DokanControl} elemets.
 	 */
-	static native Pointer DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
+	static native WinNT.HANDLE DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
 
 	/**
 	 * Release Mount point list resources from {@link #DokanGetMountPointList}.
+	 *
+	 * <p>
+	 * After {@link #DokanGetMountPointList} call you will receive a dynamically allocated array of {@link DokanControl}.
+	 * This array needs to be released when no longer needed by calling this function.
+	 * </p>
 	 *
 	 * @param startOfList Pointer to the start of the {@link DokanControl} list.
 	 */
@@ -202,4 +225,5 @@ public class NativeMethods {
 	 */
 	static native long DokanNtStatusFromWin32(int error);
 
+	//TODO: notify methods
 }
