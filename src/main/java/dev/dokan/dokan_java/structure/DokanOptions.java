@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure;
 
 
-import dev.dokan.dokan_java.NativeMethods;
+import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
@@ -20,7 +20,7 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Version of the Dokany features requested (version "123" is equal to Dokany version 1.2.3).
 	 */
-	public short Version = NativeMethods.getMinimumRequiredDokanVersion();
+	public short Version = DokanNativeMethods.getMinimumRequiredDokanVersion();
 
 	/**
 	 * Number of threads to be used internally by Dokany library. More thread will handle more events at the same time.

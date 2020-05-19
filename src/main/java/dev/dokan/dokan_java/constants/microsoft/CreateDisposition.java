@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
+import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.DokanyOperations;
 import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.ptr.IntByReference;
@@ -9,7 +10,7 @@ import com.sun.jna.ptr.IntByReference;
  *
  * <p>
  * <b> Attention!</b>
- * The members of this enum are the kernel flags, not to be confused with the user flags in {@link CreationDisposition}. To convert them, use {@link dev.dokan.dokan_java.NativeMethods#DokanMapKernelToUserCreateFileFlags(long, long, long, long, IntByReference, IntByReference, IntByReference)}. The relation between this two is also
+ * The members of this enum are the kernel flags, not to be confused with the user flags in {@link CreationDisposition}. To convert them, use {@link DokanNativeMethods#DokanMapKernelToUserCreateFileFlags(long, long, long, long, IntByReference, IntByReference, IntByReference)}. The relation between this two is also
  * descriped under this <a href="https://stackoverflow.com/questions/22552697/correspondence-between-procmon-and-createfile-disposition-options#22553544">link</a>.
  * </p>
  *

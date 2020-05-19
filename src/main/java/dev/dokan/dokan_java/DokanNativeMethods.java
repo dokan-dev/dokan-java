@@ -17,7 +17,7 @@ import dev.dokan.dokan_java.structure.DokanOptions;
 /**
  * Native API to the kernel Dokan driver.
  */
-public class NativeMethods implements StdCallLibrary {
+public class DokanNativeMethods implements StdCallLibrary {
 
 	private static final String DOKAN_DLL = "dokan1";
 
@@ -28,7 +28,7 @@ public class NativeMethods implements StdCallLibrary {
 		Native.register(DOKAN_DLL);
 	}
 
-	private NativeMethods() {
+	private DokanNativeMethods() {
 
 	}
 

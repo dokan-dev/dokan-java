@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.structure;
 
+import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.DokanyOperations;
 import com.sun.jna.Structure;
 
@@ -30,7 +31,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     public long DokanContext;
 
     /**
-     * A pointer to {@link DokanOptions} which was passed to {@link dev.dokan.dokan_java.NativeMethods#DokanMain}.
+     * A pointer to {@link DokanOptions} which was passed to {@link DokanNativeMethods#DokanMain}.
      */
     public DokanOptions DokanOpts;
 

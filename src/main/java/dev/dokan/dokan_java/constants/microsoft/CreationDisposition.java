@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
+import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
@@ -7,7 +8,7 @@ import com.sun.jna.ptr.IntByReference;
 /**
  * Enum of actions to take on a not-necessarily existing file or device.
  * <p>These values are the userspace equivalent of {@link CreateDisposition}.
- * For a given CreateDisposition value the corresponding CreationDisposition value can be computed via the {@link dev.dokan.dokan_java.NativeMethods#DokanMapKernelToUserCreateFileFlags(long, long, long, long,
+ * For a given CreateDisposition value the corresponding CreationDisposition value can be computed via the {@link DokanNativeMethods#DokanMapKernelToUserCreateFileFlags(long, long, long, long,
  * IntByReference, IntByReference, IntByReference)}
  * </p>
  *
