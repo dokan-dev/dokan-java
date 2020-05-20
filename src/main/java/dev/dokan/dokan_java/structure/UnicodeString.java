@@ -12,7 +12,7 @@ import com.sun.jna.WString;
  * It is defined in <a href="https://github.com/dokan-dev/dokany/blob/master/dokan/fileinfo.h">fileinfo.h</a> in the dokan module of the Dokany project.
  */
 @Structure.FieldOrder({"Length", "MaximumLength", "Buffer"})
-public class UnicodeString extends Structure implements Structure.ByReference {
+public class UnicodeString extends Structure {
 
 	/**
 	 * The length, in bytes, of the string stored in {@link UnicodeString#Buffer}.

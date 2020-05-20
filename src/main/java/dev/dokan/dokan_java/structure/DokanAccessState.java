@@ -14,7 +14,7 @@ import java.util.List;
  * @see <a href="https://docs.microsoft.com/de-de/windows-hardware/drivers/ddi/wdm/ns-wdm-_access_state">Microsoft Documentation</a>
  * @see <a href="https://github.com/dokan-dev/dokany/blob/master/sys/public.h>Definition in {@code public.h}</a> of the Dokany project.
  */
-public class DokanAccessState extends Structure implements Structure.ByReference {
+public class DokanAccessState extends Structure {
 
 	/**
 	 * A boolean value that specifies whether security was evaluated as part of the access check.
