@@ -4,6 +4,9 @@ package dev.dokan.dokan_java.structure;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinNT;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * This is a Dokan specific implementation of the ACCESS_STATE structure of the windows kernel.
@@ -11,7 +14,7 @@ import com.sun.jna.platform.win32.WinNT;
  * @see <a href="https://docs.microsoft.com/de-de/windows-hardware/drivers/ddi/wdm/ns-wdm-_access_state">Microsoft Documentation</a>
  * @see <a href="https://github.com/dokan-dev/dokany/blob/master/sys/public.h>Definition in {@code public.h}</a> of the Dokany project.
  */
-public class DokanAccessState extends Structure implements Structure.ByReference{
+public class DokanAccessState extends Structure implements Structure.ByReference {
 
 	/**
 	 * A boolean value that specifies whether security was evaluated as part of the access check.
@@ -28,7 +31,7 @@ public class DokanAccessState extends Structure implements Structure.ByReference
 	/**
 	 * A Boolean value that specifies whether an audit should be generated when the handle being created is closed.
 	 * This member is currently unused by drivers.
- 	 */
+	 */
 	public boolean GenerateOnClose;
 
 	/**
@@ -43,7 +46,7 @@ public class DokanAccessState extends Structure implements Structure.ByReference
 	 * For more information about how to check for traverse access, see <a href="https://docs.microsoft.com/windows-hardware/drivers/ifs/checking-for-traverse-privilege-on-irp-mj-create">Check for Traverse Privilege on IRP_MJ_CREATE</a>.
 	 * A driver can also check for the TOKEN_IS_RESTRICTED flag.
 	 * These flags are defined in Ntifs.h.
- 	 */
+	 */
 	public long Flags;
 
 	/**
@@ -79,4 +82,18 @@ public class DokanAccessState extends Structure implements Structure.ByReference
 	 */
 	public UnicodeString ObjectType;
 
+	@Override
+	protected List<String> getFieldOrder() {
+		return Arrays.asList(new String[]{"SecurityEvaluated",
+				"GenerateAudit",
+				"GenerateOnClose",
+				"AuditPrivileges",
+				"Flags",
+				"RemainingDesiredAccess",
+				"PreviouslyGrantedAccess",
+				"OriginalDesiredAccess",
+				"SecurityDescriptor",
+				"ObjectName",
+				"ObjectType"});
+	}
 }

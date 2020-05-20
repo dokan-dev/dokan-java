@@ -7,11 +7,11 @@ import com.sun.jna.WString;
 
 /**
  * Supplemental class used to define Unicode Strings.
- *
+ * <p>
  * This class is needed to fully implement {@link DokanAccessState}.
  * It is defined in <a href="https://github.com/dokan-dev/dokany/blob/master/dokan/fileinfo.h">fileinfo.h</a> in the dokan module of the Dokany project.
- *
  */
+@Structure.FieldOrder({"Length", "MaximumLength", "Buffer"})
 public class UnicodeString extends Structure implements Structure.ByReference {
 
 	/**
@@ -26,7 +26,7 @@ public class UnicodeString extends Structure implements Structure.ByReference {
 
 	/**
 	 * Pointer to a buffer used to contain a string of wide characters.
-	 *
+	 * <p>
 	 * Just kiddin, we directly convert it to a WString.
 	 * TODO: maybe just make a reference here!
 	 */
