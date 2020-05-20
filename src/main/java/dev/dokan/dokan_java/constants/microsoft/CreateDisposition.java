@@ -1,12 +1,12 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.DokanyOperations;
+import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.ptr.IntByReference;
 
 /**
- * Enum of possible actions to perform on a file when the function {@link DokanyOperations#ZwCreateFile} is called.
+ * Enum of possible actions to perform on a file when the function {@link DokanOperations#ZwCreateFile} is called.
  *
  * <p>
  * <b> Attention!</b>

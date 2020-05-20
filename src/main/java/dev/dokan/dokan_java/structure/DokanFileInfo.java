@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure;
 
 import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.DokanyOperations;
+import dev.dokan.dokan_java.DokanOperations;
 import com.sun.jna.Structure;
 
 import java.util.Arrays;
@@ -21,12 +21,12 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     public long Context;
 
     /**
-     * Flag if the file has to be delete during {@link DokanyOperations#Cleanup} event.
+     * Flag if the file has to be delete during {@link DokanOperations#Cleanup} event.
      */
     public byte DeleteOnClose;
 
     /**
-     * Reserved. Used internally by Dokany library. Never modify.
+     * Reserved. Used internally by Dokan library. Never modify.
      */
     public long DokanContext;
 
@@ -36,7 +36,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     public DokanOptions DokanOpts;
 
     /**
-     * Requesting a directory file. Must be set in {@link DokanyOperations#ZwCreateFile} if the file object appears to be a directory.
+     * Requesting a directory file. Must be set in {@link DokanOperations#ZwCreateFile} if the file object appears to be a directory.
      */
     public byte IsDirectory;
 
@@ -99,7 +99,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
 
     @Override
     public String toString() {
-        return "DokanyFileInfo(Context=" + this.Context + ", DokanContext=" + this.DokanContext + ", DokanOpts=" + this.DokanOpts + ", ProcessId=" + this.ProcessId + ", IsDirectory=" + this.IsDirectory + ", DeleteOnClose=" + this.DeleteOnClose + ", PagingIo=" + this.PagingIo + ", SynchronousIo=" + this.SynchronousIo + ", Nocache=" + this.Nocache + ", WriteToEndOfFile=" + this.WriteToEndOfFile + ")";
+        return "DokanFileInfo(Context=" + this.Context + ", DokanContext=" + this.DokanContext + ", DokanOpts=" + this.DokanOpts + ", ProcessId=" + this.ProcessId + ", IsDirectory=" + this.IsDirectory + ", DeleteOnClose=" + this.DeleteOnClose + ", PagingIo=" + this.PagingIo + ", SynchronousIo=" + this.SynchronousIo + ", Nocache=" + this.Nocache + ", WriteToEndOfFile=" + this.WriteToEndOfFile + ")";
     }
 
 }

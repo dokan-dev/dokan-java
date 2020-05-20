@@ -48,10 +48,10 @@ public class DokanNativeMethods implements StdCallLibrary {
 	 * If the mount fails, it will directly return {@link MountError}.
 	 *
 	 * @param options A {@link DokanOptions} object that describes the mount.
-	 * @param operations Instance of {@link DokanyOperations} that will be called for each file system request made by the kernel.
+	 * @param operations Instance of {@link DokanOperations} that will be called for each file system request made by the kernel.
 	 * @return a status code indicating the outcome. For the possible values, see {@link MountError}.
 	 */
-	static native int DokanMain(DokanOptions options, DokanyOperations operations);
+	static native int DokanMain(DokanOptions options, DokanOperations operations);
 
 	/**
 	 * Get the version of Dokan.
@@ -122,7 +122,7 @@ public class DokanNativeMethods implements StdCallLibrary {
 	static native WinNT.HANDLE DokanOpenRequestorToken(DokanFileInfo dokanFileInfo);
 
 	/**
-	 * Convert {@link DokanyOperations.ZwCreateFile} parameters to CreateFile parameters.
+	 * Convert {@link DokanOperations.ZwCreateFile} parameters to CreateFile parameters.
 	 * TODO: Improve documentation
 	 *
 	 * @param desiredAccess

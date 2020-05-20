@@ -18,12 +18,12 @@ import java.util.List;
 public class DokanOptions extends Structure implements Structure.ByReference {
 
 	/**
-	 * Version of the Dokany features requested (version "123" is equal to Dokany version 1.2.3).
+	 * Version of the Dokan features requested (version "123" is equal to Dokan version 1.2.3).
 	 */
 	public short Version = DokanNativeMethods.getMinimumRequiredDokanVersion();
 
 	/**
-	 * Number of threads to be used internally by Dokany library. More thread will handle more events at the same time.
+	 * Number of threads to be used internally by Dokan library. More thread will handle more events at the same time.
 	 */
 	public short ThreadCount;
 
@@ -50,7 +50,7 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	public WString UNCName;
 
 	/**
-	 * Max timeout in milliseconds of each request before Dokany gives up to wait events to complete.
+	 * Max timeout in milliseconds of each request before Dokan gives up to wait events to complete.
 	 */
 	public long Timeout;
 
