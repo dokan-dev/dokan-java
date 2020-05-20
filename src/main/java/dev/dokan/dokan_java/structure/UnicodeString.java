@@ -28,6 +28,7 @@ public class UnicodeString extends Structure implements Structure.ByReference {
 	 * Pointer to a buffer used to contain a string of wide characters.
 	 *
 	 * Just kiddin, we directly convert it to a WString.
+	 * TODO: maybe just make a reference here!
 	 */
 	public WString Buffer;
 
