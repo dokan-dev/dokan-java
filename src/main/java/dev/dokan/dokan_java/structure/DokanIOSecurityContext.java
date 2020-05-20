@@ -3,12 +3,11 @@ package dev.dokan.dokan_java.structure;
 
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WinBase;
 
 
 /**
  * The DokanIOSecurityContext contains the Dokan specific security context of the Windows kernel create request.
- * It is a parameter in the {@link dev.dokan.dokan_java.DokanFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} function.
+ * It is a parameter in the {@link dev.dokan.dokan_java.DokanFileSystem#zwCreateFile(WString, DokanIOSecurityContext, int, int, int, int, int, DokanFileInfo)} function.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_security_context?redirectedfrom=MSDN">Microsoft documentation</a> of the original structure
  * @see <a href="https://github.com/dokan-dev/dokany/blob/master/sys/public.h>Definition in {@code public.h}</a> of the Dokany project.
