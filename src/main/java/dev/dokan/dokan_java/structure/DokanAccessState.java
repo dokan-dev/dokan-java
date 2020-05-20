@@ -1,8 +1,8 @@
 package dev.dokan.dokan_java.structure;
 
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import com.sun.jna.platform.win32.WinNT;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +47,7 @@ public class DokanAccessState extends Structure {
 	 * A driver can also check for the TOKEN_IS_RESTRICTED flag.
 	 * These flags are defined in Ntifs.h.
 	 */
-	public long Flags;
+	public int Flags;
 
 	/**
 	 * An ACCESS_MASK type that describes the access rights that have not yet been granted to the caller.
@@ -70,7 +70,8 @@ public class DokanAccessState extends Structure {
 	/**
 	 * A pointer to a SECURITY_DESCRIPTOR structure that contains security information for the object that this access relates to.
 	 */
-	public WinNT.SECURITY_DESCRIPTOR_RELATIVE.ByReference SecurityDescriptor;
+	public Pointer SecurityDescriptor;
+	//public WinNT.SECURITY_DESCRIPTOR_RELATIVE.ByReference SecurityDescriptor; //Does not work
 
 	/**
 	 * A UNICODE_STRING structure that contains the object name string for the access. This member is used for auditing.

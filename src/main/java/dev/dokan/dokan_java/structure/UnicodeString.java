@@ -1,8 +1,8 @@
 package dev.dokan.dokan_java.structure;
 
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import com.sun.jna.WString;
 
 
 /**
@@ -26,10 +26,7 @@ public class UnicodeString extends Structure {
 
 	/**
 	 * Pointer to a buffer used to contain a string of wide characters.
-	 * <p>
-	 * Just kiddin, we directly convert it to a WString.
-	 * TODO: maybe just make a reference here!
 	 */
-	public WString Buffer;
+	public Pointer Buffer;
 
 }
