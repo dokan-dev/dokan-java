@@ -6,6 +6,7 @@ import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -51,7 +52,7 @@ public interface DokanFileSystem extends Mountable {
      */
     int zwCreateFile(
             WString rawPath,
-            WinBase.SECURITY_ATTRIBUTES securityContext,
+            DokanIOSecurityContext securityContext,
             int rawDesiredAccess,
             int rawFileAttributes,
             int rawShareAccess,

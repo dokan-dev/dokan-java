@@ -7,6 +7,8 @@ import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
+
 
 public class DokanFileSystemStub extends AbstractDokanFileSystem {
 
@@ -29,7 +31,7 @@ public class DokanFileSystemStub extends AbstractDokanFileSystem {
      */
     @Override
     @NotImplemented
-    public int zwCreateFile(WString rawPath, WinBase.SECURITY_ATTRIBUTES securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+    public int zwCreateFile(WString rawPath, DokanIOSecurityContext securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
         return 0;
     }
 

@@ -17,6 +17,7 @@ import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
     }
 
     @Override
-    public int zwCreateFile(WString rawPath, WinBase.SECURITY_ATTRIBUTES securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+    public int zwCreateFile(WString rawPath, DokanIOSecurityContext securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
         Path p = getrootedPath(rawPath);
 
         //the files must exist and we are read only here
