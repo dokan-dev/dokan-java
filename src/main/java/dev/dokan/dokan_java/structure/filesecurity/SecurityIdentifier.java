@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.Byteable;
-import dev.dokan.dokan_java.DokanyException;
+import dev.dokan.dokan_java.DokanException;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
 
 import java.nio.ByteBuffer;
@@ -37,7 +37,7 @@ public class SecurityIdentifier implements Byteable {
 			if (subAuthorities.size() <= MAX_SUB_AUTHORITIES) {
 				this.subAuthorities.addAll(subAuthorities);
 			} else {
-				throw new DokanyException("Number of sub-authorities exceeds the limit of "+MAX_SUB_AUTHORITIES+", it is: "+subAuthorities.size());
+				throw new DokanException("Number of sub-authorities exceeds the limit of "+MAX_SUB_AUTHORITIES+", it is: "+subAuthorities.size());
 			}
 		}
 	}

@@ -1,13 +1,13 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 
-import dev.dokan.dokan_java.AbstractDokanyFileSystem;
+import dev.dokan.dokan_java.AbstractDokanFileSystem;
 import dev.dokan.dokan_java.FileSystemInformation;
 
 /**
  * Win32 Error Codes
  * <p>
- * These should be returned instead of {@link NtStatuses} values when in the {@link AbstractDokanyFileSystem#AbstractDokanyFileSystem(FileSystemInformation, boolean)} the `useKernelFlagsAndCodes` is set to
+ * These should be returned instead of {@link NtStatuses} values when in the {@link AbstractDokanFileSystem#AbstractDokanFileSystem(FileSystemInformation, boolean)} the `useKernelFlagsAndCodes` is set to
  * false.
  * </p>
  *

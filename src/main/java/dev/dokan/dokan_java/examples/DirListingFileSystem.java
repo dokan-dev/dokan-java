@@ -6,9 +6,9 @@ import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
-import dev.dokan.dokan_java.DokanyFileSystemStub;
-import dev.dokan.dokan_java.DokanyOperations;
-import dev.dokan.dokan_java.DokanyUtils;
+import dev.dokan.dokan_java.DokanFileSystemStub;
+import dev.dokan.dokan_java.DokanOperations;
+import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.FileSystemInformation;
 import dev.dokan.dokan_java.constants.EnumInteger;
 import dev.dokan.dokan_java.constants.microsoft.CreateOptions;
@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 /**
  * This filesystem shows the content of a given directory and it sub directories
  */
-public class DirListingFileSystem extends DokanyFileSystemStub {
+public class DirListingFileSystem extends DokanFileSystemStub {
 
     private final AtomicLong handleHandler;
     private final FileStore fileStore;
@@ -190,7 +190,7 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
     }
 
     @Override
-    public int findFiles(WString rawPath, DokanyOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
+    public int findFiles(WString rawPath, DokanOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
         Path path = getrootedPath(rawPath);
         if (dokanFileInfo.Context == 0) {
             return Win32ErrorCodes.ERROR_INVALID_HANDLE;
@@ -231,11 +231,11 @@ public class DirListingFileSystem extends DokanyFileSystemStub {
 
     @Override
     public int getVolumeInformation(Pointer rawVolumeNameBuffer, int rawVolumeNameSize, IntByReference rawVolumeSerialNumber, IntByReference rawMaximumComponentLength, IntByReference rawFileSystemFlags, Pointer rawFileSystemNameBuffer, int rawFileSystemNameSize, DokanFileInfo dokanFileInfo) {
-        rawVolumeNameBuffer.setWideString(0L, DokanyUtils.trimStrToSize(this.volumeName, rawVolumeNameSize));
+        rawVolumeNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.volumeName, rawVolumeNameSize));
         rawVolumeSerialNumber.setValue(this.volumeSerialnumber);
         rawMaximumComponentLength.setValue(this.fileSystemInformation.getMaxComponentLength());
         rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().toInt());
-        rawFileSystemNameBuffer.setWideString(0L, DokanyUtils.trimStrToSize(this.fileSystemInformation.getFileSystemName(), rawFileSystemNameSize));
+        rawFileSystemNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.fileSystemInformation.getFileSystemName(), rawFileSystemNameSize));
         return Win32ErrorCodes.ERROR_SUCCESS;
     }
 

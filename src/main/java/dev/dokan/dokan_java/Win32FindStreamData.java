@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.sun.jna.Structure;
 
-public class Win32FindStreamData extends Structure implements DokanyOperations.Win32FindStreamDataInterface {
+public class Win32FindStreamData extends Structure implements DokanOperations.Win32FindStreamDataInterface {
 	public long length;
 	//max path = 260 under windows
 	public char[] cFileName = new char[260 + 36];
