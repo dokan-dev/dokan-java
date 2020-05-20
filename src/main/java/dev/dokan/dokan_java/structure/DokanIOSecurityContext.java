@@ -13,7 +13,7 @@ import com.sun.jna.platform.win32.WinBase;
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_io_security_context?redirectedfrom=MSDN">Microsoft documentation</a> of the original structure
  * @see <a href="https://github.com/dokan-dev/dokany/blob/master/sys/public.h>Definition in {@code public.h}</a> of the Dokany project.
  */
-@Structure.FieldOrder({"AccessState, DesiredAccess"})
+@Structure.FieldOrder({"AccessState", "DesiredAccess"})
 public class DokanIOSecurityContext extends Structure implements Structure.ByReference {
 
 	/**
