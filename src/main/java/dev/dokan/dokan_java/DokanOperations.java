@@ -8,12 +8,12 @@ import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 import com.sun.jna.ptr.IntByReference;
@@ -119,7 +119,7 @@ public class DokanOperations extends Structure {
          */
         long callback(
                 WString rawPath,
-                WinBase.SECURITY_ATTRIBUTES securityContext,
+                DokanIOSecurityContext securityContext,
                 int rawDesiredAccess,
                 int rawFileAttributes,
                 int rawShareAccess,
