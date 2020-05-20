@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Structure containing information for a single dokany mount.
+ * Structure containing information for a single Dokan device.
  * <p>
  * Used by dev.dokan.dokan_java.NativeMethods#DokanGetMountPointList(boolean, LongByReference)} and dev.dokan.dokan_java.NativeMethods#DokanReleaseMountPointList(Pointer).
  */

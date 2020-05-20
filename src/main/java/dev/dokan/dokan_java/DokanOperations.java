@@ -23,7 +23,7 @@ import com.sun.jna.ptr.LongByReference;
 /**
  * Dokan API callbacks interface. This is an internal class and should not used directly by code outside com.dokany.java.
  * <p>
- * A struct of callbacks that describe all Dokany API operation that will be called when Windows accesses the file system.
+ * A struct of callbacks that describe all Dokan API operation that will be called when Windows accesses the file system.
  * <p>
  * The return value is always one of the {@link NtStatuses} values.
  * <p>
@@ -495,7 +495,7 @@ public class DokanOperations extends Structure {
      *
      * @see {@link FileSystemFlag#READ_ONLY_VOLUME} is automatically added to the <paramref name="features"/> if <see cref="DokanOpts.WriteProtection"/> was specified when the volume was mounted.
      * <p>
-     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokany kernel driver use following settings by default:
+     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokan kernel driver use following settings by default:
      *
      * <ul>
      * <li>rawVolumeSerialNumber = 0x19831116</li>
@@ -530,7 +530,7 @@ public class DokanOperations extends Structure {
     }
 
     /**
-     * Is called when Dokany succeeded mounting the volume.
+     * Is called when Dokan succeeded mounting the volume.
      */
     @FunctionalInterface
     interface Mounted extends Callback {
@@ -540,7 +540,7 @@ public class DokanOperations extends Structure {
     }
 
     /**
-     * Is called when Dokany succeeded unmounting the volume.
+     * Is called when Dokan succeeded unmounting the volume.
      */
     @FunctionalInterface
     interface Unmounted extends Callback {

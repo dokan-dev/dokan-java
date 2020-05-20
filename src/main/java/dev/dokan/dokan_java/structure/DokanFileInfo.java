@@ -26,7 +26,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     public byte DeleteOnClose;
 
     /**
-     * Reserved. Used internally by Dokany library. Never modify.
+     * Reserved. Used internally by Dokan library. Never modify.
      */
     public long DokanContext;
 
@@ -99,7 +99,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
 
     @Override
     public String toString() {
-        return "DokanyFileInfo(Context=" + this.Context + ", DokanContext=" + this.DokanContext + ", DokanOpts=" + this.DokanOpts + ", ProcessId=" + this.ProcessId + ", IsDirectory=" + this.IsDirectory + ", DeleteOnClose=" + this.DeleteOnClose + ", PagingIo=" + this.PagingIo + ", SynchronousIo=" + this.SynchronousIo + ", Nocache=" + this.Nocache + ", WriteToEndOfFile=" + this.WriteToEndOfFile + ")";
+        return "DokanFileInfo(Context=" + this.Context + ", DokanContext=" + this.DokanContext + ", DokanOpts=" + this.DokanOpts + ", ProcessId=" + this.ProcessId + ", IsDirectory=" + this.IsDirectory + ", DeleteOnClose=" + this.DeleteOnClose + ", PagingIo=" + this.PagingIo + ", SynchronousIo=" + this.SynchronousIo + ", Nocache=" + this.Nocache + ", WriteToEndOfFile=" + this.WriteToEndOfFile + ")";
     }
 
 }

@@ -342,7 +342,7 @@ public interface DokanFileSystem extends Mountable {
      * <p>
      * {@link FileSystemFlag#READ_ONLY_VOLUME} is automatically added to the features if {@link MountOption#WRITE_PROTECTION} was specified during mount.
      * <p>
-     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokany kernel driver use following settings by default:
+     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokan kernel driver use following settings by default:
      *
      * <ul>
      * <li>rawVolumeSerialNumber = 0x19831116</li>
@@ -372,7 +372,7 @@ public interface DokanFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * Is called when Dokany succeeded mounting the volume.
+     * Is called when Dokan succeeded mounting the volume.
      *
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
      * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
@@ -381,7 +381,7 @@ public interface DokanFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * Is called when Dokany succeeded unmounting the volume.
+     * Is called when Dokan succeeded unmounting the volume.
      *
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
      * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
