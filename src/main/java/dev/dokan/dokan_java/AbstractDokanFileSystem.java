@@ -54,7 +54,7 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
         if (usesKernelFlagsAndCodes) {
             if (isImplemented("zwCreateFile")) {
-                dokanOperations.setZwCreateFile((rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo) -> zwCreateFile(rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo));
+                dokanOperations.setZwCreateFile(this::zwCreateFile);
             }
             if (isImplemented("cleanup")) {
                 dokanOperations.setCleanup(this::cleanup);
