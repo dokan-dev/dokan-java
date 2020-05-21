@@ -38,7 +38,6 @@ public class DokanOperations extends Structure {
     public DokanOperations() {
     }
 
-    // @Override
     @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(
