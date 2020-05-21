@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.constants.dokany;
 import dev.dokan.dokan_java.constants.EnumInteger;
 
 /**
- * Return values of com.dokan.java.NativeMethods#DokanMain(DokanOptions, DokanyOperations)
+ * Return values of com.dokan.java.NativeMethods#DokanMain(DokanOptions, DokanOperations)
  *
  * @see <a href="https://dokan-dev.github.io/dokany-doc/html/group___dokan_main_result.html#ga39e6334f1cca7437400660e123c7d98f">Dokany documentation</a>
  */

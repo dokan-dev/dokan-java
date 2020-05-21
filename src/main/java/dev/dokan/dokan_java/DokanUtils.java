@@ -26,7 +26,7 @@ import static dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes.ERROR_DEV
 /**
  * Utilities to do various operations.
  */
-public class DokanyUtils {
+public class DokanUtils {
 
     private static final boolean winVersionAtLeast8;
 
@@ -43,7 +43,7 @@ public class DokanyUtils {
         winVersionAtLeast8 = tmp;
     }
 
-    private DokanyUtils() {
+    private DokanUtils() {
 
     }
 

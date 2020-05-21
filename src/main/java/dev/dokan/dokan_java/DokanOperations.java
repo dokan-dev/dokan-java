@@ -8,12 +8,12 @@ import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinBase.WIN32_FIND_DATA;
 import com.sun.jna.ptr.IntByReference;
@@ -21,21 +21,21 @@ import com.sun.jna.ptr.LongByReference;
 
 
 /**
- * Dokany API callbacks interface. This is an internal class and should not used directly by code outside com.dokany.java.
+ * Dokan API callbacks interface. This is an internal class and should not used directly by code outside com.dokany.java.
  * <p>
- * A struct of callbacks that describe all Dokany API operation that will be called when Windows accesses the file system.
+ * A struct of callbacks that describe all Dokan API operation that will be called when Windows accesses the file system.
  * <p>
  * The return value is always one of the {@link NtStatuses} values.
  * <p>
  * All these callbacks can be set to <i>null</i> or return {@link NtStatuses#STATUS_NOT_IMPLEMENTED} if you don't want to support one of them. Be aware that returning such a value to important callbacks such as {@link
- * DokanyOperations.ZwCreateFile} or {@link DokanyOperations.ReadFile} would make the file system not working or unstable.
+ * DokanOperations.ZwCreateFile} or {@link DokanOperations.ReadFile} would make the file system not working or unstable.
  * <p>
- * This is the same struct as <i>_DOKAN_OPERATIONS</i> (dokan.h) in the C++ version of Dokany.
+ * This is the same struct as <i>_DOKAN_OPERATIONS</i> (dokan.h) in the C++ version of Dokan.
  */
 @SuppressWarnings("ALL")
-public class DokanyOperations extends Structure {
+public class DokanOperations extends Structure {
 
-    public DokanyOperations() {
+    public DokanOperations() {
     }
 
     // @Override
@@ -119,7 +119,7 @@ public class DokanyOperations extends Structure {
          */
         long callback(
                 WString rawPath,
-                WinBase.SECURITY_ATTRIBUTES securityContext,
+                DokanIOSecurityContext securityContext,
                 int rawDesiredAccess,
                 int rawFileAttributes,
                 int rawShareAccess,
@@ -131,7 +131,7 @@ public class DokanyOperations extends Structure {
     /**
      * Receipt of this request indicates that the last handle for a file object that is associated with the target device object has been closed (but, due to outstanding I/O requests, might not have been released).
      * <p>
-     * Cleanup is requested before @{link {@link DokanyOperations#CloseFile} is called.
+     * Cleanup is requested before @{link {@link DokanOperations#CloseFile} is called.
      */
     @FunctionalInterface
     interface Cleanup extends Callback {
@@ -149,7 +149,7 @@ public class DokanyOperations extends Structure {
      * CloseFile is called at the end of the life of the context. Receipt of this request indicates that the last handle of the file object that is associated with the target device object has been closed and released.
      * All outstanding I/O requests have been completed or canceled.
      * <p>
-     * CloseFile is requested after {@link DokanyOperations.Cleanup} is called. Anything remaining in {@link DokanFileInfo#Context} has to be cleared before return.
+     * CloseFile is requested after {@link DokanOperations.Cleanup} is called. Anything remaining in {@link DokanFileInfo#Context} has to be cleared before return.
      */
     @FunctionalInterface
     interface CloseFile extends Callback {
@@ -164,7 +164,7 @@ public class DokanyOperations extends Structure {
     }
 
     /**
-     * ReadFile callback on the file previously opened in {@link DokanyOperations.ZwCreateFile}. It can be called by different thread at the same time, therefore the read has to be thread safe.
+     * ReadFile callback on the file previously opened in {@link DokanOperations.ZwCreateFile}. It can be called by different thread at the same time, therefore the read has to be thread safe.
      */
     interface ReadFile extends Callback {
 
@@ -187,7 +187,7 @@ public class DokanyOperations extends Structure {
     }
 
     /**
-     * WriteFile callback on the file previously opened in {@link DokanyOperations.ZwCreateFile} It can be called by different thread at the same time, therefore the write/context has to be thread safe.
+     * WriteFile callback on the file previously opened in {@link DokanOperations.ZwCreateFile} It can be called by different thread at the same time, therefore the write/context has to be thread safe.
      */
     @FunctionalInterface
     interface WriteFile extends Callback {
@@ -264,7 +264,7 @@ public class DokanyOperations extends Structure {
     }
 
     /**
-     * Same as {@link DokanyOperations.FindFiles} but with a search pattern to filter the result.
+     * Same as {@link DokanOperations.FindFiles} but with a search pattern to filter the result.
      */
     @FunctionalInterface
     interface FindFilesWithPattern extends Callback {
@@ -329,12 +329,12 @@ public class DokanyOperations extends Structure {
      * You should NOT delete the file in this method, but instead you must only check whether you can delete the file or not, and return {@link NtStatuses#STATUS_SUCCESS} (when you can delete it) or appropriate error codes such
      * as {@link NtStatuses#STATUS_ACCESS_DENIED}, {@link NtStatuses#STATUS_OBJECT_NO_LONGER_EXISTS}, {@link NtStatuses#STATUS_OBJECT_NAME_NOT_FOUND}.
      * <p>
-     * {@link DokanyOperations.DeleteFile} will also be called with {@link DokanFileInfo#DeleteOnClose} set to <i>false</i> to notify the driver when the file is no longer requested to be deleted.
+     * {@link DokanOperations.DeleteFile} will also be called with {@link DokanFileInfo#DeleteOnClose} set to <i>false</i> to notify the driver when the file is no longer requested to be deleted.
      * <p>
-     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanyOperations.Cleanup}> call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you have to actually delete the file
+     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanOperations.Cleanup}> call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you have to actually delete the file
      * being closed.
      *
-     * @see {@link DokanyOperations.DeleteDirectory}
+     * @see {@link DokanOperations.DeleteDirectory}
      */
     @FunctionalInterface
     interface DeleteFile extends Callback {
@@ -352,7 +352,7 @@ public class DokanyOperations extends Structure {
     /**
      * Check if it is possible to delete a directory.
      *
-     * @see {@link DokanyOperations.DeleteFile} for more specifics.
+     * @see {@link DokanOperations.DeleteFile} for more specifics.
      */
     @FunctionalInterface
     interface DeleteDirectory extends Callback {
@@ -467,8 +467,8 @@ public class DokanyOperations extends Structure {
      * Retrieves information about the amount of space that is available on a disk volume, which is the total amount of space, the total amount of free space, and the total amount of free space available to the user that
      * is associated with the calling thread.
      * <p>
-     * Neither this method nor {@link DokanyOperations.GetVolumeInformation} save the {@link DokanFileInfo#Context}. Before these methods are called, {@link DokanyOperations.ZwCreateFile} may not be called. (ditto @{link
-     * DokanyOperations.CloseFile} and @{link DokanyOperations.Cleanup}).
+     * Neither this method nor {@link DokanOperations.GetVolumeInformation} save the {@link DokanFileInfo#Context}. Before these methods are called, {@link DokanOperations.ZwCreateFile} may not be called. (ditto @{link
+     * DokanOperations.CloseFile} and @{link DokanOperations.Cleanup}).
      */
     @FunctionalInterface
     interface GetDiskFreeSpace extends Callback {
@@ -490,12 +490,12 @@ public class DokanyOperations extends Structure {
     /**
      * Retrieves information about the file system and volume associated with the specified root directory.
      * <p>
-     * Neither this method nor {@link DokanyOperations.GetVolumeInformation} save the {@link DokanFileInfo#Context}. Before these methods are called, {@link DokanyOperations.ZwCreateFile} may not be called. (ditto @{link
-     * DokanyOperations.CloseFile} and @{link DokanyOperations.Cleanup}).
+     * Neither this method nor {@link DokanOperations.GetVolumeInformation} save the {@link DokanFileInfo#Context}. Before these methods are called, {@link DokanOperations.ZwCreateFile} may not be called. (ditto @{link
+     * DokanOperations.CloseFile} and @{link DokanOperations.Cleanup}).
      *
      * @see {@link FileSystemFlag#READ_ONLY_VOLUME} is automatically added to the <paramref name="features"/> if <see cref="DokanOpts.WriteProtection"/> was specified when the volume was mounted.
      * <p>
-     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokany kernel driver use following settings by default:
+     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokan kernel driver use following settings by default:
      *
      * <ul>
      * <li>rawVolumeSerialNumber = 0x19831116</li>
@@ -530,7 +530,7 @@ public class DokanyOperations extends Structure {
     }
 
     /**
-     * Is called when Dokany succeeded mounting the volume.
+     * Is called when Dokan succeeded mounting the volume.
      */
     @FunctionalInterface
     interface Mounted extends Callback {
@@ -540,7 +540,7 @@ public class DokanyOperations extends Structure {
     }
 
     /**
-     * Is called when Dokany succeeded unmounting the volume.
+     * Is called when Dokan succeeded unmounting the volume.
      */
     @FunctionalInterface
     interface Unmounted extends Callback {
@@ -652,103 +652,103 @@ public class DokanyOperations extends Structure {
         char[] cFileName();
     }
 
-    public void setZwCreateFile(DokanyOperations.ZwCreateFile zwCreateFile) {
+    public void setZwCreateFile(DokanOperations.ZwCreateFile zwCreateFile) {
         ZwCreateFile = zwCreateFile;
     }
 
-    public void setCleanup(DokanyOperations.Cleanup cleanup) {
+    public void setCleanup(DokanOperations.Cleanup cleanup) {
         Cleanup = cleanup;
     }
 
-    public void setCloseFile(DokanyOperations.CloseFile closeFile) {
+    public void setCloseFile(DokanOperations.CloseFile closeFile) {
         CloseFile = closeFile;
     }
 
-    public void setReadFile(DokanyOperations.ReadFile readFile) {
+    public void setReadFile(DokanOperations.ReadFile readFile) {
         ReadFile = readFile;
     }
 
-    public void setWriteFile(DokanyOperations.WriteFile writeFile) {
+    public void setWriteFile(DokanOperations.WriteFile writeFile) {
         WriteFile = writeFile;
     }
 
-    public void setFlushFileBuffers(DokanyOperations.FlushFileBuffers flushFileBuffers) {
+    public void setFlushFileBuffers(DokanOperations.FlushFileBuffers flushFileBuffers) {
         FlushFileBuffers = flushFileBuffers;
     }
 
-    public void setGetFileInformation(DokanyOperations.GetFileInformation getFileInformation) {
+    public void setGetFileInformation(DokanOperations.GetFileInformation getFileInformation) {
         GetFileInformation = getFileInformation;
     }
 
-    public void setFindFiles(DokanyOperations.FindFiles findFiles) {
+    public void setFindFiles(DokanOperations.FindFiles findFiles) {
         FindFiles = findFiles;
     }
 
-    public void setFindFilesWithPattern(DokanyOperations.FindFilesWithPattern findFilesWithPattern) {
+    public void setFindFilesWithPattern(DokanOperations.FindFilesWithPattern findFilesWithPattern) {
         FindFilesWithPattern = findFilesWithPattern;
     }
 
-    public void setSetFileAttributes(DokanyOperations.SetFileAttributes setFileAttributes) {
+    public void setSetFileAttributes(DokanOperations.SetFileAttributes setFileAttributes) {
         SetFileAttributes = setFileAttributes;
     }
 
-    public void setSetFileTime(DokanyOperations.SetFileTime setFileTime) {
+    public void setSetFileTime(DokanOperations.SetFileTime setFileTime) {
         SetFileTime = setFileTime;
     }
 
-    public void setDeleteFile(DokanyOperations.DeleteFile deleteFile) {
+    public void setDeleteFile(DokanOperations.DeleteFile deleteFile) {
         DeleteFile = deleteFile;
     }
 
-    public void setDeleteDirectory(DokanyOperations.DeleteDirectory deleteDirectory) {
+    public void setDeleteDirectory(DokanOperations.DeleteDirectory deleteDirectory) {
         DeleteDirectory = deleteDirectory;
     }
 
-    public void setMoveFile(DokanyOperations.MoveFile moveFile) {
+    public void setMoveFile(DokanOperations.MoveFile moveFile) {
         MoveFile = moveFile;
     }
 
-    public void setSetEndOfFile(DokanyOperations.SetEndOfFile setEndOfFile) {
+    public void setSetEndOfFile(DokanOperations.SetEndOfFile setEndOfFile) {
         SetEndOfFile = setEndOfFile;
     }
 
-    public void setSetAllocationSize(DokanyOperations.SetAllocationSize setAllocationSize) {
+    public void setSetAllocationSize(DokanOperations.SetAllocationSize setAllocationSize) {
         SetAllocationSize = setAllocationSize;
     }
 
-    public void setLockFile(DokanyOperations.LockFile lockFile) {
+    public void setLockFile(DokanOperations.LockFile lockFile) {
         LockFile = lockFile;
     }
 
-    public void setUnlockFile(DokanyOperations.UnlockFile unlockFile) {
+    public void setUnlockFile(DokanOperations.UnlockFile unlockFile) {
         UnlockFile = unlockFile;
     }
 
-    public void setGetDiskFreeSpace(DokanyOperations.GetDiskFreeSpace getDiskFreeSpace) {
+    public void setGetDiskFreeSpace(DokanOperations.GetDiskFreeSpace getDiskFreeSpace) {
         GetDiskFreeSpace = getDiskFreeSpace;
     }
 
-    public void setGetVolumeInformation(DokanyOperations.GetVolumeInformation getVolumeInformation) {
+    public void setGetVolumeInformation(DokanOperations.GetVolumeInformation getVolumeInformation) {
         GetVolumeInformation = getVolumeInformation;
     }
 
-    public void setMounted(DokanyOperations.Mounted mounted) {
+    public void setMounted(DokanOperations.Mounted mounted) {
         Mounted = mounted;
     }
 
-    public void setUnmounted(DokanyOperations.Unmounted unmounted) {
+    public void setUnmounted(DokanOperations.Unmounted unmounted) {
         Unmounted = unmounted;
     }
 
-    public void setGetFileSecurity(DokanyOperations.GetFileSecurity getFileSecurity) {
+    public void setGetFileSecurity(DokanOperations.GetFileSecurity getFileSecurity) {
         GetFileSecurity = getFileSecurity;
     }
 
-    public void setSetFileSecurity(DokanyOperations.SetFileSecurity setFileSecurity) {
+    public void setSetFileSecurity(DokanOperations.SetFileSecurity setFileSecurity) {
         SetFileSecurity = setFileSecurity;
     }
 
-    public void setFindStreams(DokanyOperations.FindStreams findStreams) {
+    public void setFindStreams(DokanOperations.FindStreams findStreams) {
         FindStreams = findStreams;
     }
 }

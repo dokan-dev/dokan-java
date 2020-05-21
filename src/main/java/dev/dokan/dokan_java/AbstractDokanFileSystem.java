@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
 /**
  * TODO: Add Description to this class
  */
-public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
+public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
     private static final int TIMEOUT = 3000;
 
     protected final FileSystemInformation fileSystemInformation;
-    protected final DokanyOperations dokanyOperations;
+    protected final DokanOperations dokanOperations;
     protected final boolean usesKernelFlagsAndCodes;
     protected Path mountPoint;
     protected String volumeName;
@@ -38,15 +38,15 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     private final AtomicBoolean isMounted;
     private Set<String> notImplementedMethods;
 
-    public AbstractDokanyFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
+    public AbstractDokanFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
         this.fileSystemInformation = fileSystemInformation;
         this.usesKernelFlagsAndCodes = usesKernelFlagsAndCodes;
         this.isMounted = new AtomicBoolean(false);
-        this.dokanyOperations = new DokanyOperations();
-        init(dokanyOperations);
+        this.dokanOperations = new DokanOperations();
+        init(dokanOperations);
     }
 
-    private void init(DokanyOperations dokanyOperations) {
+    private void init(DokanOperations dokanOperations) {
         notImplementedMethods = Arrays.stream(getClass().getMethods())
                 .filter(method -> method.getAnnotation(NotImplemented.class) != null)
                 .map(Method::getName)
@@ -54,166 +54,166 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
 
         if (usesKernelFlagsAndCodes) {
             if (isImplemented("zwCreateFile")) {
-                dokanyOperations.setZwCreateFile(this::zwCreateFile);
+                dokanOperations.setZwCreateFile((rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo) -> zwCreateFile(rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo));
             }
             if (isImplemented("cleanup")) {
-                dokanyOperations.setCleanup(this::cleanup);
+                dokanOperations.setCleanup(this::cleanup);
             }
             if (isImplemented("closeFile")) {
-                dokanyOperations.setCloseFile(this::closeFile);
+                dokanOperations.setCloseFile(this::closeFile);
             }
             if (isImplemented("readFile")) {
-                dokanyOperations.setReadFile(this::readFile);
+                dokanOperations.setReadFile(this::readFile);
             }
             if (isImplemented("writeFile")) {
-                dokanyOperations.setWriteFile(this::writeFile);
+                dokanOperations.setWriteFile(this::writeFile);
             }
             if (isImplemented("flushFileBuffer")) {
-                dokanyOperations.setFlushFileBuffers(this::flushFileBuffers);
+                dokanOperations.setFlushFileBuffers(this::flushFileBuffers);
             }
             if (isImplemented("getFileInformation")) {
-                dokanyOperations.setGetFileInformation(this::getFileInformation);
+                dokanOperations.setGetFileInformation(this::getFileInformation);
             }
             if (isImplemented("findFiles")) {
-                dokanyOperations.setFindFiles(this::findFiles);
+                dokanOperations.setFindFiles(this::findFiles);
             }
             if (isImplemented("findFilesWithPattern")) {
-                dokanyOperations.setFindFilesWithPattern(this::findFilesWithPattern);
+                dokanOperations.setFindFilesWithPattern(this::findFilesWithPattern);
             }
             if (isImplemented("setFileAttributes")) {
-                dokanyOperations.setSetFileAttributes(this::setFileAttributes);
+                dokanOperations.setSetFileAttributes(this::setFileAttributes);
             }
             if (isImplemented("setFileTime")) {
-                dokanyOperations.setSetFileTime(this::setFileTime);
+                dokanOperations.setSetFileTime(this::setFileTime);
             }
             if (isImplemented("deleteFile")) {
-                dokanyOperations.setDeleteFile(this::deleteFile);
+                dokanOperations.setDeleteFile(this::deleteFile);
             }
             if (isImplemented("deleteDirectory")) {
-                dokanyOperations.setDeleteDirectory(this::deleteDirectory);
+                dokanOperations.setDeleteDirectory(this::deleteDirectory);
             }
             if (isImplemented("moveFile")) {
-                dokanyOperations.setMoveFile(this::moveFile);
+                dokanOperations.setMoveFile(this::moveFile);
             }
             if (isImplemented("setEndOfFile")) {
-                dokanyOperations.setSetEndOfFile(this::setEndOfFile);
+                dokanOperations.setSetEndOfFile(this::setEndOfFile);
             }
             if (isImplemented("setAllocationSize")) {
-                dokanyOperations.setSetAllocationSize(this::setAllocationSize);
+                dokanOperations.setSetAllocationSize(this::setAllocationSize);
             }
             if (isImplemented("lockFile")) {
-                dokanyOperations.setLockFile(this::lockFile);
+                dokanOperations.setLockFile(this::lockFile);
             }
             if (isImplemented("unlockFile")) {
-                dokanyOperations.setUnlockFile(this::unlockFile);
+                dokanOperations.setUnlockFile(this::unlockFile);
             }
             if (isImplemented("getDiskFreeSpace")) {
-                dokanyOperations.setGetDiskFreeSpace(this::getDiskFreeSpace);
+                dokanOperations.setGetDiskFreeSpace(this::getDiskFreeSpace);
             }
             if (isImplemented("getVolumeInformation")) {
-                dokanyOperations.setGetVolumeInformation(this::getVolumeInformation);
+                dokanOperations.setGetVolumeInformation(this::getVolumeInformation);
             }
             if (isImplemented("mounted")) {
-                dokanyOperations.setMounted(this::mounted);
+                dokanOperations.setMounted(this::mounted);
             }
             if (isImplemented("unmounted")) {
-                dokanyOperations.setUnmounted(this::unmounted);
+                dokanOperations.setUnmounted(this::unmounted);
             }
             if (isImplemented("getFileSecurity")) {
-                dokanyOperations.setGetFileSecurity(this::getFileSecurity);
+                dokanOperations.setGetFileSecurity(this::getFileSecurity);
             }
             if (isImplemented("setFileSecurity")) {
-                dokanyOperations.setSetFileSecurity(this::setFileSecurity);
+                dokanOperations.setSetFileSecurity(this::setFileSecurity);
             }
             if (isImplemented("fillWin32FindData")) {
                 //TODO: write meaningful comment why there is no method binding
             }
             if (isImplemented("findStreams")) {
-                dokanyOperations.setFindStreams(this::findStreams);
+                dokanOperations.setFindStreams(this::findStreams);
             }
         } else {
             if (isImplemented("zwCreateFile")) {
-                dokanyOperations.setZwCreateFile((rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo) -> {
-                    int creationDisposition = DokanyUtils.convertCreateDispositionToCreationDispostion(rawCreateDisposition);
-                    int desiredAccessGeneric = DokanyUtils.mapFileGenericAccessToGenericAccess(rawDesiredAccess);
-                    int fileAttributesAndFlags = DokanyUtils.addFileFlagsToFileAttributes(rawFileAttributes, rawCreateOptions);
-                    return DokanyUtils.ntStatusFromWin32ErrorCode(this.zwCreateFile(rawPath, securityContext, desiredAccessGeneric, fileAttributesAndFlags, rawShareAccess, creationDisposition, rawCreateOptions, dokanFileInfo));
+                dokanOperations.setZwCreateFile((rawPath, securityContext, rawDesiredAccess, rawFileAttributes, rawShareAccess, rawCreateDisposition, rawCreateOptions, dokanFileInfo) -> {
+                    int creationDisposition = DokanUtils.convertCreateDispositionToCreationDispostion(rawCreateDisposition);
+                    int desiredAccessGeneric = DokanUtils.mapFileGenericAccessToGenericAccess(rawDesiredAccess);
+                    int fileAttributesAndFlags = DokanUtils.addFileFlagsToFileAttributes(rawFileAttributes, rawCreateOptions);
+                    return DokanUtils.ntStatusFromWin32ErrorCode(this.zwCreateFile(rawPath, securityContext, desiredAccessGeneric, fileAttributesAndFlags, rawShareAccess, creationDisposition, rawCreateOptions, dokanFileInfo));
                 });
             }
             if (isImplemented("cleanup")) {
-                dokanyOperations.setCleanup(this::cleanup); //cleanup returns void, so no further preprocessing is necessary
+                dokanOperations.setCleanup(this::cleanup); //cleanup returns void, so no further preprocessing is necessary
             }
             if (isImplemented("closeFile")) {
-                dokanyOperations.setCloseFile(this::closeFile);
+                dokanOperations.setCloseFile(this::closeFile);
             }
             if (isImplemented("readFile")) {
-                dokanyOperations.setReadFile((rawPath, rawBuffer, rawBufferLength, rawReadLength, rawOffset, dokanyFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.readFile(rawPath, rawBuffer, rawBufferLength, rawReadLength, rawOffset, dokanyFileInfo)));
+                dokanOperations.setReadFile((rawPath, rawBuffer, rawBufferLength, rawReadLength, rawOffset, dokanyFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.readFile(rawPath, rawBuffer, rawBufferLength, rawReadLength, rawOffset, dokanyFileInfo)));
             }
             if (isImplemented("writeFile")) {
-                dokanyOperations.setWriteFile((rawPath, rawBuffer, rawNumberOfBytesToWrite, rawNumberOfWritesWritten, rawOffset, dokanyFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.writeFile(rawPath, rawBuffer, rawNumberOfBytesToWrite, rawNumberOfWritesWritten, rawOffset, dokanyFileInfo)));
+                dokanOperations.setWriteFile((rawPath, rawBuffer, rawNumberOfBytesToWrite, rawNumberOfWritesWritten, rawOffset, dokanyFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.writeFile(rawPath, rawBuffer, rawNumberOfBytesToWrite, rawNumberOfWritesWritten, rawOffset, dokanyFileInfo)));
             }
             if (isImplemented("flushFileBuffer")) {
-                dokanyOperations.setFlushFileBuffers((rawPath, dokanyFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.flushFileBuffers(rawPath, dokanyFileInfo)));
+                dokanOperations.setFlushFileBuffers((rawPath, dokanyFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.flushFileBuffers(rawPath, dokanyFileInfo)));
             }
             if (isImplemented("getFileInformation")) {
-                dokanyOperations.setGetFileInformation((rawPath, handleFileInfo, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.getFileInformation(rawPath, handleFileInfo, dokanFileInfo)));
+                dokanOperations.setGetFileInformation((rawPath, handleFileInfo, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.getFileInformation(rawPath, handleFileInfo, dokanFileInfo)));
             }
             if (isImplemented("findFiles")) {
-                dokanyOperations.setFindFiles((rawPath, rawFillWin32FindData, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.findFiles(rawPath, rawFillWin32FindData, dokanFileInfo)));
+                dokanOperations.setFindFiles((rawPath, rawFillWin32FindData, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.findFiles(rawPath, rawFillWin32FindData, dokanFileInfo)));
             }
             if (isImplemented("findFilesWithPattern")) {
-                dokanyOperations.setFindFilesWithPattern(((rawPath, rawFillWin32FindData, pattern, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.findFilesWithPattern(rawPath, rawFillWin32FindData, pattern, dokanFileInfo))));
+                dokanOperations.setFindFilesWithPattern(((rawPath, rawFillWin32FindData, pattern, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.findFilesWithPattern(rawPath, rawFillWin32FindData, pattern, dokanFileInfo))));
             }
             if (isImplemented("setFileAttributes")) {
-                dokanyOperations.setSetFileAttributes((rawPath, rawAttributes, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.setFileAttributes(rawPath, rawAttributes, dokanFileInfo)));
+                dokanOperations.setSetFileAttributes((rawPath, rawAttributes, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.setFileAttributes(rawPath, rawAttributes, dokanFileInfo)));
             }
             if (isImplemented("setFileTime")) {
-                dokanyOperations.setSetFileTime((rawPath, rawCreatonTime, rawLastAccessTime, rawLastWriteTime, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.setFileTime(rawPath, rawCreatonTime, rawLastAccessTime, rawLastWriteTime, dokanFileInfo)));
+                dokanOperations.setSetFileTime((rawPath, rawCreatonTime, rawLastAccessTime, rawLastWriteTime, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.setFileTime(rawPath, rawCreatonTime, rawLastAccessTime, rawLastWriteTime, dokanFileInfo)));
             }
             if (isImplemented("deleteFile")) {
-                dokanyOperations.setDeleteFile((rawPath, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.deleteFile(rawPath, dokanFileInfo)));
+                dokanOperations.setDeleteFile((rawPath, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.deleteFile(rawPath, dokanFileInfo)));
             }
             if (isImplemented("deleteDirectory")) {
-                dokanyOperations.setDeleteDirectory((rawPath, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.deleteDirectory(rawPath, dokanFileInfo)));
+                dokanOperations.setDeleteDirectory((rawPath, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.deleteDirectory(rawPath, dokanFileInfo)));
             }
             if (isImplemented("moveFile")) {
-                dokanyOperations.setMoveFile((rawPath, rawNewFileName, rawReplaceIfExisting, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.moveFile(rawPath, rawNewFileName, rawReplaceIfExisting, dokanFileInfo)));
+                dokanOperations.setMoveFile((rawPath, rawNewFileName, rawReplaceIfExisting, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.moveFile(rawPath, rawNewFileName, rawReplaceIfExisting, dokanFileInfo)));
             }
             if (isImplemented("setEndOfFile")) {
-                dokanyOperations.setSetEndOfFile((rawPath, rawByteOffset, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.setEndOfFile(rawPath, rawByteOffset, dokanFileInfo)));
+                dokanOperations.setSetEndOfFile((rawPath, rawByteOffset, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.setEndOfFile(rawPath, rawByteOffset, dokanFileInfo)));
             }
             if (isImplemented("setAllocationSize")) {
-                dokanyOperations.setSetAllocationSize((rawPath, rawLength, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.setAllocationSize(rawPath, rawLength, dokanFileInfo)));
+                dokanOperations.setSetAllocationSize((rawPath, rawLength, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.setAllocationSize(rawPath, rawLength, dokanFileInfo)));
             }
             if (isImplemented("lockFile")) {
-                dokanyOperations.setLockFile((rawPath, rawByteOffset, rawLength, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.lockFile(rawPath, rawByteOffset, rawLength, dokanFileInfo)));
+                dokanOperations.setLockFile((rawPath, rawByteOffset, rawLength, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.lockFile(rawPath, rawByteOffset, rawLength, dokanFileInfo)));
             }
             if (isImplemented("unlockFile")) {
-                dokanyOperations.setUnlockFile((rawPath, rawByteOffset, rawLength, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.unlockFile(rawPath, rawByteOffset, rawLength, dokanFileInfo)));
+                dokanOperations.setUnlockFile((rawPath, rawByteOffset, rawLength, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.unlockFile(rawPath, rawByteOffset, rawLength, dokanFileInfo)));
             }
             if (isImplemented("getDiskFreeSpace")) {
-                dokanyOperations.setGetDiskFreeSpace((freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.getDiskFreeSpace(freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes, dokanFileInfo)));
+                dokanOperations.setGetDiskFreeSpace((freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.getDiskFreeSpace(freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes, dokanFileInfo)));
             }
             if (isImplemented("getVolumeInformation")) {
-                dokanyOperations.setGetVolumeInformation((rawVolumeNameBuffer, rawVolumeNameSize, rawVolumeSerialNumber, rawMaximumComponentLength, rawFileSystemFlags, rawFileSystemNameBuffer, rawFileSystemNameSize, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.getVolumeInformation(rawVolumeNameBuffer, rawVolumeNameSize, rawVolumeSerialNumber, rawMaximumComponentLength, rawFileSystemFlags, rawFileSystemNameBuffer, rawFileSystemNameSize, dokanFileInfo)));
+                dokanOperations.setGetVolumeInformation((rawVolumeNameBuffer, rawVolumeNameSize, rawVolumeSerialNumber, rawMaximumComponentLength, rawFileSystemFlags, rawFileSystemNameBuffer, rawFileSystemNameSize, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.getVolumeInformation(rawVolumeNameBuffer, rawVolumeNameSize, rawVolumeSerialNumber, rawMaximumComponentLength, rawFileSystemFlags, rawFileSystemNameBuffer, rawFileSystemNameSize, dokanFileInfo)));
             }
             if (isImplemented("mounted")) {
-                dokanyOperations.setMounted((dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.mounted(dokanFileInfo)));
+                dokanOperations.setMounted((dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.mounted(dokanFileInfo)));
             }
             if (isImplemented("unmounted")) {
-                dokanyOperations.setUnmounted((dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.unmounted(dokanFileInfo)));
+                dokanOperations.setUnmounted((dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.unmounted(dokanFileInfo)));
             }
             if (isImplemented("getFileSecurity")) {
-                dokanyOperations.setGetFileSecurity((rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, rawSecurityDescriptorLengthNeeded, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.getFileSecurity(rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, rawSecurityDescriptorLengthNeeded, dokanFileInfo)));
+                dokanOperations.setGetFileSecurity((rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, rawSecurityDescriptorLengthNeeded, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.getFileSecurity(rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, rawSecurityDescriptorLengthNeeded, dokanFileInfo)));
             }
             if (isImplemented("setFileSecurity")) {
-                dokanyOperations.setSetFileSecurity((rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.setFileSecurity(rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, dokanFileInfo)));
+                dokanOperations.setSetFileSecurity((rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.setFileSecurity(rawPath, rawSecurityInformation, rawSecurityDescriptor, rawSecurityDescriptorLength, dokanFileInfo)));
             }
             if (isImplemented("fillWin32FindData")) {
                 //TODO: write meaningful comment why there is no method binding
             }
             if (isImplemented("findStreams")) {
-                dokanyOperations.setFindStreams((rawPath, fillWin32FindStreamData, dokanFileInfo) -> DokanyUtils.ntStatusFromWin32ErrorCode(this.findStreams(rawPath, fillWin32FindStreamData, dokanFileInfo)));
+                dokanOperations.setFindStreams((rawPath, fillWin32FindStreamData, dokanFileInfo) -> DokanUtils.ntStatusFromWin32ErrorCode(this.findStreams(rawPath, fillWin32FindStreamData, dokanFileInfo)));
             }
 
         }
@@ -247,7 +247,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         try {
             int mountStatus;
 
-            if (DokanyUtils.canHandleShutdownHooks()) {
+            if (DokanUtils.canHandleShutdownHooks()) {
                 Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
             }
 
@@ -290,7 +290,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     }
 
     private int execMount(DokanOptions dokanOptions) {
-        return NativeMethods.DokanMain(dokanOptions, this.dokanyOperations);
+        return DokanNativeMethods.DokanMain(dokanOptions, this.dokanOperations);
     }
 
     @Override
@@ -300,7 +300,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         }
 
         if (isMounted.get()) {
-            if (NativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
+            if (DokanNativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
                 isMounted.set(false);
             } else {
                 throw new UnmountFailedException("Unmount of " + volumeName + "(" + mountPoint + ") failed. Try again, shut down JVM or use `dokanctl.exe to unmount manually.");
@@ -311,13 +311,13 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     private boolean volumeIsStillMounted() {
         char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
         LongByReference length = new LongByReference();
-        Pointer startOfList = NativeMethods.DokanGetMountPointList(false, length);
+        Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, length);
         List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
         // It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
         boolean mountPointInList = list.stream().anyMatch(entry ->
                 Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
                         && (entry.MountPoint.length == 12 + mntPtCharArray.length || entry.MountPoint[12 + mntPtCharArray.length] == '\0'));
-        NativeMethods.DokanReleaseMountPointList(startOfList);
+        DokanNativeMethods.DokanReleaseMountPointList(startOfList);
         return mountPointInList;
     }
 

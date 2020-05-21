@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure;
 
-import dev.dokan.dokan_java.DokanyOperations;
-import dev.dokan.dokan_java.DokanyUtils;
+import dev.dokan.dokan_java.DokanOperations;
+import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Contains information that the {@link DokanyOperations#GetFileInformation} function retrieves.
+ * Contains information that the {@link DokanOperations#GetFileInformation} function retrieves.
  * <p>
  * The identifier that is stored in the nFileIndexHigh and nFileIndexLow members is called the file ID. Support for file IDs is file system-specific. File IDs are not guaranteed to be unique over time, because file
  * systems are free to reuse them. In some cases, the file ID for a file can change over time.
@@ -140,9 +140,9 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     }
 
     public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {
-        this.ftCreationTime = DokanyUtils.getTime(creationTime);
-        this.ftLastAccessTime = DokanyUtils.getTime(lastAccessTime);
-        this.ftLastWriteTime = DokanyUtils.getTime(lastWriteTime);
+        this.ftCreationTime = DokanUtils.getTime(creationTime);
+        this.ftLastAccessTime = DokanUtils.getTime(lastAccessTime);
+        this.ftLastWriteTime = DokanUtils.getTime(lastWriteTime);
     }
 
     /**
@@ -170,7 +170,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
      * @param lastWriteTime the new last write timestamp of the file
      */
     public void setLastWriteTime(final long lastWriteTime) {
-        this.ftLastWriteTime = DokanyUtils.getTime(lastWriteTime);
+        this.ftLastWriteTime = DokanUtils.getTime(lastWriteTime);
     }
 
     /**
@@ -179,7 +179,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
      * @param creationTime the new creation timestamp of the file
      */
     public void setCreationTime(final long creationTime) {
-        this.ftCreationTime = DokanyUtils.getTime(creationTime);
+        this.ftCreationTime = DokanUtils.getTime(creationTime);
     }
 
     /**

@@ -6,6 +6,7 @@ import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 import dev.dokan.dokan_java.structure.DokanOptions;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -19,7 +20,7 @@ import com.sun.jna.ptr.LongByReference;
 /**
  * Main interface to implement. These methods will be registered in the dokany kernel driver to handle filesystem requests.
  */
-public interface DokanyFileSystem extends Mountable {
+public interface DokanFileSystem extends Mountable {
 
     /**
      * CreateFile Dokan API callback.
@@ -33,7 +34,7 @@ public interface DokanyFileSystem extends Mountable {
      * to TRUE. On the other hand, if {@link DokanFileInfo#IsDirectory} is set to TRUE but the path targets a file, {@link NtStatuses#STATUS_NOT_A_DIRECTORY} must be returned.
      * <p>
      * {@link DokanFileInfo#Context} can be used to store Data (like a filehandle) that can be retrieved in all other requests related to the Context. To avoid memory leak, Context needs to be released in {@link
-     * DokanyFileSystem#cleanup(WString, DokanFileInfo)} .
+     * DokanFileSystem#cleanup(WString, DokanFileInfo)} .
      *
      * @param rawPath Path requested by the Kernel on the File System. TODO: rewrite this parameter description to link to winBase
      * @param securityContext the security context of the kernel (see also in the windows driver API <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/ns-wdm-_io_security_context">IO_SECURITY_CONTEXT</a>)
@@ -51,7 +52,7 @@ public interface DokanyFileSystem extends Mountable {
      */
     int zwCreateFile(
             WString rawPath,
-            WinBase.SECURITY_ATTRIBUTES securityContext,
+            DokanIOSecurityContext securityContext,
             int rawDesiredAccess,
             int rawFileAttributes,
             int rawShareAccess,
@@ -62,7 +63,7 @@ public interface DokanyFileSystem extends Mountable {
     /**
      * Receipt of this request indicates that the last handle for a file object that is associated with the target device object has been closed (but, due to outstanding I/O requests, might not have been released).
      * <p>
-     * Cleanup is requested before @{link {@link DokanyFileSystem#closeFile(WString, DokanFileInfo)} is called.
+     * Cleanup is requested before @{link {@link DokanFileSystem#closeFile(WString, DokanFileInfo)} is called.
      *
      * @param rawPath
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
@@ -75,7 +76,7 @@ public interface DokanyFileSystem extends Mountable {
      * CloseFile is called at the end of the life of the context. Receipt of this request indicates that the last handle of the file object that is associated with the target device object has been closed and released.
      * All outstanding I/O requests have been completed or canceled.
      * <p>
-     * CloseFile is requested after {@link DokanyFileSystem#cleanup(WString, DokanFileInfo)} is called. Anything remaining in {@link DokanFileInfo#Context} has to be cleared before return.
+     * CloseFile is requested after {@link DokanFileSystem#cleanup(WString, DokanFileInfo)} is called. Anything remaining in {@link DokanFileInfo#Context} has to be cleared before return.
      *
      * @param rawPath
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
@@ -85,7 +86,7 @@ public interface DokanyFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * ReadFile callback on the file previously opened in {@link DokanyFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)}. It can be called by different thread at the
+     * ReadFile callback on the file previously opened in {@link DokanFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)}. It can be called by different thread at the
      * same time, therefore the read has to be thread safe.
      *
      * @param rawPath
@@ -105,7 +106,7 @@ public interface DokanyFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * WriteFile callback on the file previously opened in {@link DokanyFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} It can be called by different thread at the
+     * WriteFile callback on the file previously opened in {@link DokanFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} It can be called by different thread at the
      * same time, therefore the write/context has to be thread safe.
      *
      * @param rawPath
@@ -159,11 +160,11 @@ public interface DokanyFileSystem extends Mountable {
      */
     int findFiles(
             WString rawPath,
-            DokanyOperations.FillWin32FindData rawFillFindData,
+            DokanOperations.FillWin32FindData rawFillFindData,
             DokanFileInfo dokanFileInfo);
 
     /**
-     * Same as {@link DokanyFileSystem#findFiles(WString, DokanyOperations.FillWin32FindData, DokanFileInfo)} but with a search pattern to filter the result.
+     * Same as {@link DokanFileSystem#findFiles(WString, DokanOperations.FillWin32FindData, DokanFileInfo)} but with a search pattern to filter the result.
      *
      * @param fileName
      * @param searchPattern
@@ -174,7 +175,7 @@ public interface DokanyFileSystem extends Mountable {
     int findFilesWithPattern(
             WString fileName,
             WString searchPattern,
-            DokanyOperations.FillWin32FindData rawFillFindData,
+            DokanOperations.FillWin32FindData rawFillFindData,
             DokanFileInfo dokanFileInfo);
 
     /**
@@ -213,10 +214,10 @@ public interface DokanyFileSystem extends Mountable {
      * You should NOT delete the file in this method, but instead you must only check whether you can delete the file or not, and return {@link NtStatuses#STATUS_SUCCESS} (when you can delete it) or appropriate error
      * codes such as {@link NtStatuses#STATUS_ACCESS_DENIED}, {@link NtStatuses#STATUS_OBJECT_NO_LONGER_EXISTS}, {@link NtStatuses#STATUS_OBJECT_NAME_NOT_FOUND}.
      * <p>
-     * {@link DokanyFileSystem#deleteFile(WString, DokanFileInfo)} will also be called with {@link DokanFileInfo#DeleteOnClose} set to <i>false</i> to notify the driver when the file is no longer requested to be
+     * {@link DokanFileSystem#deleteFile(WString, DokanFileInfo)} will also be called with {@link DokanFileInfo#DeleteOnClose} set to <i>false</i> to notify the driver when the file is no longer requested to be
      * deleted.
      * <p>
-     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanyFileSystem#cleanup(WString, DokanFileInfo)} call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you
+     * When you return {@link NtStatuses#STATUS_SUCCESS}, you get a {@link DokanFileSystem#cleanup(WString, DokanFileInfo)} call afterwards with {@link DokanFileInfo#DeleteOnClose} set to <i>true</i> and only then you
      * have to actually delete the file being closed.
      *
      * @param rawPath
@@ -317,9 +318,9 @@ public interface DokanyFileSystem extends Mountable {
      * Retrieves information about the amount of space that is available on a disk volume, which is the total amount of space, the total amount of free space, and the total amount of free space available to the user that
      * is associated with the calling thread.
      * <p>
-     * Neither this method nor {@link DokanyFileSystem#getVolumeInformation(Pointer, int, IntByReference, IntByReference, IntByReference, Pointer, int, DokanFileInfo)} save the {@link DokanFileInfo#Context}. Before these
-     * methods are called, {@link DokanyFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} may not be called. (ditto @{link DokanyOperations.CloseFile} and @{link
-     * DokanyOperations.Cleanup}).
+     * Neither this method nor {@link DokanFileSystem#getVolumeInformation(Pointer, int, IntByReference, IntByReference, IntByReference, Pointer, int, DokanFileInfo)} save the {@link DokanFileInfo#Context}. Before these
+     * methods are called, {@link DokanFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} may not be called. (ditto @{link DokanOperations.CloseFile} and @{link
+     * DokanOperations.Cleanup}).
      *
      * @param freeBytesAvailable
      * @param totalNumberOfBytes
@@ -336,13 +337,13 @@ public interface DokanyFileSystem extends Mountable {
     /**
      * Retrieves information about the file system and volume associated with the specified root directory.
      * <p>
-     * Neither this method nor {@link DokanyFileSystem#getVolumeInformation(Pointer, int, IntByReference, IntByReference, IntByReference, Pointer, int, DokanFileInfo)} save the {@link DokanFileInfo#Context}. Before these
-     * methods are called, {@link DokanyFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} may not be called. (ditto @{link DokanyOperations.CloseFile} and @{link
-     * DokanyOperations.Cleanup}).
+     * Neither this method nor {@link DokanFileSystem#getVolumeInformation(Pointer, int, IntByReference, IntByReference, IntByReference, Pointer, int, DokanFileInfo)} save the {@link DokanFileInfo#Context}. Before these
+     * methods are called, {@link DokanFileSystem#zwCreateFile(WString, WinBase.SECURITY_ATTRIBUTES, int, int, int, int, int, DokanFileInfo)} may not be called. (ditto @{link DokanOperations.CloseFile} and @{link
+     * DokanOperations.Cleanup}).
      * <p>
      * {@link FileSystemFlag#READ_ONLY_VOLUME} is automatically added to the features if {@link MountOption#WRITE_PROTECTION} was specified during mount.
      * <p>
-     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokany kernel driver use following settings by default:
+     * If {@link NtStatuses#STATUS_NOT_IMPLEMENTED} is returned, the Dokan kernel driver use following settings by default:
      *
      * <ul>
      * <li>rawVolumeSerialNumber = 0x19831116</li>
@@ -372,7 +373,7 @@ public interface DokanyFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * Is called when Dokany succeeded mounting the volume.
+     * Is called when Dokan succeeded mounting the volume.
      *
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
      * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
@@ -381,7 +382,7 @@ public interface DokanyFileSystem extends Mountable {
             DokanFileInfo dokanFileInfo);
 
     /**
-     * Is called when Dokany succeeded unmounting the volume.
+     * Is called when Dokan succeeded unmounting the volume.
      *
      * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
      * @return the appropriate NTSTATUS value. For an overview see {@link NtStatuses}.
@@ -449,7 +450,7 @@ public interface DokanyFileSystem extends Mountable {
      */
     int findStreams(
             WString rawPath,
-            DokanyOperations.FillWin32FindStreamData rawFillFindData,
+            DokanOperations.FillWin32FindStreamData rawFillFindData,
             DokanFileInfo dokanFileInfo);
 
 }

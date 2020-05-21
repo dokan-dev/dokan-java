@@ -7,10 +7,12 @@ import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
+import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 
-public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
 
-    public DokanyFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
+public class DokanFileSystemStub extends AbstractDokanFileSystem {
+
+    public DokanFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
         super(fileSystemInformation, usesKernelFlagsAndCodes);
     }
 
@@ -29,7 +31,7 @@ public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
      */
     @Override
     @NotImplemented
-    public int zwCreateFile(WString rawPath, WinBase.SECURITY_ATTRIBUTES securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
+    public int zwCreateFile(WString rawPath, DokanIOSecurityContext securityContext, int rawDesiredAccess, int rawFileAttributes, int rawShareAccess, int rawCreateDisposition, int rawCreateOptions, DokanFileInfo dokanFileInfo) {
         return 0;
     }
 
@@ -71,13 +73,13 @@ public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
 
     @Override
     @NotImplemented
-    public int findFiles(WString rawPath, DokanyOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
+    public int findFiles(WString rawPath, DokanOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
         return 0;
     }
 
     @Override
     @NotImplemented
-    public int findFilesWithPattern(WString fileName, WString searchPattern, DokanyOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
+    public int findFilesWithPattern(WString fileName, WString searchPattern, DokanOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
         return 0;
     }
 
@@ -179,7 +181,7 @@ public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
 
     @Override
     @NotImplemented
-    public int findStreams(WString rawPath, DokanyOperations.FillWin32FindStreamData rawFillFindData, DokanFileInfo dokanFileInfo) {
+    public int findStreams(WString rawPath, DokanOperations.FillWin32FindStreamData rawFillFindData, DokanFileInfo dokanFileInfo) {
         return 0;
     }
 }
