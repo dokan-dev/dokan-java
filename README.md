@@ -5,7 +5,7 @@ Dokan-Java is a Java wrapper for [Dokany 1.3.0 releases](https://github.com/doka
 
 ## Introduction
 [Dokany](https://github.com/dokan-dev/dokany) is a device driver providing an interface to develop and run your own filesystem on Windows (similar to [FUSE](https://github.com/libfuse/libfuse)).
-It is natively  written in C/C++, this library provides via [JNA](https://github.com/java-native-access/jna) a Java interface to its API with additional convenience methods.
+It is natively  written in C/C++. This library provides a Java interface to Dokany's API with additional convenience methods. Dokan-Java uses [JNA](https://github.com/java-native-access/jna) to access Dokany.
 Using this project you are able to implement your own filesystem on Windows... in Java!
 
 ## Runtime Dependencies
