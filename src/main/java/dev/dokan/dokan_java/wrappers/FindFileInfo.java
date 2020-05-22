@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.wrappers;
 
 import com.sun.jna.platform.win32.WinBase;
-import dev.dokan.dokan_java.DokanyUtils;
+import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.constants.EnumInteger;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.constants.microsoft.MicrosoftReparsePointTag;
@@ -125,9 +125,9 @@ public class FindFileInfo extends AbstractFileInfo {
 		int fileSizeLow = (int) (fileSize & 0xffffffffL);
 
 		return new WinBase.WIN32_FIND_DATA(getFlags(),
-			DokanyUtils.toFILETIME(getCreationTime()),
-			DokanyUtils.toFILETIME(getLastAccessTime()),
-			DokanyUtils.toFILETIME(getLastWriteTime()),
+			DokanUtils.toFILETIME(getCreationTime()),
+			DokanUtils.toFILETIME(getLastAccessTime()),
+			DokanUtils.toFILETIME(getLastWriteTime()),
 			fileSizeHigh,
 			fileSizeLow,
 			getReparsePointTagValueLeniently(),
