@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java;
 
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 /**
  * Supplementary class to bundle information of the filesystem.

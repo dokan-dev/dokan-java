@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.examples;
 import dev.dokan.dokan_java.FileSystemInformation;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 
 import java.io.IOException;

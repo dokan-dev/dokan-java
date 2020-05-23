@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryType;

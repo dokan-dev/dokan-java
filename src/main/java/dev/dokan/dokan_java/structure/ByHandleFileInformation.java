@@ -7,6 +7,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;

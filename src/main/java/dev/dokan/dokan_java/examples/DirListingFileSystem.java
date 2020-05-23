@@ -17,7 +17,7 @@ import dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 import java.io.IOException;
 import java.nio.file.FileStore;

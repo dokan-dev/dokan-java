@@ -1,6 +1,5 @@
-package dev.dokan.dokan_java.structure;
+package dev.dokan.dokan_java.conv;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 import dev.dokan.dokan_java.conv.EnumInteger;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 /**
  * Enum of flags specifying the options to apply when the driver creates or opens the file.

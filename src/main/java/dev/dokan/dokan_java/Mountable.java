@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java;
 
 import dev.dokan.dokan_java.constants.dokany.MountOption;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 import java.nio.file.Path;
 

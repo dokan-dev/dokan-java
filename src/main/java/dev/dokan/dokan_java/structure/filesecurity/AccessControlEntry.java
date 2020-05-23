@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.structure.filesecurity;
 import dev.dokan.dokan_java.Byteable;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryType;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
 
 public abstract class AccessControlEntry implements Byteable {
 
