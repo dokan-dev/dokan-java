@@ -8,7 +8,7 @@ import dev.dokan.dokan_java.structure.EnumIntegerSet;
 /**
  * Supplementary class to bundle information of the mounted volume and its filesystem.
  * <p>Mainly used for {@link DokanOperations#GetVolumeInformation} function to have all needed information at one place.</p>
- * TODO: Maybe this can be completely integrated in the DokanyFileSystem class
+ * TODO: Maybe this can be completely integrated in the DokanFileSystem class
  */
 public final class VolumeInformation {
 	private final int maxComponentLength;

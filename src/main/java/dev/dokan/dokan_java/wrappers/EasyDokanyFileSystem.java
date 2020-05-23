@@ -21,7 +21,7 @@ public interface EasyDokanyFileSystem {
 	//		int rawShareAccess,
 	//		int rawCreateDisposition,
 	//		int rawCreateOptions,
-	//		DokanFileInfo dokanFileInfo) { //TODO Return type //TODO Incorporate path into DokanyFileHandle
+	//		DokanFileInfo dokanFileInfo) { //TODO Return type //TODO Incorporate path into DokanFileHandle
 	@NativeName("zwCreateFile")
 	void createHandle(Path absolutePath,
 		String relativePath,
@@ -31,47 +31,47 @@ public interface EasyDokanyFileSystem {
 		EnumIntegerSet<FileShareAccess> shareAccess,
 		CreationDisposition creationDisposition,
 		EnumIntegerSet<CreateOption> createOptions,
-		DokanyFileHandle dokanyFileHandle
+		DokanFileHandle dokanFileHandle
 	); //--> zwCreateFile
 
 	@NativeName("cleanup")
-	void cleanup(Path absolutePath, String relativePath, DokanyFileHandle dokanyFileHandle);
+	void cleanup(Path absolutePath, String relativePath, DokanFileHandle dokanFileHandle);
 
 	@NativeName("closeFile")
-	void closeHandle(Path absolutePath, String relativePath, DokanyFileHandle dokanyFileHandle); //--> CloseFile
+	void closeHandle(Path absolutePath, String relativePath, DokanFileHandle dokanFileHandle); //--> CloseFile
 
 	@NativeName("readFile")
 	byte[] readFile(Path absolutePath,
 		String relativePath,
 		long offset,
 		int readLength,
-		DokanyFileHandle dokanyFileHandle); //TODO return -> callback-array?
+		DokanFileHandle dokanFileHandle); //TODO return -> callback-array?
 
 	@NativeName("writeFile")
-	int writeFile(Path absolutePath, String relativePath, byte[] buffer, long offset, DokanyFileHandle dokanyFileHandle);
+	int writeFile(Path absolutePath, String relativePath, byte[] buffer, long offset, DokanFileHandle dokanFileHandle);
 
 	@NativeName("flushFileBuffers")
-	void flush(Path absolutePath, String relativePath, DokanyFileHandle dokanyFileHandle);
+	void flush(Path absolutePath, String relativePath, DokanFileHandle dokanFileHandle);
 
 	@NativeName("getFileInformation")
-	EasyFileInfo getFileInformation(Path absolutePath, String relativePath, DokanyFileHandle dokanyFileHandle);
+	EasyFileInfo getFileInformation(Path absolutePath, String relativePath, DokanFileHandle dokanFileHandle);
 
 	@NativeName("findFiles")
-	Collection<FindFileInfo> findFiles(Path absolutePath, String relativePath, DokanyFileHandle dokanyFileHandle);
+	Collection<FindFileInfo> findFiles(Path absolutePath, String relativePath, DokanFileHandle dokanFileHandle);
 	//TODO --> Collection to callback?! --> default method?
 
 	@NativeName("findFilesWithPattern")
 	Collection<FindFileInfo> findFilesWithPattern(Path absolutePath,
 		String relativePath,
 		String pattern, //TODO Regex
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 	//TODO --> Collection to callback?!
 
 	@NativeName("setFileAttributes")
 	void setFileAttributes(Path absolutePath,
 		String relativePath,
 		EnumIntegerSet<FileAttribute> fileAttributes,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("setFileTime")
 	void setFileTime(Path absolutePath,
@@ -79,17 +79,17 @@ public interface EasyDokanyFileSystem {
 		FileTime creationTime,
 		FileTime lastAccessTime,
 		FileTime lastWriteTime,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("deleteFile")
 	void prepareDeleteFile(Path absolutePath,
 		String relativePath,
-		DokanyFileHandle dokanyFileHandle); //TODO Rename, return value?
+		DokanFileHandle dokanFileHandle); //TODO Rename, return value?
 
 	@NativeName("deleteDirectory")
 	void prepareDeleteDirectory(Path absolutePath,
 		String relativePath,
-		DokanyFileHandle dokanyFileHandle); //TODO Rename, return value?
+		DokanFileHandle dokanFileHandle); //TODO Rename, return value?
 
 	@NativeName("moveFile")
 	void moveFile(Path sourceAbsolutePath,
@@ -97,45 +97,45 @@ public interface EasyDokanyFileSystem {
 		Path destinationAbsolutePath,
 		String destinationRelativePath,
 		boolean replaceIfExisting,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("setEndOfFile")
 	void setEndOfFile(Path absolutePath,
 		String relativePath,
 		long fileSize,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("setAllocationSize")
 	void setAllocationSize(Path absolutePath,
 		String relativePath,
 		long allocationSize,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("lockFile")
 	void lockFile(Path absolutePath,
 		String relativePath,
 		long lockOffset,
 		long lockLength,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("unlockFile")
 	void unlockFile(Path absolutePath,
 		String relativePath,
 		long lockOffset,
 		long lockLength,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	@NativeName("getDiskFreeSpace")
-	DiskSpaceInfo getDiskSpaceInfo(DokanyFileHandle dokanyFileHandle); //TODO Path?
+	DiskSpaceInfo getDiskSpaceInfo(DokanFileHandle dokanFileHandle); //TODO Path?
 
 	@NativeName("getVolumeInformation")
-	VolumeInformation getVolumeInformation(DokanyFileHandle dokanyFileHandle); //TODO Path?
+	VolumeInformation getVolumeInformation(DokanFileHandle dokanFileHandle); //TODO Path?
 
 	@NativeName("mounted")
-	void mounted(DokanyFileHandle dokanyFileHandle); //TODO Path?
+	void mounted(DokanFileHandle dokanFileHandle); //TODO Path?
 
 	@NativeName("unmounted")
-	void unmounted(DokanyFileHandle dokanyFileHandle); //TODO Path?
+	void unmounted(DokanFileHandle dokanFileHandle); //TODO Path?
 
 	//	int getFileSecurity(WString rawPath,
 	//		int /* SecurityInformation */ rawSecurityInformation, //Requested information //DesiredAccessMask OR Similar CLASS OR EnumIntegerSet
@@ -148,7 +148,7 @@ public interface EasyDokanyFileSystem {
 		String relativePath,
 		DesiredAccessMask requestedDescriptorInfo,
 		int availableLength,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	// int setFileSecurity(
 	//            WString rawPath,
@@ -162,7 +162,7 @@ public interface EasyDokanyFileSystem {
 		DesiredAccessMask suppliedDescriptorInfo,
 		SelfRelativeSecurityDescriptor securityDescriptor,
 		int availableLength,
-		DokanyFileHandle dokanyFileHandle);
+		DokanFileHandle dokanFileHandle);
 
 	//TODO fillWin32FindData, findStreams
 

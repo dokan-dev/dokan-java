@@ -7,7 +7,7 @@ import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DokanyFileHandle { //TODO Add Getters?!
+public class DokanFileHandle { //TODO Add Getters?!
 
 	private static final long INVALID_HANDLE = 0L;
 
@@ -17,7 +17,7 @@ public class DokanyFileHandle { //TODO Add Getters?!
 	private int processId;
 	private DokanOptions dokanOpts; //TODO
 
-	public DokanyFileHandle(DokanFileInfo nativeInfo) {
+	public DokanFileHandle(DokanFileInfo nativeInfo) {
 		this.context = nativeInfo.Context;
 		this.dokanContext = nativeInfo.DokanContext;
 		this.processId = nativeInfo.ProcessId;
