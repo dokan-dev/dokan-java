@@ -7,7 +7,7 @@ import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -235,10 +235,10 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
      * @param sectorSize         the sector size
      * @param UNCName
      * @param threadCount        the number of threads spawned for processing filesystem calls
-     * @param options            an {@link EnumIntegerSet} containing {@link MountOption}s
+     * @param options            an {@link MaskValueSet} containing {@link MountOption}s
      */
     @Override
-    public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
+    public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, MaskValueSet<MountOption> options) {
         this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
         this.mountPoint = mountPoint;
         this.volumeName = volumeName;
@@ -278,7 +278,7 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
      * @param mountPoint
      * @param mountOptions
      */
-    public void mount(Path mountPoint, EnumIntegerSet<MountOption> mountOptions) {
+    public void mount(Path mountPoint, MaskValueSet<MountOption> mountOptions) {
         String uncName = null;
         short threadCount = 5;
         long timeout = 3000;

@@ -3,12 +3,12 @@ package dev.dokan.dokan_java.conv;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EnumIntegerSetTest {
+public class MaskValueSetTest {
 
     @Test
     void fromIntOverEnumIntegerSetToInt() {
         int val = TestEnum.A.intValue() | TestEnum.B.intValue() | TestEnum.C.intValue();
-        EnumIntegerSet<TestEnum> testSet = EnumIntegerSet.enumSetFromInt(val, TestEnum.values());
+        MaskValueSet<TestEnum> testSet = MaskValueSet.enumSetFromInt(val, TestEnum.values());
         Assertions.assertFalse(testSet.contains(TestEnum.D));
         Assertions.assertTrue(testSet.contains(TestEnum.A));
         Assertions.assertTrue(testSet.contains(TestEnum.B));

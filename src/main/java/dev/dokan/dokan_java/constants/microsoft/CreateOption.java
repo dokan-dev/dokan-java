@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.conv.MaskValueEnum;
 
 /**
@@ -35,8 +35,8 @@ public enum CreateOption implements MaskValueEnum {
         this.maskValue = maskValue;
     }
 
-    public static EnumIntegerSet<CreateOption> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<CreateOption> fromInt(final int value) {
+        return MaskValueSet.enumSetFromInt(value, values());
     }
 
     @Override

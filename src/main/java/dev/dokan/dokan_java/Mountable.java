@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java;
 
 import dev.dokan.dokan_java.constants.dokany.MountOption;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 import java.nio.file.Path;
 
@@ -25,9 +25,9 @@ public interface Mountable extends AutoCloseable {
      * @param sectorSize         the sector size
      * @param UNCName
      * @param threadCount        the number of threads spawned for processing filesystem calls
-     * @param options            an {@link EnumIntegerSet} containing {@link MountOption}s
+     * @param options            an {@link MaskValueSet} containing {@link MountOption}s
      */
-    void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options);
+    void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, MaskValueSet<MountOption> options);
 
     /**
      * Unmount this object.

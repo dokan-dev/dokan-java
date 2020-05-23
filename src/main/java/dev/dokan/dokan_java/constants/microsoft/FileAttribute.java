@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 
 import com.sun.jna.platform.win32.WinNT;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.conv.MaskValueEnum;
 
 
@@ -35,8 +35,8 @@ public enum FileAttribute implements MaskValueEnum {
 
     private final int maskValue;
 
-    public static EnumIntegerSet<FileAttribute> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<FileAttribute> fromInt(final int value) {
+        return MaskValueSet.enumSetFromInt(value, values());
     }
 
     FileAttribute(final int maskValue) {

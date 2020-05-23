@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.dokany;
 
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.conv.MaskValueEnum;
 import dev.dokan.dokan_java.structure.DokanOptions;
 
@@ -28,8 +28,8 @@ public enum MountOption implements MaskValueEnum {
         this.description = desc;
     }
 
-    public static EnumIntegerSet<MountOption> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<MountOption> fromInt(final int value) {
+        return MaskValueSet.enumSetFromInt(value, values());
     }
 
     @Override

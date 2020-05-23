@@ -8,20 +8,20 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 /**
- * Used to store multiple {@link EnumInteger} values such as {@link FileSystemFlag} and {@link MountOption}.
+ * Used to store multiple {@link MaskValueEnum} values such as {@link FileSystemFlag} and {@link MountOption}.
  *
  * @param <T> Type of {@link EnumInteger}
  */
-public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends AbstractSet<T> {
+public final class MaskValueSet<T extends Enum<T> & EnumInteger> extends AbstractSet<T> {
 
     private final EnumSet<T> elements;
 
-    public EnumIntegerSet(final Class<T> clazz) {
+    public MaskValueSet(final Class<T> clazz) {
         this.elements = EnumSet.noneOf(clazz);
     }
 
     @SafeVarargs
-    public EnumIntegerSet(T first, T... others) {
+    public MaskValueSet(T first, T... others) {
         this.elements = EnumSet.of(first, others);
     }
 
@@ -35,8 +35,8 @@ public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends Abstr
      * @param <T> enum type of the array implementing the EnumInteger interface
      * @return a set of enumInteger values whose mask were active in the intValue
      */
-    public static <T extends Enum<T> & EnumInteger> EnumIntegerSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
-        EnumIntegerSet<T> elements = new EnumIntegerSet<>(allEnumValues[0].getDeclaringClass());
+    public static <T extends Enum<T> & EnumInteger> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
+        MaskValueSet<T> elements = new MaskValueSet<>(allEnumValues[0].getDeclaringClass());
         int remainingValues = intValue;
         for (T current : allEnumValues) {
             int mask = current.intValue();

@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.DokanOperations;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.conv.MaskValueEnum;
 
 /**
@@ -12,7 +12,7 @@ import dev.dokan.dokan_java.conv.MaskValueEnum;
  * Returned in {@link DokanOperations#GetVolumeInformation} to the kernel layer indicating what properties your file system implementation supports.
  * </p>
  *
- * <p> They can be arbitrary combined within an {@link EnumIntegerSet}. However FILE_FILE_COMPRESSION and FILE_VOL_IS_COMPRESSED are mutually exclusive.</p>
+ * <p> They can be arbitrary combined within an {@link MaskValueSet}. However FILE_FILE_COMPRESSION and FILE_VOL_IS_COMPRESSED are mutually exclusive.</p>
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getvolumeinformationa#parameters">Microsoft Documentation of function GetVolumeInformation</a>, Parameter {@code lpFileSystemFlags}
  * @see <a href="https://msdn.microsoft.com/en-us/library/cc246323.aspx">Listing of possible values</a>
@@ -43,8 +43,8 @@ public enum FileSystemFlag implements MaskValueEnum {
 
     private final int maskValue;
 
-    public static EnumIntegerSet<FileSystemFlag> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<FileSystemFlag> fromInt(final int value) {
+        return MaskValueSet.enumSetFromInt(value, values());
     }
 
     FileSystemFlag(final int maskValue) {

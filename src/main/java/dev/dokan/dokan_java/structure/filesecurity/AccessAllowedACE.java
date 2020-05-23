@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryType;
@@ -9,11 +9,11 @@ import java.nio.ByteBuffer;
 
 public class AccessAllowedACE extends AccessControlEntry {
 
-	EnumIntegerSet<AccessMask> rights;
+	MaskValueSet<AccessMask> rights;
 
 	SecurityIdentifier sid;
 
-	public AccessAllowedACE(EnumIntegerSet<AccessControlEntryFlag> flags, SecurityIdentifier sid, EnumIntegerSet<AccessMask> rights) {
+	public AccessAllowedACE(MaskValueSet<AccessControlEntryFlag> flags, SecurityIdentifier sid, MaskValueSet<AccessMask> rights) {
 		super(AccessControlEntryType.ACCESS_ALLOWED_ACE_TYPE, flags);
 		this.rights = rights;
 		this.sid = sid;

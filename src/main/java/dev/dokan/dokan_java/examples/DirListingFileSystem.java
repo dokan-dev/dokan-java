@@ -17,7 +17,7 @@ import dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 import java.io.IOException;
 import java.nio.file.FileStore;
@@ -86,7 +86,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         }
 
         //set attributes
-        EnumIntegerSet<FileAttribute> fileAttrs = EnumIntegerSet.enumSetFromInt(rawFileAttributes, FileAttribute.values());
+        MaskValueSet<FileAttribute> fileAttrs = MaskValueSet.enumSetFromInt(rawFileAttributes, FileAttribute.values());
         int status = setFileAttributes(p, fileAttrs);
         if (status != Win32ErrorCodes.ERROR_SUCCESS) {
             return status;
@@ -113,7 +113,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         return Win32ErrorCodes.ERROR_SUCCESS;
     }
 
-    private int setFileAttributes(Path p, EnumIntegerSet<FileAttribute> fileAttrs) {
+    private int setFileAttributes(Path p, MaskValueSet<FileAttribute> fileAttrs) {
         DosFileAttributeView attrView = Files.getFileAttributeView(p, DosFileAttributeView.class);
         try {
             for (FileAttribute attr : fileAttrs) {

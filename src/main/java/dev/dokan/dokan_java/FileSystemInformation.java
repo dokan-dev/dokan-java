@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java;
 
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 /**
  * Supplementary class to bundle information of the filesystem.
@@ -14,18 +14,18 @@ public final class FileSystemInformation {
 
     private final int maxComponentLength;
     private final String fileSystemName;
-    private final EnumIntegerSet<FileSystemFlag> fileSystemFeatures;
+    private final MaskValueSet<FileSystemFlag> fileSystemFeatures;
 
     /**
      * Provides default values for maxComponentLength and Filesystem name.
      *
-     * @param fileSystemFlags An {@link EnumIntegerSet} of features the file system supports. For possible values, see the {@link FileSystemFlag} enum.
+     * @param fileSystemFlags An {@link MaskValueSet} of features the file system supports. For possible values, see the {@link FileSystemFlag} enum.
      */
-    public FileSystemInformation(EnumIntegerSet<FileSystemFlag> fileSystemFlags) {
+    public FileSystemInformation(MaskValueSet<FileSystemFlag> fileSystemFlags) {
         this(DEFAULT_MAX_COMPONENT_LENGTH, DEFAULT_FS_NAME, fileSystemFlags);
     }
 
-    public FileSystemInformation(final int maxComponentLength, final String fileSystemName, final EnumIntegerSet<FileSystemFlag> fileSystemFeatures) {
+    public FileSystemInformation(final int maxComponentLength, final String fileSystemName, final MaskValueSet<FileSystemFlag> fileSystemFeatures) {
         this.maxComponentLength = maxComponentLength;
         this.fileSystemName = fileSystemName;
         this.fileSystemFeatures = fileSystemFeatures;
@@ -39,7 +39,7 @@ public final class FileSystemInformation {
         return this.fileSystemName;
     }
 
-    public EnumIntegerSet<FileSystemFlag> getFileSystemFeatures() {
+    public MaskValueSet<FileSystemFlag> getFileSystemFeatures() {
         return this.fileSystemFeatures;
     }
 

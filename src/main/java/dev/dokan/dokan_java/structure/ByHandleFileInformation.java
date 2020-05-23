@@ -7,7 +7,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -105,7 +105,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
         this.dwVolumeSerialNumber = volumeSerialNumber;
     }
 
-    public ByHandleFileInformation(Path filePath, EnumIntegerSet<FileAttribute> attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, int volumeSerialNumber, long fileSize, long fileIndex) {
+    public ByHandleFileInformation(Path filePath, MaskValueSet<FileAttribute> attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, int volumeSerialNumber, long fileSize, long fileIndex) {
         this.filePath = filePath;
         this.dwFileAttributes = attrs.toInt();
         this.setTimes(creationTime.toMillis(), lastAccessTime.toMillis(), lastWriteTime.toMillis());
@@ -136,7 +136,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
         infoToReceive.dwVolumeSerialNumber = dwVolumeSerialNumber;
     }
 
-    public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
+    public void setAttributes(final MaskValueSet<FileAttribute> attributes) {
         this.dwFileAttributes = attributes != null ? attributes.toInt() : FileAttribute.NORMAL.intValue();
     }
 
