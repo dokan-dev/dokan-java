@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 
-public interface EasyDokanyFileSystem {
+public interface EasyDokanFileSystem {
 
 	//public int zwCreateFile(WString rawPath,
 	//		WinBase.SECURITY_ATTRIBUTES securityContext,
