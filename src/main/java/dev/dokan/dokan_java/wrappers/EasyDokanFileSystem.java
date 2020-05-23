@@ -15,7 +15,7 @@ import java.util.Collection;
 public interface EasyDokanFileSystem {
 
 	//public int zwCreateFile(WString rawPath,
-	//		WinBase.SECURITY_ATTRIBUTES securityContext,
+	//		DokanIOSecurityContext securityContext,
 	//		int rawDesiredAccess,
 	//		int rawFileAttributes,
 	//		int rawShareAccess,
@@ -25,7 +25,7 @@ public interface EasyDokanFileSystem {
 	@NativeName("zwCreateFile")
 	void createHandle(Path absolutePath,
 		String relativePath,
-		SecurityContext securityContext,
+		EasyDokanIOSecurityContext securityContext,
 		DesiredAccessMask desiredAccess,
 		EnumIntegerSet<FileAttribute> fileAttributes,
 		EnumIntegerSet<FileShareAccess> shareAccess,
