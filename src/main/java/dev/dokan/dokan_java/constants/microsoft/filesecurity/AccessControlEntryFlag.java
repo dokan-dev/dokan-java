@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 
 /**
  * Enumeration of the different ACE control flags.

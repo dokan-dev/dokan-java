@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.constants;
+package dev.dokan.dokan_java.conv;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

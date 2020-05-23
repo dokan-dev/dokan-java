@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.dokany;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
 import dev.dokan.dokan_java.structure.DokanOptions;
 

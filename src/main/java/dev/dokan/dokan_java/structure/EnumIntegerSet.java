@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.structure;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 

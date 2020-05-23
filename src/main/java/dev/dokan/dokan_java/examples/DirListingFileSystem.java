@@ -2,7 +2,6 @@ package dev.dokan.dokan_java.examples;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
@@ -10,7 +9,7 @@ import dev.dokan.dokan_java.DokanFileSystemStub;
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.FileSystemInformation;
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 import dev.dokan.dokan_java.constants.microsoft.CreateOptions;
 import dev.dokan.dokan_java.constants.microsoft.CreationDisposition;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;

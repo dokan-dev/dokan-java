@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.constants;
+package dev.dokan.dokan_java.conv;
 
 /**
  * An EnumInteger is an object that is represented by an 32bit integer value.

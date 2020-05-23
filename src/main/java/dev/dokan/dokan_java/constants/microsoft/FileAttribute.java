@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 import dev.dokan.dokan_java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
 

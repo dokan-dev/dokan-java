@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.dokany;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.conv.EnumInteger;
 
 /**
  * Return values of com.dokan.java.NativeMethods#DokanMain(DokanOptions, DokanOperations)
