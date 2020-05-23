@@ -3,26 +3,22 @@ package dev.dokan.dokan_java.conv;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 
-import java.util.AbstractSet;
-import java.util.EnumSet;
-import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Used to store multiple {@link MaskValueEnum} values such as {@link FileSystemFlag} and {@link MountOption}.
  *
  * @param <T> Type of {@link EnumInteger}
  */
-public final class MaskValueSet<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> {
+public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T> {
 
-    private final EnumSet<T> elements;
-
-    public MaskValueSet(final Class<T> clazz) {
-        this.elements = EnumSet.noneOf(clazz);
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> emptySet(Class<T> clazz) {
+        return new MaskValueSetImpl<>(clazz);
     }
 
     @SafeVarargs
-    public MaskValueSet(T first, T... others) {
-        this.elements = EnumSet.of(first, others);
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> of(T first, T... others) {
+        return new MaskValueSetImpl<>(first, others);
     }
 
     /**
@@ -35,8 +31,8 @@ public final class MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Abstr
      * @param <T> enum type of the array implementing the MaskValueEnum interface
      * @return a set of MaskValueEnum values whose mask were set in the intValue
      */
-    public static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
-        MaskValueSet<T> elements = new MaskValueSet<>(allEnumValues[0].getDeclaringClass());
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
+        MaskValueSet<T> elements = new MaskValueSetImpl<>(allEnumValues[0].getDeclaringClass());
         int remainingValues = intValue;
         for (T current : allEnumValues) {
             int mask = current.intValue();
@@ -49,46 +45,8 @@ public final class MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Abstr
         return elements;
     }
 
-    @SafeVarargs
-    public final void add(T item, T... items) {
-        if (item == null) {
-            throw new IllegalArgumentException("Adding null is not allowed.");
-        } else {
-            elements.add(item);
-            for (final T it : items) {
-                if (it != null) {
-                    elements.add(it);
-                }
-            }
-        }
-    }
+    void add(T... items);
 
-    public int toInt() {
-        int toReturn = 0;
-        for (final T current : elements) {
-            toReturn |= current.intValue();
-        }
-        return toReturn;
-    }
-
-    @Override
-    public boolean add(final T e) {
-        return elements.add(e);
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return elements.iterator();
-    }
-
-    @Override
-    public int size() {
-        return elements.size();
-    }
-
-    @Override
-    public String toString() {
-        return "EnumIntegerSet(elements=" + this.elements + ")";
-    }
+    int toInt();
 
 }
