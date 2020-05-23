@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @param <T> Type of {@link EnumInteger}
  */
-public final class MaskValueSet<T extends Enum<T> & EnumInteger> extends AbstractSet<T> {
+public final class MaskValueSet<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> {
 
     private final EnumSet<T> elements;
 
@@ -26,16 +26,16 @@ public final class MaskValueSet<T extends Enum<T> & EnumInteger> extends Abstrac
     }
 
     /**
-     * Creates a set of enumIntegers which corresponds to the bit flag given as an 32bit integer.
+     * Creates a set of MaskValueEnums which corresponds to the bit flag given as an 32bit integer.
      * <p>
      * The type of the set is the enum class of the input array
      *
      * @param intValue the integer value of the combined bitflag
-     * @param allEnumValues all possible values of this enumInteger
-     * @param <T> enum type of the array implementing the EnumInteger interface
-     * @return a set of enumInteger values whose mask were active in the intValue
+     * @param allEnumValues all possible values of this MaskValueEnum
+     * @param <T> enum type of the array implementing the MaskValueEnum interface
+     * @return a set of MaskValueEnum values whose mask were set in the intValue
      */
-    public static <T extends Enum<T> & EnumInteger> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
+    public static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
         MaskValueSet<T> elements = new MaskValueSet<>(allEnumValues[0].getDeclaringClass());
         int remainingValues = intValue;
         for (T current : allEnumValues) {
