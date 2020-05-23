@@ -2,6 +2,7 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.conv.MaskValueEnum;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 /**
  * Enumeration of the possible AccesMask options.
@@ -103,6 +104,9 @@ public enum AccessMask implements MaskValueEnum {
 		this.maskValue = (int) maskValue;
 	}
 
+	public static MaskValueSet<AccessMask> getSetFromInt(final int value) {
+		return MaskValueSet.getSetFromInt(value, values());
+	}
 
 	@Override
 	public int intValue() {

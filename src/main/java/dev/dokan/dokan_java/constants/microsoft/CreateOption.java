@@ -35,8 +35,8 @@ public enum CreateOption implements MaskValueEnum {
         this.maskValue = maskValue;
     }
 
-    public static MaskValueSet<CreateOption> fromInt(final int value) {
-        return MaskValueSet.enumSetFromInt(value, values());
+    public static MaskValueSet<CreateOption> getSetFromInt(final int value) {
+        return MaskValueSet.getSetFromInt(value, values());
     }
 
     @Override

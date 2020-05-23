@@ -43,8 +43,8 @@ public enum FileSystemFlag implements MaskValueEnum {
 
     private final int maskValue;
 
-    public static MaskValueSet<FileSystemFlag> fromInt(final int value) {
-        return MaskValueSet.enumSetFromInt(value, values());
+    public static MaskValueSet<FileSystemFlag> getSetFromInt(final int value) {
+        return MaskValueSet.getSetFromInt(value, values());
     }
 
     FileSystemFlag(final int maskValue) {

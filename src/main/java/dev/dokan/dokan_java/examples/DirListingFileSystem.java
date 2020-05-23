@@ -86,7 +86,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         }
 
         //set attributes
-        MaskValueSet<FileAttribute> fileAttrs = MaskValueSet.enumSetFromInt(rawFileAttributes, FileAttribute.values());
+        MaskValueSet<FileAttribute> fileAttrs = MaskValueSet.getSetFromInt(rawFileAttributes, FileAttribute.values());
         int status = setFileAttributes(p, fileAttrs);
         if (status != Win32ErrorCodes.ERROR_SUCCESS) {
             return status;

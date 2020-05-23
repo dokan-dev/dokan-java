@@ -84,7 +84,7 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	}
 
 	public MaskValueSet<MountOption> getMountOptions() {
-		return MaskValueSet.enumSetFromInt(this.Options, MountOption.values());
+		return MaskValueSet.getSetFromInt(this.Options, MountOption.values());
 	}
 
 	@Override

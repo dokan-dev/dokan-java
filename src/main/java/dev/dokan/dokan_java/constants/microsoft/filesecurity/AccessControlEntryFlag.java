@@ -1,6 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 
 import dev.dokan.dokan_java.conv.MaskValueEnum;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 
 /**
  * Enumeration of the different ACE control flags.
@@ -57,6 +58,10 @@ public enum AccessControlEntryFlag implements MaskValueEnum {
 
 	AccessControlEntryFlag(int maskValue) {
 		this.maskValue = maskValue;
+	}
+
+	public static MaskValueSet<AccessControlEntryFlag> getSetFromInt(final int value) {
+		return MaskValueSet.getSetFromInt(value, values());
 	}
 
 	@Override

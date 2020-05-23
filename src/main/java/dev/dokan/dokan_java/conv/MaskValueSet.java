@@ -31,7 +31,7 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T> 
      * @param <T> enum type of the array implementing the MaskValueEnum interface
      * @return a set of MaskValueEnum values whose mask were set in the intValue
      */
-    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> enumSetFromInt(final int intValue, final T[] allEnumValues) {
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> getSetFromInt(final int intValue, final T[] allEnumValues) {
         MaskValueSet<T> elements = new MaskValueSetImpl<>(allEnumValues[0].getDeclaringClass());
         int remainingValues = intValue;
         for (T current : allEnumValues) {
@@ -43,6 +43,10 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T> 
             }
         }
         return elements;
+    }
+
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> getSetFromInt(final int intValue, final Class<T> type) {
+        return getSetFromInt(intValue, type.getEnumConstants());
     }
 
     void add(T... items);
