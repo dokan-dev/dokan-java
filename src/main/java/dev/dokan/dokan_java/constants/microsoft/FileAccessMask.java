@@ -1,14 +1,14 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.conv.EnumInteger;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.conv.MaskValueEnum;
 
 /**
  * Additional {@link AccessMask} values specific to files.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsoft documentation of ZwCreateFile</a>, Section Parameters, Parameter {@code DesiredAccess}
  */
-public enum FileAccessMask implements EnumInteger {
+public enum FileAccessMask implements MaskValueEnum {
     READ_DATA(WinNT.FILE_READ_DATA),
     READ_ATTRIBUTES(WinNT.FILE_READ_ATTRIBUTES),
     READ_EA(WinNT.FILE_READ_EA),
@@ -18,14 +18,14 @@ public enum FileAccessMask implements EnumInteger {
     APPEND_DATA(WinNT.FILE_APPEND_DATA),
     EXECUTE(WinNT.FILE_EXECUTE);
 
-    private final int mask;
+    private final int maskValue;
 
-    FileAccessMask(int mask) {
-        this.mask = mask;
+    FileAccessMask(int maskValue) {
+        this.maskValue = maskValue;
     }
 
     @Override
-    public int getMask() {
-        return mask;
+    public int intValue() {
+        return this.maskValue;
     }
 }

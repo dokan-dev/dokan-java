@@ -1,8 +1,10 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.conv.EnumInteger;
-import dev.dokan.dokan_java.conv.EnumIntegerSet;
+
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.conv.EnumIntegerSet;
+import dev.dokan.dokan_java.conv.MaskValueEnum;
+
 
 /**
  * File attribute flags. They are  metadata values stored by the file system on disk and are used by the system.
@@ -10,7 +12,7 @@ import com.sun.jna.platform.win32.WinNT;
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/FileIO/file-attribute-constants">Microsoft documentation of file attribute constants</a>
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilea">Microsoft documentation of CreateFileA function including the list of valid file attributes</a>
  */
-public enum FileAttribute implements EnumInteger {
+public enum FileAttribute implements MaskValueEnum {
     ARCHIVE(WinNT.FILE_ATTRIBUTE_ARCHIVE),
     COMPRESSED(WinNT.FILE_ATTRIBUTE_COMPRESSED),
     DEVICE(WinNT.FILE_ATTRIBUTE_DEVICE),
@@ -31,17 +33,18 @@ public enum FileAttribute implements EnumInteger {
     RECALL_ON_DATA_ACCESS(4194394),
     RECALL_ON_OPEN(262144);
 
-    private final int mask;
+    private final int maskValue;
 
     public static EnumIntegerSet<FileAttribute> fromInt(final int value) {
         return EnumIntegerSet.enumSetFromInt(value, values());
     }
 
-    FileAttribute(final int mask) {
-        this.mask = mask;
+    FileAttribute(final int maskValue) {
+        this.maskValue = maskValue;
     }
 
-    public int getMask() {
-        return this.mask;
+    @Override
+    public int intValue() {
+        return this.maskValue;
     }
 }
