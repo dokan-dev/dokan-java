@@ -39,7 +39,7 @@ public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends Abstr
         EnumIntegerSet<T> elements = new EnumIntegerSet<>(allEnumValues[0].getDeclaringClass());
         int remainingValues = intValue;
         for (T current : allEnumValues) {
-            int mask = current.getMask();
+            int mask = current.intValue();
 
             if ((remainingValues & mask) == mask) {
                 elements.add(current);
@@ -66,7 +66,7 @@ public final class EnumIntegerSet<T extends Enum<T> & EnumInteger> extends Abstr
     public int toInt() {
         int toReturn = 0;
         for (final T current : elements) {
-            toReturn |= current.getMask();
+            toReturn |= current.intValue();
         }
         return toReturn;
     }

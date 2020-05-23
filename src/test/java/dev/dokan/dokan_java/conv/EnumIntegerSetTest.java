@@ -7,7 +7,7 @@ public class EnumIntegerSetTest {
 
     @Test
     void fromIntOverEnumIntegerSetToInt() {
-        int val = TestEnum.A.getMask() | TestEnum.B.getMask() | TestEnum.C.getMask();
+        int val = TestEnum.A.intValue() | TestEnum.B.intValue() | TestEnum.C.intValue();
         EnumIntegerSet<TestEnum> testSet = EnumIntegerSet.enumSetFromInt(val, TestEnum.values());
         Assertions.assertFalse(testSet.contains(TestEnum.D));
         Assertions.assertTrue(testSet.contains(TestEnum.A));
@@ -29,7 +29,7 @@ public class EnumIntegerSetTest {
         }
 
         @Override
-        public int getMask() {
+        public int intValue() {
             return val;
         }
     }

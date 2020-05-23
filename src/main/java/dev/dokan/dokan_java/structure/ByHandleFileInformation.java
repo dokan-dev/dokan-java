@@ -137,7 +137,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     }
 
     public void setAttributes(final EnumIntegerSet<FileAttribute> attributes) {
-        this.dwFileAttributes = attributes != null ? attributes.toInt() : FileAttribute.NORMAL.getMask();
+        this.dwFileAttributes = attributes != null ? attributes.toInt() : FileAttribute.NORMAL.intValue();
     }
 
     public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {

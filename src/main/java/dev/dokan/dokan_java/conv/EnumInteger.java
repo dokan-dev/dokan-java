@@ -17,13 +17,18 @@ public interface EnumInteger {
      *
      * @throws IllegalArgumentException if none of the EnumIntegers equals the given value
      */
-    static <T extends EnumInteger> T enumFromInt(final int value, final T[] enumValues) {
+    static <T extends Enum<T> & EnumInteger> T enumFromInt(final int value, final T[] enumValues) {
         for (final T current : enumValues) {
-            if (value == current.getMask()) {
+            if (value == current.intValue()) {
                 return current;
             }
         }
+
         throw new IllegalArgumentException("Invalid int value: " + value);
+    }
+
+    static <T extends Enum<T> & EnumInteger> T enumFromInt(final int value, final Class<T> type) {
+        return enumFromInt(value, type.getEnumConstants());
     }
 
     /**
@@ -31,6 +36,6 @@ public interface EnumInteger {
      *
      * @return the value representing this object.
      */
-    int getMask();
+    int intValue();
 
 }

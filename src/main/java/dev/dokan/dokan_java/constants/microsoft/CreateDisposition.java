@@ -74,14 +74,14 @@ public enum CreateDisposition implements EnumInteger {
     FILE_OVERWRITE(CreateDispositions.FILE_OVERWRITE),
     FILE_OVERWRITE_IF(CreateDispositions.FILE_OVERWRITE_IF);
 
-    private final int mask;
+    private final int intValue;
 
-    CreateDisposition(int mask) {
-        this.mask = mask;
+    CreateDisposition(int intValue) {
+        this.intValue = intValue;
     }
 
     @Override
-    public int getMask() {
-        return mask;
+    public int intValue() {
+        return this.intValue;
     }
 }

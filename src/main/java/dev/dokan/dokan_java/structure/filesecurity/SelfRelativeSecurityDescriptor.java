@@ -169,7 +169,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
     }
 
     public static SelfRelativeSecurityDescriptor createEmptySD(EnumIntegerSet<SecurityDescriptorControlFlag> flags) {
-        if ((flags.toInt() & (SecurityDescriptorControlFlag.DP.getMask() | SecurityDescriptorControlFlag.SP.getMask())) == 0) {
+        if ((flags.toInt() & (SecurityDescriptorControlFlag.DP.intValue() | SecurityDescriptorControlFlag.SP.intValue())) == 0) {
             flags.add(SecurityDescriptorControlFlag.SR);
             return new SelfRelativeSecurityDescriptor(flags);
         } else {
@@ -180,11 +180,11 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
 
     public static SelfRelativeSecurityDescriptor createSD(EnumIntegerSet<SecurityDescriptorControlFlag> flags, SecurityIdentifier owner, SecurityIdentifier group, AccessControlList sacl, AccessControlList dacl) {
         int controlMask = flags.toInt();
-        if ((controlMask & SecurityDescriptorControlFlag.DP.getMask()) != 0 && dacl == null) {
+        if ((controlMask & SecurityDescriptorControlFlag.DP.intValue()) != 0 && dacl == null) {
             //abort
             return null;
         }
-        if ((controlMask & SecurityDescriptorControlFlag.SP.getMask()) != 0 && sacl == null) {
+        if ((controlMask & SecurityDescriptorControlFlag.SP.intValue()) != 0 && sacl == null) {
             //abort
             return null;
         }

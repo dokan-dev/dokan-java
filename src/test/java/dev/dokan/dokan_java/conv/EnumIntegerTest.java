@@ -8,7 +8,7 @@ public class EnumIntegerTest {
     @Test
     void FromIntegerOverEnumToInteger() {
         int val = 4096;
-        Assertions.assertEquals(val, EnumInteger.enumFromInt(val, TestEnum.values()).getMask());
+        Assertions.assertEquals(val, EnumInteger.enumFromInt(val, TestEnum.values()).intValue());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class EnumIntegerTest {
         }
 
         @Override
-        public int getMask() {
+        public int intValue() {
             return val;
         }
     }
