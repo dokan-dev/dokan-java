@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Objects;
 
 
-public final class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> implements MaskValueSet<T> {
+public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> implements MaskValueSet<T> {
 
     private final EnumSet<T> elements;
 
