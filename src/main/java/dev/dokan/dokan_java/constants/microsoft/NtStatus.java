@@ -1818,6 +1818,10 @@ public enum NtStatus implements EnumInteger {
         this.description = description;
     }
 
+    public static NtStatus fromInt(final int value) {
+        return EnumInteger.enumFromInt(value, values());
+    }
+
     @Override
     public int intValue() {
         return this.intValue;

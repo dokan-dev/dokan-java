@@ -80,6 +80,10 @@ public enum CreateDisposition implements EnumInteger {
         this.intValue = intValue;
     }
 
+    public static CreateDisposition fromInt(final int value) {
+        return EnumInteger.enumFromInt(value, values());
+    }
+
     @Override
     public int intValue() {
         return this.intValue;
