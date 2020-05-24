@@ -3,6 +3,7 @@ package dev.dokan.dokan_java.structure;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import com.sun.jna.platform.win32.WinNT;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,10 +69,9 @@ public class DokanAccessState extends Structure {
 	public int OriginalDesiredAccess;
 
 	/**
-	 * A pointer to a SECURITY_DESCRIPTOR structure that contains security information for the object that this access relates to.
+	 * A self relative security descriptor that contains security information for the object that this access relates to.
 	 */
-	public Pointer SecurityDescriptor;
-	//public WinNT.SECURITY_DESCRIPTOR_RELATIVE.ByReference SecurityDescriptor; //Does not work
+	public WinNT.SECURITY_DESCRIPTOR_RELATIVE SecurityDescriptor;
 
 	/**
 	 * A UNICODE_STRING structure that contains the object name string for the access. This member is used for auditing.
