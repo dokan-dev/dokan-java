@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java;
 
+
 import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -22,36 +23,37 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+
 /**
  * TODO: Add Description to this class
  */
 public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
-    private static final int TIMEOUT = 3000;
-    private static final CallbackThreadInitializer DEFAULT_CALLBACK_THREAD_INITIALIZER = new CallbackThreadInitializer();
+	private static final int TIMEOUT = 3000;
+	private static final CallbackThreadInitializer DEFAULT_CALLBACK_THREAD_INITIALIZER = new CallbackThreadInitializer();
 
-    protected final FileSystemInformation fileSystemInformation;
-    protected final DokanOperations dokanOperations;
-    protected Path mountPoint;
-    protected String volumeName;
-    protected int volumeSerialnumber;
-    protected DokanOptions dokanOptions;
+	protected final FileSystemInformation fileSystemInformation;
+	protected final DokanOperations dokanOperations;
+	protected Path mountPoint;
+	protected String volumeName;
+	protected int volumeSerialnumber;
+	protected DokanOptions dokanOptions;
 
-    private final AtomicBoolean isMounted;
-    private Set<String> notImplementedMethods;
+	private final AtomicBoolean isMounted;
+	private Set<String> notImplementedMethods;
 
-    public AbstractDokanFileSystem(FileSystemInformation fileSystemInformation) {
-        this.fileSystemInformation = fileSystemInformation;
-        this.isMounted = new AtomicBoolean(false);
-        this.dokanOperations = new DokanOperations();
-        init(dokanOperations);
-    }
+	public AbstractDokanFileSystem(FileSystemInformation fileSystemInformation) {
+		this.fileSystemInformation = fileSystemInformation;
+		this.isMounted = new AtomicBoolean(false);
+		this.dokanOperations = new DokanOperations();
+		init(dokanOperations);
+	}
 
-    private void init(DokanOperations dokanOperations) {
-        notImplementedMethods = Arrays.stream(getClass().getMethods())
-                .filter(method -> method.getAnnotation(NotImplemented.class) != null)
-                .map(Method::getName)
-                .collect(Collectors.toSet());
+	private void init(DokanOperations dokanOperations) {
+		notImplementedMethods = Arrays.stream(getClass().getMethods())
+				.filter(method -> method.getAnnotation(NotImplemented.class) != null)
+				.map(Method::getName)
+				.collect(Collectors.toSet());
 
 		if (isImplemented("zwCreateFile")) {
 			dokanOperations.setZwCreateFile(this::zwCreateFile);
@@ -153,114 +155,114 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 			dokanOperations.setFindStreams(this::findStreams);
 			Native.setCallbackThreadInitializer(dokanOperations.FindStreams, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
-    }
+	}
 
-    private boolean isImplemented(String funcName) {
-        return !notImplementedMethods.contains(funcName);
-    }
+	private boolean isImplemented(String funcName) {
+		return !notImplementedMethods.contains(funcName);
+	}
 
-    /**
-     * The general mount method. If the underlying system supports shutdown hooks, one is installed in case the JVM is shutting down and the filesystem is still mounted.
-     *
-     * @param mountPoint         path pointing to an empty directory or unused drive letter
-     * @param volumeName         the displayed name of the volume (only important when a drive letter is used as a mount point)
-     * @param volumeSerialnumber the serial number of the volume (only important when a drive letter is used as a mount point)
-     * @param blocking           if true the mount and further file system calls are foreground operations and thus will block this thread. To unmount the device you have to use the dokanctl.exe tool.
-     * @param timeout            timeout after which a not processed file system call is canceled and the volume is unmounted
-     * @param allocationUnitSize the size of the smallest allocatable space in bytes
-     * @param sectorSize         the sector size
-     * @param UNCName
-     * @param threadCount        the number of threads spawned for processing filesystem calls
-     * @param options            an {@link EnumIntegerSet} containing {@link MountOption}s
-     */
-    @Override
-    public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
-        this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
-        this.mountPoint = mountPoint;
-        this.volumeName = volumeName;
-        this.volumeSerialnumber = volumeSerialnumber;
+	/**
+	 * The general mount method. If the underlying system supports shutdown hooks, one is installed in case the JVM is shutting down and the filesystem is still mounted.
+	 *
+	 * @param mountPoint path pointing to an empty directory or unused drive letter
+	 * @param volumeName the displayed name of the volume (only important when a drive letter is used as a mount point)
+	 * @param volumeSerialnumber the serial number of the volume (only important when a drive letter is used as a mount point)
+	 * @param blocking if true the mount and further file system calls are foreground operations and thus will block this thread. To unmount the device you have to use the dokanctl.exe tool.
+	 * @param timeout timeout after which a not processed file system call is canceled and the volume is unmounted
+	 * @param allocationUnitSize the size of the smallest allocatable space in bytes
+	 * @param sectorSize the sector size
+	 * @param UNCName
+	 * @param threadCount the number of threads spawned for processing filesystem calls
+	 * @param options an {@link EnumIntegerSet} containing {@link MountOption}s
+	 */
+	@Override
+	public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, EnumIntegerSet<MountOption> options) {
+		this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
+		this.mountPoint = mountPoint;
+		this.volumeName = volumeName;
+		this.volumeSerialnumber = volumeSerialnumber;
 
-        try {
-            int mountStatus;
+		try {
+			int mountStatus;
 
-            if (DokanUtils.canHandleShutdownHooks()) {
-                Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
-            }
+			if (DokanUtils.canHandleShutdownHooks()) {
+				Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
+			}
 
-            if (blocking) {
-                mountStatus = execMount(dokanOptions);
-            } else {
-                try {
-                    mountStatus = CompletableFuture
-                            .supplyAsync(() -> execMount(dokanOptions))
-                            .get(TIMEOUT, TimeUnit.MILLISECONDS);
-                } catch (TimeoutException e) {
-                    // ok
-                    mountStatus = 0;
-                }
-                isMounted.set(true);
-            }
-            if (mountStatus < 0) {
-                throw new RuntimeException("Negative result of mount operation. Code" + mountStatus + " -- " + MountError.fromInt(mountStatus).getDescription());
-            }
-        } catch (UnsatisfiedLinkError | Exception e) {
-            throw new MountFailedException("Unable to mount filesystem.", e);
-        }
-    }
+			if (blocking) {
+				mountStatus = execMount(dokanOptions);
+			} else {
+				try {
+					mountStatus = CompletableFuture
+							.supplyAsync(() -> execMount(dokanOptions))
+							.get(TIMEOUT, TimeUnit.MILLISECONDS);
+				} catch (TimeoutException e) {
+					// ok
+					mountStatus = 0;
+				}
+				isMounted.set(true);
+			}
+			if (mountStatus < 0) {
+				throw new RuntimeException("Negative result of mount operation. Code" + mountStatus + " -- " + MountError.fromInt(mountStatus).getDescription());
+			}
+		} catch (UnsatisfiedLinkError | Exception e) {
+			throw new MountFailedException("Unable to mount filesystem.", e);
+		}
+	}
 
-    /**
-     * Additional method for easy mounting with a lot of default values
-     *
-     * @param mountPoint
-     * @param mountOptions
-     */
-    public void mount(Path mountPoint, EnumIntegerSet<MountOption> mountOptions) {
-        String uncName = null;
-        short threadCount = 5;
-        long timeout = 3000;
-        long allocationUnitSize = 4096;
-        long sectorsize = 512;
-        String volumeName = "DOKAN";
-        int volumeSerialnumber = 30975;
-        mount(mountPoint, volumeName, volumeSerialnumber, false, timeout, allocationUnitSize, sectorsize, uncName, threadCount, mountOptions);
-    }
+	/**
+	 * Additional method for easy mounting with a lot of default values
+	 *
+	 * @param mountPoint
+	 * @param mountOptions
+	 */
+	public void mount(Path mountPoint, EnumIntegerSet<MountOption> mountOptions) {
+		String uncName = null;
+		short threadCount = 5;
+		long timeout = 3000;
+		long allocationUnitSize = 4096;
+		long sectorsize = 512;
+		String volumeName = "DOKAN";
+		int volumeSerialnumber = 30975;
+		mount(mountPoint, volumeName, volumeSerialnumber, false, timeout, allocationUnitSize, sectorsize, uncName, threadCount, mountOptions);
+	}
 
-    private int execMount(DokanOptions dokanOptions) {
-        return DokanNativeMethods.DokanMain(dokanOptions, this.dokanOperations);
-    }
+	private int execMount(DokanOptions dokanOptions) {
+		return DokanNativeMethods.DokanMain(dokanOptions, this.dokanOperations);
+	}
 
-    @Override
-    public final synchronized void unmount() {
-        if (!volumeIsStillMounted()) {
-            isMounted.set(false);
-        }
+	@Override
+	public final synchronized void unmount() {
+		if (!volumeIsStillMounted()) {
+			isMounted.set(false);
+		}
 
-        if (isMounted.get()) {
-            if (DokanNativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
-                isMounted.set(false);
-            } else {
-                throw new UnmountFailedException("Unmount of " + volumeName + "(" + mountPoint + ") failed. Try again, shut down JVM or use `dokanctl.exe to unmount manually.");
-            }
-        }
-    }
+		if (isMounted.get()) {
+			if (DokanNativeMethods.DokanRemoveMountPoint(new WString(mountPoint.toAbsolutePath().toString()))) {
+				isMounted.set(false);
+			} else {
+				throw new UnmountFailedException("Unmount of " + volumeName + "(" + mountPoint + ") failed. Try again, shut down JVM or use `dokanctl.exe to unmount manually.");
+			}
+		}
+	}
 
-    private boolean volumeIsStillMounted() {
-        char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
-        LongByReference length = new LongByReference();
-        Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, length);
-        List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
-        // It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
-        boolean mountPointInList = list.stream().anyMatch(entry ->
-                Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
-                        && (entry.MountPoint.length == 12 + mntPtCharArray.length || entry.MountPoint[12 + mntPtCharArray.length] == '\0'));
-        DokanNativeMethods.DokanReleaseMountPointList(startOfList);
-        return mountPointInList;
-    }
+	private boolean volumeIsStillMounted() {
+		char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
+		LongByReference length = new LongByReference();
+		Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, length);
+		List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
+		// It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
+		boolean mountPointInList = list.stream().anyMatch(entry ->
+				Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
+						&& (entry.MountPoint.length == 12 + mntPtCharArray.length || entry.MountPoint[12 + mntPtCharArray.length] == '\0'));
+		DokanNativeMethods.DokanReleaseMountPointList(startOfList);
+		return mountPointInList;
+	}
 
 
-    @Override
-    public void close() {
-        unmount();
-    }
+	@Override
+	public void close() {
+		unmount();
+	}
 
 }
