@@ -1,5 +1,7 @@
 package dev.dokan.dokan_java;
 
+import com.sun.jna.CallbackThreadInitializer;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.LongByReference;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
     private static final int TIMEOUT = 3000;
+    private static final CallbackThreadInitializer DEFAULT_CALLBACK_THREAD_INITIALIZER = new CallbackThreadInitializer();
 
     protected final FileSystemInformation fileSystemInformation;
     protected final DokanOperations dokanOperations;
@@ -52,78 +55,103 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
 		if (isImplemented("zwCreateFile")) {
 			dokanOperations.setZwCreateFile(this::zwCreateFile);
+			Native.setCallbackThreadInitializer(dokanOperations.ZwCreateFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("cleanup")) {
 			dokanOperations.setCleanup(this::cleanup);
+			Native.setCallbackThreadInitializer(dokanOperations.Cleanup, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("closeFile")) {
 			dokanOperations.setCloseFile(this::closeFile);
+			Native.setCallbackThreadInitializer(dokanOperations.CloseFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("readFile")) {
 			dokanOperations.setReadFile(this::readFile);
+			Native.setCallbackThreadInitializer(dokanOperations.ReadFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("writeFile")) {
 			dokanOperations.setWriteFile(this::writeFile);
+			Native.setCallbackThreadInitializer(dokanOperations.WriteFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("flushFileBuffer")) {
 			dokanOperations.setFlushFileBuffers(this::flushFileBuffers);
+			Native.setCallbackThreadInitializer(dokanOperations.FlushFileBuffers, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("getFileInformation")) {
 			dokanOperations.setGetFileInformation(this::getFileInformation);
+			Native.setCallbackThreadInitializer(dokanOperations.GetFileInformation, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("findFiles")) {
 			dokanOperations.setFindFiles(this::findFiles);
+			Native.setCallbackThreadInitializer(dokanOperations.FindFiles, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("findFilesWithPattern")) {
 			dokanOperations.setFindFilesWithPattern(this::findFilesWithPattern);
+			Native.setCallbackThreadInitializer(dokanOperations.FindFilesWithPattern, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("setFileAttributes")) {
 			dokanOperations.setSetFileAttributes(this::setFileAttributes);
+			Native.setCallbackThreadInitializer(dokanOperations.SetFileAttributes, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("setFileTime")) {
 			dokanOperations.setSetFileTime(this::setFileTime);
+			Native.setCallbackThreadInitializer(dokanOperations.SetFileTime, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("deleteFile")) {
 			dokanOperations.setDeleteFile(this::deleteFile);
+			Native.setCallbackThreadInitializer(dokanOperations.DeleteFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("deleteDirectory")) {
 			dokanOperations.setDeleteDirectory(this::deleteDirectory);
+			Native.setCallbackThreadInitializer(dokanOperations.DeleteDirectory, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("moveFile")) {
 			dokanOperations.setMoveFile(this::moveFile);
+			Native.setCallbackThreadInitializer(dokanOperations.MoveFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("setEndOfFile")) {
 			dokanOperations.setSetEndOfFile(this::setEndOfFile);
+			Native.setCallbackThreadInitializer(dokanOperations.SetEndOfFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("setAllocationSize")) {
 			dokanOperations.setSetAllocationSize(this::setAllocationSize);
+			Native.setCallbackThreadInitializer(dokanOperations.SetAllocationSize, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("lockFile")) {
 			dokanOperations.setLockFile(this::lockFile);
+			Native.setCallbackThreadInitializer(dokanOperations.LockFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("unlockFile")) {
 			dokanOperations.setUnlockFile(this::unlockFile);
+			Native.setCallbackThreadInitializer(dokanOperations.UnlockFile, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("getDiskFreeSpace")) {
 			dokanOperations.setGetDiskFreeSpace(this::getDiskFreeSpace);
+			Native.setCallbackThreadInitializer(dokanOperations.GetDiskFreeSpace, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("getVolumeInformation")) {
 			dokanOperations.setGetVolumeInformation(this::getVolumeInformation);
+			Native.setCallbackThreadInitializer(dokanOperations.GetVolumeInformation, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("mounted")) {
 			dokanOperations.setMounted(this::mounted);
+			Native.setCallbackThreadInitializer(dokanOperations.Mounted, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("unmounted")) {
 			dokanOperations.setUnmounted(this::unmounted);
+			Native.setCallbackThreadInitializer(dokanOperations.Unmounted, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("getFileSecurity")) {
 			dokanOperations.setGetFileSecurity(this::getFileSecurity);
+			Native.setCallbackThreadInitializer(dokanOperations.GetFileSecurity, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("setFileSecurity")) {
 			dokanOperations.setSetFileSecurity(this::setFileSecurity);
+			Native.setCallbackThreadInitializer(dokanOperations.SetFileSecurity, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
 		if (isImplemented("findStreams")) {
 			dokanOperations.setFindStreams(this::findStreams);
+			Native.setCallbackThreadInitializer(dokanOperations.FindStreams, DEFAULT_CALLBACK_THREAD_INITIALIZER);
 		}
     }
 
