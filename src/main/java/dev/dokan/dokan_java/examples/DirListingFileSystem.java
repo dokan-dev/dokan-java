@@ -88,13 +88,6 @@ public class DirListingFileSystem extends DokanFileSystemStub {
 
         }
 
-        //set attributes
-        EnumIntegerSet<FileAttribute> fileAttrs = EnumIntegerSet.enumSetFromInt(rawFileAttributes, FileAttribute.values());
-        int status = setFileAttributes(p, fileAttrs);
-        if (status != Win32ErrorCodes.ERROR_SUCCESS) {
-            return status;
-        }
-
         if (Files.isDirectory(p)) {
             if ( EnumIntegerSet.enumSetFromInt(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
                 return NtStatuses.STATUS_FILE_IS_A_DIRECTORY;
@@ -111,35 +104,6 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         dokanFileInfo.Context = val;
 
         return NtStatuses.STATUS_SUCCESS;
-    }
-
-    private int setFileAttributes(Path p, EnumIntegerSet<FileAttribute> fileAttrs) {
-        DosFileAttributeView attrView = Files.getFileAttributeView(p, DosFileAttributeView.class);
-        try {
-            for (FileAttribute attr : fileAttrs) {
-                switch (attr) {
-                    case HIDDEN:
-                        attrView.setHidden(true);
-                        break;
-                    case READONLY:
-                        attrView.setReadOnly(true);
-                        break;
-                    case ARCHIVE:
-                        attrView.setArchive(true);
-                        break;
-                    case SYSTEM:
-                        attrView.setSystem(true);
-                        break;
-                    default:
-                        //not supported
-                        break;
-                }
-            }
-            return Win32ErrorCodes.ERROR_SUCCESS;
-        } catch (IOException e) {
-            return Win32ErrorCodes.ERROR_WRITE_FAULT;
-
-        }
     }
 
     @Override
