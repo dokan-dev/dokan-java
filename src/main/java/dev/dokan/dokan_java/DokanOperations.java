@@ -599,14 +599,18 @@ public class DokanOperations extends Structure {
                 DokanFileInfo dokanFileInfo);
     }
 
+    /**
+     * Used to add an entry in FindFiles operation
+     */
     @FunctionalInterface
     public interface FillWin32FindData extends StdCallLibrary.StdCallCallback {
 
         /**
          * @param rawFillFindData
          * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
+		 * @return {@code 1} if buffer is full, otherwise {@code 0} (currently it never returns 1)
          */
-        void fillWin32FindData(
+        int fillWin32FindData(
                 WIN32_FIND_DATA rawFillFindData,
                 DokanFileInfo dokanFileInfo);
     }
@@ -630,8 +634,7 @@ public class DokanOperations extends Structure {
     }
 
     /**
-     *
-     *
+     * TODO
      */
     @FunctionalInterface
     public interface FillWin32FindStreamData extends StdCallLibrary.StdCallCallback {
@@ -639,8 +642,9 @@ public class DokanOperations extends Structure {
         /**
          * @param rawFillFindData
          * @param dokanFileInfo {@link DokanFileInfo} with information about the file or directory.
+         * @return
          */
-        void callback(
+        int fillWin32FindStreamData(
                 Win32FindStreamData rawFillFindData,
                 DokanFileInfo dokanFileInfo);
     }
