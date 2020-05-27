@@ -3,6 +3,7 @@ package dev.dokan.dokan_java;
 import java.util.Arrays;
 import java.util.List;
 
+import com.sun.jna.win32.StdCallLibrary;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
@@ -103,7 +104,7 @@ public class DokanOperations extends Structure {
      * @see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">MSDN for more information about the parameters of this callback.</a>
      */
     @FunctionalInterface
-    interface ZwCreateFile extends Callback {
+    interface ZwCreateFile extends DokanCallback {
 
         /**
          * @param rawPath Path requested by the Kernel on the File System.
@@ -133,7 +134,7 @@ public class DokanOperations extends Structure {
      * Cleanup is requested before @{link {@link DokanOperations#CloseFile} is called.
      */
     @FunctionalInterface
-    interface Cleanup extends Callback {
+    interface Cleanup extends DokanCallback {
 
         /**
          * @param rawPath
@@ -151,7 +152,7 @@ public class DokanOperations extends Structure {
      * CloseFile is requested after {@link DokanOperations.Cleanup} is called. Anything remaining in {@link DokanFileInfo#Context} has to be cleared before return.
      */
     @FunctionalInterface
-    interface CloseFile extends Callback {
+    interface CloseFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -165,7 +166,7 @@ public class DokanOperations extends Structure {
     /**
      * ReadFile callback on the file previously opened in {@link DokanOperations.ZwCreateFile}. It can be called by different thread at the same time, therefore the read has to be thread safe.
      */
-    interface ReadFile extends Callback {
+    interface ReadFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -189,7 +190,7 @@ public class DokanOperations extends Structure {
      * WriteFile callback on the file previously opened in {@link DokanOperations.ZwCreateFile} It can be called by different thread at the same time, therefore the write/context has to be thread safe.
      */
     @FunctionalInterface
-    interface WriteFile extends Callback {
+    interface WriteFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -214,7 +215,7 @@ public class DokanOperations extends Structure {
      * Clears buffers for this context and causes any buffered data to be written to the file.
      */
     @FunctionalInterface
-    interface FlushFileBuffers extends Callback {
+    interface FlushFileBuffers extends DokanCallback {
 
         /**
          * @param rawPath
@@ -230,7 +231,7 @@ public class DokanOperations extends Structure {
      * Get specific informations on a file.
      */
     @FunctionalInterface
-    interface GetFileInformation extends Callback {
+    interface GetFileInformation extends DokanCallback {
 
         /**
          * @param fileName
@@ -248,7 +249,7 @@ public class DokanOperations extends Structure {
      * List all files in the path requested.
      */
     @FunctionalInterface
-    interface FindFiles extends Callback {
+    interface FindFiles extends DokanCallback {
 
         /**
          * @param rawPath
@@ -266,7 +267,7 @@ public class DokanOperations extends Structure {
      * Same as {@link DokanOperations.FindFiles} but with a search pattern to filter the result.
      */
     @FunctionalInterface
-    interface FindFilesWithPattern extends Callback {
+    interface FindFilesWithPattern extends DokanCallback {
 
         /**
          * @param fileName
@@ -286,7 +287,7 @@ public class DokanOperations extends Structure {
      * Set file attributes on a specific file.
      */
     @FunctionalInterface
-    interface SetFileAttributes extends Callback {
+    interface SetFileAttributes extends DokanCallback {
 
         /**
          * @param rawPath
@@ -304,7 +305,7 @@ public class DokanOperations extends Structure {
      * Set file times on a specific file.
      */
     @FunctionalInterface
-    interface SetFileTime extends Callback {
+    interface SetFileTime extends DokanCallback {
 
         /**
          * @param rawPath path to file or directory
@@ -336,7 +337,7 @@ public class DokanOperations extends Structure {
      * @see {@link DokanOperations.DeleteDirectory}
      */
     @FunctionalInterface
-    interface DeleteFile extends Callback {
+    interface DeleteFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -354,7 +355,7 @@ public class DokanOperations extends Structure {
      * @see {@link DokanOperations.DeleteFile} for more specifics.
      */
     @FunctionalInterface
-    interface DeleteDirectory extends Callback {
+    interface DeleteDirectory extends DokanCallback {
 
         /**
          * @param rawPath
@@ -370,7 +371,7 @@ public class DokanOperations extends Structure {
      * Move a file or directory to a new location.
      */
     @FunctionalInterface
-    interface MoveFile extends Callback {
+    interface MoveFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -390,7 +391,7 @@ public class DokanOperations extends Structure {
      * SetEndOfFile is used to truncate or extend a file (physical file size).
      */
     @FunctionalInterface
-    interface SetEndOfFile extends Callback {
+    interface SetEndOfFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -408,7 +409,7 @@ public class DokanOperations extends Structure {
      * SetAllocationSize is used to truncate or extend a file.
      */
     @FunctionalInterface
-    interface SetAllocationSize extends Callback {
+    interface SetAllocationSize extends DokanCallback {
 
         /**
          * @param rawPath
@@ -426,7 +427,7 @@ public class DokanOperations extends Structure {
      * Lock file at a specific offset and data length. This is only used if {@link MountOption#FILELOCK_USER_MODE} is enabled.
      */
     @FunctionalInterface
-    interface LockFile extends Callback {
+    interface LockFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -446,7 +447,7 @@ public class DokanOperations extends Structure {
      * Unlock file at a specific offset and data length. This is only used if {@link MountOption#FILELOCK_USER_MODE} is enabled.
      */
     @FunctionalInterface
-    interface UnlockFile extends Callback {
+    interface UnlockFile extends DokanCallback {
 
         /**
          * @param rawPath
@@ -470,7 +471,7 @@ public class DokanOperations extends Structure {
      * DokanOperations.CloseFile} and @{link DokanOperations.Cleanup}).
      */
     @FunctionalInterface
-    interface GetDiskFreeSpace extends Callback {
+    interface GetDiskFreeSpace extends DokanCallback {
 
         /**
          * @param freeBytesAvailable
@@ -504,7 +505,7 @@ public class DokanOperations extends Structure {
      * </ul>
      */
     @FunctionalInterface
-    interface GetVolumeInformation extends Callback {
+    interface GetVolumeInformation extends DokanCallback {
 
         /**
          * @param rawVolumeNameBuffer
@@ -532,7 +533,7 @@ public class DokanOperations extends Structure {
      * Is called when Dokan succeeded mounting the volume.
      */
     @FunctionalInterface
-    interface Mounted extends Callback {
+    interface Mounted extends DokanCallback {
 
         long mounted(
                 DokanFileInfo dokanFileInfo);
@@ -542,7 +543,7 @@ public class DokanOperations extends Structure {
      * Is called when Dokan succeeded unmounting the volume.
      */
     @FunctionalInterface
-    interface Unmounted extends Callback {
+    interface Unmounted extends DokanCallback {
 
         long unmounted(
                 final DokanFileInfo dokanFileInfo);
@@ -554,7 +555,7 @@ public class DokanOperations extends Structure {
      * Supported since version 0.6.0. You must specify the version in {@link DokanOptions#Version}.
      */
     @FunctionalInterface
-    interface GetFileSecurity extends Callback {
+    interface GetFileSecurity extends DokanCallback {
 
         /**
          * @param rawPath
@@ -580,7 +581,7 @@ public class DokanOperations extends Structure {
      * Supported since version 0.6.0. You must specify the version in {@link DokanOptions#Version}.
      */
     @FunctionalInterface
-    interface SetFileSecurity extends Callback {
+    interface SetFileSecurity extends DokanCallback {
 
         /**
          * @param rawPath
@@ -599,7 +600,7 @@ public class DokanOperations extends Structure {
     }
 
     @FunctionalInterface
-    public interface FillWin32FindData extends Callback {
+    public interface FillWin32FindData extends StdCallLibrary.StdCallCallback {
 
         /**
          * @param rawFillFindData
@@ -614,7 +615,7 @@ public class DokanOperations extends Structure {
      * Retrieve all NTFS Streams informations on the file. This is only called if {@link MountOption#ALT_STREAM} is enabled.
      */
     @FunctionalInterface
-    interface FindStreams extends Callback {
+    interface FindStreams extends DokanCallback {
 
         /**
          * @param rawPath
@@ -633,7 +634,7 @@ public class DokanOperations extends Structure {
      *
      */
     @FunctionalInterface
-    public interface FillWin32FindStreamData extends Callback {
+    public interface FillWin32FindStreamData extends StdCallLibrary.StdCallCallback {
 
         /**
          * @param rawFillFindData
