@@ -122,9 +122,6 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 		if (isImplemented("setFileSecurity")) {
 			dokanOperations.setSetFileSecurity(this::setFileSecurity);
 		}
-		if (isImplemented("fillWin32FindData")) {
-			//TODO: write meaningful comment why there is no method binding
-		}
 		if (isImplemented("findStreams")) {
 			dokanOperations.setFindStreams(this::findStreams);
 		}
