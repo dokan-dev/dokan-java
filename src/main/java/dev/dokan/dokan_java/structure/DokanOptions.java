@@ -69,9 +69,13 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	}
 
 	public DokanOptions(final String mountPoint, final short threadCount, final EnumIntegerSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
+		this(mountPoint, threadCount, mountOptions.toInt(), uncName, timeout, allocationUnitSize, sectorSize);
+	}
+
+	public DokanOptions(final String mountPoint, final short threadCount, final int mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
-		Options = mountOptions.toInt();
+		Options = mountOptions;
 		if (uncName != null) {
 			UNCName = new WString(uncName);
 		} else {
