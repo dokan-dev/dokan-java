@@ -12,8 +12,8 @@ import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
 
 public class DokanFileSystemStub extends AbstractDokanFileSystem {
 
-    public DokanFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
-        super(fileSystemInformation, usesKernelFlagsAndCodes);
+    public DokanFileSystemStub(FileSystemInformation fileSystemInformation)  {
+        super(fileSystemInformation);
     }
 
     /**
