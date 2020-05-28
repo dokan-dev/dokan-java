@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.examples;
 
+
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinNT;
@@ -9,21 +10,19 @@ import dev.dokan.dokan_java.DokanFileSystemStub;
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.FileSystemInformation;
+import dev.dokan.dokan_java.constants.microsoft.CreateDisposition;
+import dev.dokan.dokan_java.constants.microsoft.CreateOption;
+import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
 import dev.dokan.dokan_java.conv.EnumInteger;
-import dev.dokan.dokan_java.constants.microsoft.CreateOptions;
-import dev.dokan.dokan_java.constants.microsoft.CreationDisposition;
-import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
-import dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes;
+import dev.dokan.dokan_java.conv.MaskValueSet;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
-import dev.dokan.dokan_java.conv.MaskValueSet;
 
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.DosFileAttributes;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -38,7 +37,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
     private final Path root;
 
     public DirListingFileSystem(Path root, FileSystemInformation fileSystemInformation) {
-        super(fileSystemInformation, false);
+        super(fileSystemInformation);
         this.root = root;
         this.handleHandler = new AtomicLong(0);
         FileStore tmp = null;
@@ -55,52 +54,43 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         Path p = getrootedPath(rawPath);
 
         //the files must exist and we are read only here
-        CreationDisposition openOption = EnumInteger.enumFromInt(rawCreateDisposition, CreationDisposition.values());
-        if (!Files.exists(p)) {
+        CreateDisposition openOption = EnumInteger.enumFromInt(rawCreateDisposition, CreateDisposition.values());
+        if (Files.exists(p)) {
             switch (openOption) {
-                case CREATE_NEW:
-                case OPEN_ALWAYS:
-                case CREATE_ALWAYS:
-                    return Win32ErrorCodes.ERROR_ACCESS_DENIED;
-                case OPEN_EXISTING:
-                case TRUNCATE_EXISTING:
-                    return Win32ErrorCodes.ERROR_FILE_NOT_FOUND; //this is maybe a lot, but definitly not atomical
+                case FILE_CREATE:
+                	return NtStatuses.STATUS_OBJECT_NAME_COLLISION;
+                case FILE_OPEN:
+                case FILE_OPEN_IF:
+                    break;
+                case FILE_OVERWRITE:
+                case FILE_OVERWRITE_IF:
+                case FILE_SUPERSEDE:
+                	return NtStatuses.STATUS_ACCESS_DENIED;
                 default:
-                    return Win32ErrorCodes.ERROR_GEN_FAILURE;
+                    return NtStatuses.STATUS_UNSUCCESSFUL;
             }
         } else {
             switch (openOption) {
-                case CREATE_NEW:
-                    return Win32ErrorCodes.ERROR_ALREADY_EXISTS;
-                case TRUNCATE_EXISTING:
-                    return Win32ErrorCodes.ERROR_ACCESS_DENIED; //this is maybe a lot, but definitly not atomical
-                case OPEN_ALWAYS:
-                case CREATE_ALWAYS:
-                case OPEN_EXISTING:
-                    //NO-OP
-                    break;
+                case FILE_CREATE:
+                case FILE_OPEN_IF:
+                case FILE_OVERWRITE_IF:
+                case FILE_SUPERSEDE:
+                    return NtStatuses.STATUS_ACCESS_DENIED;
+                case FILE_OPEN:
+                case FILE_OVERWRITE:
+                    return NtStatuses.STATUS_OBJECT_NAME_NOT_FOUND;
                 default:
-                    return Win32ErrorCodes.ERROR_GEN_FAILURE;
+                    return NtStatuses.STATUS_UNSUCCESSFUL;
             }
 
-        }
-
-        //set attributes
-        MaskValueSet<FileAttribute> fileAttrs = MaskValueSet.getSetFromInt(rawFileAttributes, FileAttribute.values());
-        int status = setFileAttributes(p, fileAttrs);
-        if (status != Win32ErrorCodes.ERROR_SUCCESS) {
-            return status;
         }
 
         if (Files.isDirectory(p)) {
-            if ((rawCreateOptions & CreateOptions.FILE_NON_DIRECTORY_FILE) != 0) {
-                return Win32ErrorCodes.ERROR_DIRECTORY;
+            if (MaskValueSet.getSetFromInt(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
+                return NtStatuses.STATUS_FILE_IS_A_DIRECTORY;
             } else {
                 dokanFileInfo.IsDirectory = 1;
             }
-            //TODO
-        } else {
-
         }
 
         long val = this.handleHandler.incrementAndGet();
@@ -110,36 +100,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
 
         dokanFileInfo.Context = val;
 
-        return Win32ErrorCodes.ERROR_SUCCESS;
-    }
-
-    private int setFileAttributes(Path p, MaskValueSet<FileAttribute> fileAttrs) {
-        DosFileAttributeView attrView = Files.getFileAttributeView(p, DosFileAttributeView.class);
-        try {
-            for (FileAttribute attr : fileAttrs) {
-                switch (attr) {
-                    case HIDDEN:
-                        attrView.setHidden(true);
-                        break;
-                    case READONLY:
-                        attrView.setReadOnly(true);
-                        break;
-                    case ARCHIVE:
-                        attrView.setArchive(true);
-                        break;
-                    case SYSTEM:
-                        attrView.setSystem(true);
-                        break;
-                    default:
-                        //not supported
-                        break;
-                }
-            }
-            return Win32ErrorCodes.ERROR_SUCCESS;
-        } catch (IOException e) {
-            return Win32ErrorCodes.ERROR_WRITE_FAULT;
-
-        }
+        return NtStatuses.STATUS_SUCCESS;
     }
 
     @Override
@@ -158,13 +119,13 @@ public class DirListingFileSystem extends DokanFileSystemStub {
     public int getFileInformation(WString rawPath, ByHandleFileInformation handleFileInfo, DokanFileInfo dokanFileInfo) {
         Path p = getrootedPath(rawPath);
         if (dokanFileInfo.Context == 0) {
-            return Win32ErrorCodes.ERROR_INVALID_HANDLE;
+            return NtStatuses.STATUS_INVALID_HANDLE;
         }
         try {
             getFileInformation(p).copyTo(handleFileInfo);
-            return Win32ErrorCodes.ERROR_SUCCESS;
+            return NtStatuses.STATUS_SUCCESS;
         } catch (IOException e) {
-            return Win32ErrorCodes.ERROR_READ_FAULT;
+            return NtStatuses.STATUS_IO_DEVICE_ERROR;
         }
     }
 
@@ -193,7 +154,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
     public int findFiles(WString rawPath, DokanOperations.FillWin32FindData rawFillFindData, DokanFileInfo dokanFileInfo) {
         Path path = getrootedPath(rawPath);
         if (dokanFileInfo.Context == 0) {
-            return Win32ErrorCodes.ERROR_INVALID_HANDLE;
+            return NtStatuses.STATUS_INVALID_HANDLE;
         }
         try (Stream<Path> stream = Files.list(path)) {
             stream.map(p -> {
@@ -207,24 +168,24 @@ public class DirListingFileSystem extends DokanFileSystemStub {
                     rawFillFindData.fillWin32FindData(file, dokanFileInfo);
                 }
             });
-            return Win32ErrorCodes.ERROR_SUCCESS;
+            return NtStatuses.STATUS_SUCCESS;
         } catch (IOException e) {
-            return Win32ErrorCodes.ERROR_READ_FAULT;
+            return NtStatuses.STATUS_IO_DEVICE_ERROR;
         }
     }
 
     @Override
     public int getDiskFreeSpace(LongByReference freeBytesAvailable, LongByReference totalNumberOfBytes, LongByReference totalNumberOfFreeBytes, DokanFileInfo dokanFileInfo) {
         if (this.fileStore == null) {
-            return Win32ErrorCodes.ERROR_GEN_FAILURE;
+            return NtStatuses.STATUS_UNSUCCESSFUL;
         } else {
             try {
                 freeBytesAvailable.setValue(fileStore.getUsableSpace());
                 totalNumberOfBytes.setValue(fileStore.getTotalSpace());
                 totalNumberOfFreeBytes.setValue(fileStore.getUnallocatedSpace());
-                return Win32ErrorCodes.ERROR_SUCCESS;
+                return NtStatuses.STATUS_SUCCESS;
             } catch (IOException e) {
-                return Win32ErrorCodes.ERROR_IO_DEVICE;
+                return NtStatuses.STATUS_IO_DEVICE_ERROR;
             }
         }
     }
@@ -236,7 +197,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         rawMaximumComponentLength.setValue(this.fileSystemInformation.getMaxComponentLength());
         rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().toInt());
         rawFileSystemNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.fileSystemInformation.getFileSystemName(), rawFileSystemNameSize));
-        return Win32ErrorCodes.ERROR_SUCCESS;
+        return NtStatuses.STATUS_SUCCESS;
     }
 
     private Path getrootedPath(WString rawPath) {
