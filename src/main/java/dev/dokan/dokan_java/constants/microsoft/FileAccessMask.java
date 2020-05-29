@@ -25,8 +25,8 @@ public enum FileAccessMask implements MaskValueEnum {
         this.maskingValue = maskingValue;
     }
 
-    public static MaskValueSet<FileAccessMask> getSetFromInt(final int value) {
-        return MaskValueSet.getSetFromInt(value, values());
+    public static MaskValueSet<FileAccessMask> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
     @Override

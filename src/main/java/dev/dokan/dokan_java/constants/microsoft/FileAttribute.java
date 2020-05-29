@@ -35,8 +35,8 @@ public enum FileAttribute implements MaskValueEnum {
 
     private final int maskingValue;
 
-    public static MaskValueSet<FileAttribute> getSetFromInt(final int value) {
-        return MaskValueSet.getSetFromInt(value, values());
+    public static MaskValueSet<FileAttribute> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
     FileAttribute(final int maskingValue) {
