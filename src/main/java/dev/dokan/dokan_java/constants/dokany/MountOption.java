@@ -28,8 +28,8 @@ public enum MountOption implements MaskValueEnum {
         this.description = desc;
     }
 
-    public static MaskValueSet<MountOption> getSetFromInt(final int value) {
-        return MaskValueSet.getSetFromInt(value, values());
+    public static MaskValueSet<MountOption> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
     @Override

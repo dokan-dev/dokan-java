@@ -86,7 +86,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         }
 
         if (Files.isDirectory(p)) {
-            if (MaskValueSet.getSetFromInt(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
+            if (MaskValueSet.maskValueSet(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
                 return NtStatuses.STATUS_FILE_IS_A_DIRECTORY;
             } else {
                 dokanFileInfo.IsDirectory = 1;

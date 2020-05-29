@@ -104,8 +104,8 @@ public enum AccessMask implements MaskValueEnum {
 		this.maskingValue = (int) maskingValue;
 	}
 
-	public static MaskValueSet<AccessMask> getSetFromInt(final int value) {
-		return MaskValueSet.getSetFromInt(value, values());
+	public static MaskValueSet<AccessMask> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
 	}
 
 	@Override

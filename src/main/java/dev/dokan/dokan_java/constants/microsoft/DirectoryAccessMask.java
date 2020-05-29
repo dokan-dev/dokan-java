@@ -19,8 +19,8 @@ public enum DirectoryAccessMask implements MaskValueEnum {
 		this.maskingValue = maskingValue;
 	}
 
-	public static MaskValueSet<DirectoryAccessMask> getSetFromInt(final int value) {
-		return MaskValueSet.getSetFromInt(value, values());
+	public static MaskValueSet<DirectoryAccessMask> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
 	}
 
 	@Override
