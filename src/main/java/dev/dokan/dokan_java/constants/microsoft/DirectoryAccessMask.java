@@ -13,10 +13,10 @@ public enum DirectoryAccessMask implements MaskValueEnum {
     LIST_DIRECTORY(WinNT.FILE_LIST_DIRECTORY),
     TRAVERSE(WinNT.FILE_TRAVERSE);
 
-	private final int maskValue;
+	private final int maskingValue;
 
-	DirectoryAccessMask(int maskValue) {
-		this.maskValue = maskValue;
+	DirectoryAccessMask(int maskingValue) {
+		this.maskingValue = maskingValue;
 	}
 
 	public static MaskValueSet<DirectoryAccessMask> getSetFromInt(final int value) {
@@ -25,6 +25,6 @@ public enum DirectoryAccessMask implements MaskValueEnum {
 
 	@Override
 	public int intValue() {
-		return this.maskValue;
+		return this.maskingValue;
 	}
 }

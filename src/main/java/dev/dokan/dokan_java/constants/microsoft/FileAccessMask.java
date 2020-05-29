@@ -19,10 +19,10 @@ public enum FileAccessMask implements MaskValueEnum {
     APPEND_DATA(WinNT.FILE_APPEND_DATA),
     EXECUTE(WinNT.FILE_EXECUTE);
 
-    private final int maskValue;
+    private final int maskingValue;
 
-    FileAccessMask(int maskValue) {
-        this.maskValue = maskValue;
+    FileAccessMask(int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
     public static MaskValueSet<FileAccessMask> getSetFromInt(final int value) {
@@ -31,6 +31,6 @@ public enum FileAccessMask implements MaskValueEnum {
 
     @Override
     public int intValue() {
-        return this.maskValue;
+        return this.maskingValue;
     }
 }

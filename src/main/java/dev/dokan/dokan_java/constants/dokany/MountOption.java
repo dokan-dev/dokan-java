@@ -20,11 +20,11 @@ public enum MountOption implements MaskValueEnum {
     CURRENT_SESSION(128, "Mount the drive on current session only."),
     FILELOCK_USER_MODE(256, "Enable Lockfile/Unlockfile operations. Otherwise Dokan will take care of it.");
 
-    private final int maskValue;
+    private final int maskingValue;
     private final String description;
 
-    MountOption(final int maskValue, final String desc) {
-        this.maskValue = maskValue;
+    MountOption(final int maskingValue, final String desc) {
+        this.maskingValue = maskingValue;
         this.description = desc;
     }
 
@@ -34,7 +34,7 @@ public enum MountOption implements MaskValueEnum {
 
     @Override
     public int intValue() {
-        return this.maskValue;
+        return this.maskingValue;
     }
 
     public String getDescription() {

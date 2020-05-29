@@ -54,10 +54,10 @@ public enum AccessControlEntryFlag implements MaskValueEnum {
 	SUCCESSFUL_ACCESS_ACE_FLAG(0x40);
 
 
-	private final int maskValue;
+	private final int maskingValue;
 
-	AccessControlEntryFlag(int maskValue) {
-		this.maskValue = maskValue;
+	AccessControlEntryFlag(int maskingValue) {
+		this.maskingValue = maskingValue;
 	}
 
 	public static MaskValueSet<AccessControlEntryFlag> getSetFromInt(final int value) {
@@ -66,6 +66,6 @@ public enum AccessControlEntryFlag implements MaskValueEnum {
 
 	@Override
 	public int intValue() {
-		return this.maskValue;
+		return this.maskingValue;
 	}
 }

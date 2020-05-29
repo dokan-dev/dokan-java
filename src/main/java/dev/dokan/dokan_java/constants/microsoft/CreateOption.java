@@ -29,10 +29,10 @@ public enum CreateOption implements MaskValueEnum {
     FILE_NO_COMPRESSION(CreateOptions.FILE_NO_COMPRESSION),
     FILE_SESSION_AWARE(CreateOptions.FILE_SESSION_AWARE);
 
-    private final int maskValue;
+    private final int maskingValue;
 
-    CreateOption(final int maskValue) {
-        this.maskValue = maskValue;
+    CreateOption(final int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
     public static MaskValueSet<CreateOption> getSetFromInt(final int value) {
@@ -41,7 +41,7 @@ public enum CreateOption implements MaskValueEnum {
 
     @Override
     public int intValue() {
-        return this.maskValue;
+        return this.maskingValue;
     }
 
 }

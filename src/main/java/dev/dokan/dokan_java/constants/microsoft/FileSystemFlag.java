@@ -41,18 +41,18 @@ public enum FileSystemFlag implements MaskValueEnum {
     VOLUME_IS_COMPRESSED(WinNT.FILE_VOLUME_IS_COMPRESSED),
     VOLUME_QUOTAS(WinNT.FILE_VOLUME_QUOTAS);
 
-    private final int maskValue;
+    private final int maskingValue;
 
     public static MaskValueSet<FileSystemFlag> getSetFromInt(final int value) {
         return MaskValueSet.getSetFromInt(value, values());
     }
 
-    FileSystemFlag(final int maskValue) {
-        this.maskValue = maskValue;
+    FileSystemFlag(final int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
     @Override
     public int intValue() {
-        return this.maskValue;
+        return this.maskingValue;
     }
 }

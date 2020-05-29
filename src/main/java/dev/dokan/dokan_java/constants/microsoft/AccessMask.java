@@ -98,10 +98,10 @@ public enum AccessMask implements MaskValueEnum {
 	 */
 	DELETE(WinNT.DELETE);
 
-	private int maskValue;
+	private int maskingValue;
 
-	AccessMask(long maskValue) {
-		this.maskValue = (int) maskValue;
+	AccessMask(long maskingValue) {
+		this.maskingValue = (int) maskingValue;
 	}
 
 	public static MaskValueSet<AccessMask> getSetFromInt(final int value) {
@@ -110,6 +110,6 @@ public enum AccessMask implements MaskValueEnum {
 
 	@Override
 	public int intValue() {
-		return this.maskValue;
+		return this.maskingValue;
 	}
 }

@@ -33,18 +33,18 @@ public enum FileAttribute implements MaskValueEnum {
     RECALL_ON_DATA_ACCESS(4194394),
     RECALL_ON_OPEN(262144);
 
-    private final int maskValue;
+    private final int maskingValue;
 
     public static MaskValueSet<FileAttribute> getSetFromInt(final int value) {
         return MaskValueSet.getSetFromInt(value, values());
     }
 
-    FileAttribute(final int maskValue) {
-        this.maskValue = maskValue;
+    FileAttribute(final int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
     @Override
     public int intValue() {
-        return this.maskValue;
+        return this.maskingValue;
     }
 }

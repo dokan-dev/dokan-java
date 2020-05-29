@@ -105,10 +105,10 @@ public enum SecurityDescriptorControlFlag implements MaskValueEnum {
 	 */
 	OD(1 << 0);
 
-	private final int maskValue;
+	private final int maskingValue;
 
-	SecurityDescriptorControlFlag(int maskValue) {
-		this.maskValue = maskValue;
+	SecurityDescriptorControlFlag(int maskingValue) {
+		this.maskingValue = maskingValue;
 	}
 
 	public static MaskValueSet<SecurityDescriptorControlFlag> getSetFromInt(final int value) {
@@ -116,6 +116,6 @@ public enum SecurityDescriptorControlFlag implements MaskValueEnum {
 	}
 	@Override
 	public int intValue() {
-		return this.maskValue;
+		return this.maskingValue;
 	}
 }
