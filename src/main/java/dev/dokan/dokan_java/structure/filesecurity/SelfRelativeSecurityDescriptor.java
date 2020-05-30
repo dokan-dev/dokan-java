@@ -145,7 +145,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
         ByteBuffer buf = ByteBuffer.allocate(sizeOfByteArray());
         buf.put(revision);
         buf.put(sbz1);
-        buf.putShort(Short.reverseBytes((short) control.toInt()));
+        buf.putShort(Short.reverseBytes((short) control.intValue()));
         buf.putInt(Integer.reverseBytes(offsetOwner));
         buf.putInt(Integer.reverseBytes(offsetGroup));
         buf.putInt(Integer.reverseBytes(offsetSacl));
@@ -169,7 +169,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
     }
 
     public static SelfRelativeSecurityDescriptor createEmptySD(MaskValueSet<SecurityDescriptorControlFlag> flags) {
-        if ((flags.toInt() & (SecurityDescriptorControlFlag.DP.intValue() | SecurityDescriptorControlFlag.SP.intValue())) == 0) {
+        if ((flags.intValue() & (SecurityDescriptorControlFlag.DP.intValue() | SecurityDescriptorControlFlag.SP.intValue())) == 0) {
             flags.add(SecurityDescriptorControlFlag.SR);
             return new SelfRelativeSecurityDescriptor(flags);
         } else {
@@ -179,7 +179,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
     }
 
     public static SelfRelativeSecurityDescriptor createSD(MaskValueSet<SecurityDescriptorControlFlag> flags, SecurityIdentifier owner, SecurityIdentifier group, AccessControlList sacl, AccessControlList dacl) {
-        int controlMask = flags.toInt();
+        int controlMask = flags.intValue();
         if ((controlMask & SecurityDescriptorControlFlag.DP.intValue()) != 0 && dacl == null) {
             //abort
             return null;

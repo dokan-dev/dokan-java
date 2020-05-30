@@ -72,7 +72,7 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	public DokanOptions(final String mountPoint, final short threadCount, final MaskValueSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
-		Options = mountOptions.toInt();
+		Options = mountOptions.intValue();
 		if (uncName != null) {
 			UNCName = new WString(uncName);
 		} else {

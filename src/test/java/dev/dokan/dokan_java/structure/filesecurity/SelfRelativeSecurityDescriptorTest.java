@@ -27,9 +27,9 @@ public class SelfRelativeSecurityDescriptorTest {
 		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
 		ByteBuffer buf = ByteBuffer.allocate(2);
 
-		Assertions.assertEquals((43 << 8 + 0) << 16, Integer.reverseBytes(control.toInt()));
-		Assertions.assertEquals((43 << 8 + 0), Short.reverseBytes((short) control.toInt()));
-		Assertions.assertArrayEquals(new byte[]{43, 0}, buf.putShort(Short.reverseBytes((short) control.toInt())).array());
+		Assertions.assertEquals((43 << 8 + 0) << 16, Integer.reverseBytes(control.intValue()));
+		Assertions.assertEquals((43 << 8 + 0), Short.reverseBytes((short) control.intValue()));
+		Assertions.assertArrayEquals(new byte[]{43, 0}, buf.putShort(Short.reverseBytes((short) control.intValue())).array());
 	}
 
 	@Test

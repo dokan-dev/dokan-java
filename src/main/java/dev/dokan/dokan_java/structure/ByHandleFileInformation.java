@@ -107,7 +107,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
 
     public ByHandleFileInformation(Path filePath, MaskValueSet<FileAttribute> attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, int volumeSerialNumber, long fileSize, long fileIndex) {
         this.filePath = filePath;
-        this.dwFileAttributes = attrs.toInt();
+        this.dwFileAttributes = attrs.intValue();
         this.setTimes(creationTime.toMillis(), lastAccessTime.toMillis(), lastWriteTime.toMillis());
         this.setIndex(fileIndex);
         this.setFileSize(fileSize);
@@ -137,7 +137,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     }
 
     public void setAttributes(final MaskValueSet<FileAttribute> attributes) {
-        this.dwFileAttributes = attributes != null ? attributes.toInt() : FileAttribute.NORMAL.intValue();
+        this.dwFileAttributes = attributes != null ? attributes.intValue() : FileAttribute.NORMAL.intValue();
     }
 
     public void setTimes(final long creationTime, final long lastAccessTime, final long lastWriteTime) {

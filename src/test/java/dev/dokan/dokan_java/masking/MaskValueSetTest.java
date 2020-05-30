@@ -13,7 +13,7 @@ public class MaskValueSetTest {
         Assertions.assertTrue(testSet.contains(TestEnum.A));
         Assertions.assertTrue(testSet.contains(TestEnum.B));
         Assertions.assertTrue(testSet.contains(TestEnum.C));
-        Assertions.assertEquals(val, testSet.toInt());
+        Assertions.assertEquals(val, testSet.intValue());
     }
 
     enum TestEnum implements MaskValueEnum {

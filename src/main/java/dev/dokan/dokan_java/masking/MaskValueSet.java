@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @param <T> Type of {@link EnumInteger}
  */
-public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T> {
+public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T>, IntegerConvertible {
 
     static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> emptySet(Class<T> clazz) {
         return new MaskValueSetImpl<>(clazz);
@@ -50,7 +50,5 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T> 
     }
 
     void add(T... items);
-
-    int toInt();
 
 }

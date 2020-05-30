@@ -195,7 +195,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         rawVolumeNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.volumeName, rawVolumeNameSize));
         rawVolumeSerialNumber.setValue(this.volumeSerialnumber);
         rawMaximumComponentLength.setValue(this.fileSystemInformation.getMaxComponentLength());
-        rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().toInt());
+        rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().intValue());
         rawFileSystemNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.fileSystemInformation.getFileSystemName(), rawFileSystemNameSize));
         return NtStatuses.STATUS_SUCCESS;
     }

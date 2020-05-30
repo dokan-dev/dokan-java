@@ -21,7 +21,6 @@ public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends Abstrac
         this.elements = EnumSet.of(first, others);
     }
 
-
     @SafeVarargs
     @Override
     public final void add(T... items) {
@@ -33,7 +32,7 @@ public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends Abstrac
     }
 
     @Override
-    public int toInt() {
+    public int intValue() {
         int toReturn = 0;
         for (final T current : this.elements) {
             toReturn |= current.intValue();

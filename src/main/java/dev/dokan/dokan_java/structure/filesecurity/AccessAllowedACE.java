@@ -23,9 +23,9 @@ public class AccessAllowedACE extends AccessControlEntry {
 	public byte[] toByteArray() {
 		ByteBuffer buf = ByteBuffer.allocate(sizeOfByteArray());
 		buf.put(type.toByteArray());
-		buf.put((byte) flags.toInt());
+		buf.put((byte) flags.intValue());
 		buf.putShort(Short.reverseBytes((short) sizeOfByteArray()));
-		buf.putInt(Integer.reverseBytes(rights.toInt()));
+		buf.putInt(Integer.reverseBytes(rights.intValue()));
 		buf.put(sid.toByteArray());
 		return buf.array();
 	}
