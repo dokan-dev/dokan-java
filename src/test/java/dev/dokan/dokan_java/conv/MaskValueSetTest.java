@@ -8,7 +8,7 @@ public class MaskValueSetTest {
     @Test
     void fromIntOverEnumIntegerSetToInt() {
         int val = TestEnum.A.intValue() | TestEnum.B.intValue() | TestEnum.C.intValue();
-        MaskValueSet<TestEnum> testSet = MaskValueSet.enumSetFromInt(val, TestEnum.values());
+        MaskValueSet<TestEnum> testSet = MaskValueSet.maskValueSet(val, TestEnum.values());
         Assertions.assertFalse(testSet.contains(TestEnum.D));
         Assertions.assertTrue(testSet.contains(TestEnum.A));
         Assertions.assertTrue(testSet.contains(TestEnum.B));
@@ -16,7 +16,7 @@ public class MaskValueSetTest {
         Assertions.assertEquals(val, testSet.toInt());
     }
 
-    enum TestEnum implements EnumInteger {
+    enum TestEnum implements MaskValueEnum {
         A(0x01),
         B(0x08),
         C(0x110),
