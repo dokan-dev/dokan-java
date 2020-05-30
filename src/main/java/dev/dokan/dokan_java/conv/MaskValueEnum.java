@@ -15,7 +15,7 @@ public interface MaskValueEnum extends EnumInteger {
         return MaskValueSet.maskValueSet(mask, type);
     }
 
-    default int getMaskingValue() {
+    default int maskingValue() {
         return intValue();
     }
 }
