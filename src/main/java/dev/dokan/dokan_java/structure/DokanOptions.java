@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 
-import dev.dokan.dokan_java.conv.MaskValueEnum;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Enumeration of the different ACE control flags.

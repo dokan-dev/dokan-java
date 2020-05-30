@@ -10,7 +10,7 @@ import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;

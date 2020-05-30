@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.conv.MaskValueSet;
-import dev.dokan.dokan_java.conv.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
 
 /**
  * Enum of flags specifying the options to apply when the driver creates or opens the file.

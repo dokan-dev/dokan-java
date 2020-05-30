@@ -1,8 +1,8 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 import com.sun.jna.platform.win32.WinNT;
-import dev.dokan.dokan_java.conv.MaskValueEnum;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Additional {@link AccessMask} values specific to files.

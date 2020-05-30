@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.examples;
 import dev.dokan.dokan_java.FileSystemInformation;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 
 import java.io.IOException;

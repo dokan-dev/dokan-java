@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.conv;
+package dev.dokan.dokan_java.masking;
 
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;

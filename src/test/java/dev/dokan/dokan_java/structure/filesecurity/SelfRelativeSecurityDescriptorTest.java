@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SecurityDescriptorControlFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -2,8 +2,8 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.DokanOperations;
-import dev.dokan.dokan_java.conv.MaskValueSet;
-import dev.dokan.dokan_java.conv.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
 
 /**
  * Properties which the implemented filesystem supports.

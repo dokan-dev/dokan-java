@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.Byteable;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SecurityDescriptorControlFlag;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;

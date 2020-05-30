@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java;
 
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.conv.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Supplementary class to bundle information of the filesystem.

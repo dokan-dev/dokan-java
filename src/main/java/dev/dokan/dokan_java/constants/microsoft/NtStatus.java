@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 
-import dev.dokan.dokan_java.conv.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 /**
  * NTSTATUS values are status codes indicating the success or reason of failure of called methods.

@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.conv.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 /**
  * Enum of actions to take on a not-necessarily existing file or device.
