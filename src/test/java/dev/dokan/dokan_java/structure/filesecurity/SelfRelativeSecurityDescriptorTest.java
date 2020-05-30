@@ -24,8 +24,7 @@ public class SelfRelativeSecurityDescriptorTest {
 
 	@Test
 	public void testControlField() {
-		MaskValueSet<SecurityDescriptorControlFlag> control = new MaskValueSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
 		ByteBuffer buf = ByteBuffer.allocate(2);
 
 		Assertions.assertEquals((43 << 8 + 0) << 16, Integer.reverseBytes(control.toInt()));
@@ -64,11 +63,9 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testAccessAllowedACE() {
 		//set the flag
-		MaskValueSet<AccessControlEntryFlag> flags = new MaskValueSet<AccessControlEntryFlag>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = new MaskValueSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");// everyone sid
 		//create ace
@@ -92,11 +89,9 @@ public class SelfRelativeSecurityDescriptorTest {
 		Assertions.assertArrayEquals(new byte[]{0x04, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00}, emptySaclRev4.toByteArray());
 
 		//test DACL rev2 with accessAllowACE
-		MaskValueSet<AccessControlEntryFlag> flags = new MaskValueSet<AccessControlEntryFlag>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = new MaskValueSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");
 		//create ace
@@ -107,8 +102,7 @@ public class SelfRelativeSecurityDescriptorTest {
 
 	@Test
 	public void testEmptySecurityDescriptor() {
-		MaskValueSet<SecurityDescriptorControlFlag> flags = new MaskValueSet<>(SecurityDescriptorControlFlag.class);
-		flags.add(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> flags = MaskValueSet.of(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
 		byte[] expected = getEmptySelfRelativeSecurityDescriptorWithEmptyFlags();
 		expected[2] = 43;
 		Assertions.assertArrayEquals(expected, SelfRelativeSecurityDescriptor.createEmptySD(flags).toByteArray());
@@ -117,8 +111,7 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testOwnerAndGroupSD() {
 		//control
-		MaskValueSet<SecurityDescriptorControlFlag> control = new MaskValueSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.SD, SecurityDescriptorControlFlag.DD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.SD, SecurityDescriptorControlFlag.DD);
 		//owner
 		SecurityIdentifier oSid = SecurityIdentifier.fromString("S-1-1-0");
 		//group
@@ -140,18 +133,15 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testSDWithOwnerGroupAndDacl() {
 		//control
-		MaskValueSet<SecurityDescriptorControlFlag> control = new MaskValueSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.DP, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.DP, SecurityDescriptorControlFlag.SD);
 		//owner
 		SecurityIdentifier oSid = SecurityIdentifier.fromString("S-1-1-0");
 		SecurityIdentifier gSid = SecurityIdentifier.fromString("S-1-1-0");
 		//ace
 		//ace control
-		MaskValueSet<AccessControlEntryFlag> flags = new MaskValueSet<>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = new MaskValueSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//create ace
 		AccessControlList daclRev2WithAccessAllow = AccessControlList.createDaclRevision2(Collections.singletonList(new AccessAllowedACE(flags, oSid, mask)));
 

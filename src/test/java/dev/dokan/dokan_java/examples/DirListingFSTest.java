@@ -17,11 +17,9 @@ public class DirListingFSTest {
         System.out.println("Starting Dokany MirrorFS");
 
         Path mountPoint = Path.of("M:\\mnt\\");
-        MaskValueSet<MountOption> mountOptions = new MaskValueSet<>(MountOption.class);
-        mountOptions.add(MountOption.STD_ERR_OUTPUT, MountOption.WRITE_PROTECTION, MountOption.CURRENT_SESSION);
+        MaskValueSet<MountOption> mountOptions = MaskValueSet.of(MountOption.STD_ERR_OUTPUT, MountOption.WRITE_PROTECTION, MountOption.CURRENT_SESSION);
 
-        MaskValueSet<FileSystemFlag> fsFeatures = new MaskValueSet<>(FileSystemFlag.class);
-        fsFeatures.add(FileSystemFlag.READ_ONLY_VOLUME, FileSystemFlag.CASE_PRESERVED_NAMES);
+        MaskValueSet<FileSystemFlag> fsFeatures = MaskValueSet.of(FileSystemFlag.READ_ONLY_VOLUME, FileSystemFlag.CASE_PRESERVED_NAMES);
         FileSystemInformation fsInfo = new FileSystemInformation(fsFeatures);
         try (DirListingFileSystem fs = new DirListingFileSystem(Paths.get("M:\\test"), fsInfo)) {
             fs.mount(mountPoint, mountOptions);
