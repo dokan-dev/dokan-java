@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SecurityDescriptorControlFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +24,12 @@ public class SelfRelativeSecurityDescriptorTest {
 
 	@Test
 	public void testControlField() {
-		EnumIntegerSet<SecurityDescriptorControlFlag> control = new EnumIntegerSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
 		ByteBuffer buf = ByteBuffer.allocate(2);
 
-		Assertions.assertEquals((43 << 8 + 0) << 16, Integer.reverseBytes(control.toInt()));
-		Assertions.assertEquals((43 << 8 + 0), Short.reverseBytes((short) control.toInt()));
-		Assertions.assertArrayEquals(new byte[]{43, 0}, buf.putShort(Short.reverseBytes((short) control.toInt())).array());
+		Assertions.assertEquals((43 << 8 + 0) << 16, Integer.reverseBytes(control.intValue()));
+		Assertions.assertEquals((43 << 8 + 0), Short.reverseBytes((short) control.intValue()));
+		Assertions.assertArrayEquals(new byte[]{43, 0}, buf.putShort(Short.reverseBytes((short) control.intValue())).array());
 	}
 
 	@Test
@@ -64,11 +63,9 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testAccessAllowedACE() {
 		//set the flag
-		EnumIntegerSet<AccessControlEntryFlag> flags = new EnumIntegerSet<AccessControlEntryFlag>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		EnumIntegerSet<AccessMask> mask = new EnumIntegerSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");// everyone sid
 		//create ace
@@ -92,11 +89,9 @@ public class SelfRelativeSecurityDescriptorTest {
 		Assertions.assertArrayEquals(new byte[]{0x04, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00}, emptySaclRev4.toByteArray());
 
 		//test DACL rev2 with accessAllowACE
-		EnumIntegerSet<AccessControlEntryFlag> flags = new EnumIntegerSet<AccessControlEntryFlag>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		EnumIntegerSet<AccessMask> mask = new EnumIntegerSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");
 		//create ace
@@ -107,8 +102,7 @@ public class SelfRelativeSecurityDescriptorTest {
 
 	@Test
 	public void testEmptySecurityDescriptor() {
-		EnumIntegerSet<SecurityDescriptorControlFlag> flags = new EnumIntegerSet<>(SecurityDescriptorControlFlag.class);
-		flags.add(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> flags = MaskValueSet.of(SecurityDescriptorControlFlag.GD, SecurityDescriptorControlFlag.OD, SecurityDescriptorControlFlag.DD, SecurityDescriptorControlFlag.SD);
 		byte[] expected = getEmptySelfRelativeSecurityDescriptorWithEmptyFlags();
 		expected[2] = 43;
 		Assertions.assertArrayEquals(expected, SelfRelativeSecurityDescriptor.createEmptySD(flags).toByteArray());
@@ -117,8 +111,7 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testOwnerAndGroupSD() {
 		//control
-		EnumIntegerSet<SecurityDescriptorControlFlag> control = new EnumIntegerSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.SD, SecurityDescriptorControlFlag.DD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.SD, SecurityDescriptorControlFlag.DD);
 		//owner
 		SecurityIdentifier oSid = SecurityIdentifier.fromString("S-1-1-0");
 		//group
@@ -140,18 +133,15 @@ public class SelfRelativeSecurityDescriptorTest {
 	@Test
 	public void testSDWithOwnerGroupAndDacl() {
 		//control
-		EnumIntegerSet<SecurityDescriptorControlFlag> control = new EnumIntegerSet<>(SecurityDescriptorControlFlag.class);
-		control.add(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.DP, SecurityDescriptorControlFlag.SD);
+		MaskValueSet<SecurityDescriptorControlFlag> control = MaskValueSet.of(SecurityDescriptorControlFlag.SR, SecurityDescriptorControlFlag.DP, SecurityDescriptorControlFlag.SD);
 		//owner
 		SecurityIdentifier oSid = SecurityIdentifier.fromString("S-1-1-0");
 		SecurityIdentifier gSid = SecurityIdentifier.fromString("S-1-1-0");
 		//ace
 		//ace control
-		EnumIntegerSet<AccessControlEntryFlag> flags = new EnumIntegerSet<>(AccessControlEntryFlag.class);
-		flags.add(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
+		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		EnumIntegerSet<AccessMask> mask = new EnumIntegerSet<>(AccessMask.class);
-		mask.add(AccessMask.GENERIC_ALL);
+		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
 		//create ace
 		AccessControlList daclRev2WithAccessAllow = AccessControlList.createDaclRevision2(Collections.singletonList(new AccessAllowedACE(flags, oSid, mask)));
 

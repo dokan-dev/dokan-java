@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.dokany;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
 import dev.dokan.dokan_java.structure.DokanOptions;
 
 /**
@@ -9,7 +9,7 @@ import dev.dokan.dokan_java.structure.DokanOptions;
  *
  * @see <a href="https://dokan-dev.github.io/dokany-doc/html/group___d_o_k_a_n___o_p_t_i_o_n.html">Dokany documentation</a>
  */
-public enum MountOption implements EnumInteger {
+public enum MountOption implements MaskValueEnum {
     DEBUG_MODE(1, "Enable output debug message."),
     STD_ERR_OUTPUT(2, "Enable output debug message to stderr."),
     ALT_STREAM(4, "Use alternate stream."),
@@ -20,20 +20,21 @@ public enum MountOption implements EnumInteger {
     CURRENT_SESSION(128, "Mount the drive on current session only."),
     FILELOCK_USER_MODE(256, "Enable Lockfile/Unlockfile operations. Otherwise Dokan will take care of it.");
 
-    private final int mask;
+    private final int maskingValue;
     private final String description;
 
-    MountOption(final int i, final String desc) {
-        this.mask = i;
+    MountOption(final int maskingValue, final String desc) {
+        this.maskingValue = maskingValue;
         this.description = desc;
     }
 
-    public static EnumIntegerSet<MountOption> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<MountOption> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
-    public int getMask() {
-        return this.mask;
+    @Override
+    public int intValue() {
+        return this.maskingValue;
     }
 
     public String getDescription() {

@@ -1,9 +1,8 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.platform.win32.WinNT;
-import com.sun.jna.ptr.IntByReference;
+import dev.dokan.dokan_java.DokanNativeMethods;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 /**
  * Enum of actions to take on a not-necessarily existing file or device.
@@ -64,18 +63,19 @@ public enum CreationDisposition implements EnumInteger {
     OPEN_ALWAYS(WinNT.OPEN_ALWAYS),
     TRUNCATE_EXISTING(WinNT.TRUNCATE_EXISTING);
 
-    private final int mask;
+    private final int intValue;
 
-    CreationDisposition(final int i) {
-        mask = i;
+    CreationDisposition(final int intValue) {
+        this.intValue = intValue;
     }
 
     public static CreationDisposition fromInt(final int value) {
         return EnumInteger.enumFromInt(value, values());
     }
 
-    public int getMask() {
-        return this.mask;
+    @Override
+    public int intValue() {
+        return this.intValue;
     }
 
 }

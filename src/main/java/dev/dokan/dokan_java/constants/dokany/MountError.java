@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.dokany;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 /**
  * Return values of com.dokan.java.NativeMethods#DokanMain(DokanOptions, DokanOperations)
@@ -17,20 +17,21 @@ public enum MountError implements EnumInteger {
     MOUNT_POINT_ERROR(-6, "Mount failed: Mount point is invalid."),
     VERSION_ERROR(-7, "Mount failed: Requested an incompatible version.");
 
-    private final int mask;
+    private final int intValue;
     private final String description;
 
     public static MountError fromInt(final int value) {
         return EnumInteger.enumFromInt(value, values());
     }
 
-    MountError(final int mask, final String description) {
-        this.mask = mask;
+    MountError(final int intValue, final String description) {
+        this.intValue = intValue;
         this.description = description;
     }
 
-    public int getMask() {
-        return this.mask;
+    @Override
+    public int intValue() {
+        return this.intValue;
     }
 
     public String getDescription() {

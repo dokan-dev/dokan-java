@@ -140,19 +140,19 @@ public class DokanUtils {
     public static int convertCreateDispositionToCreationDispostion(int createDisposition) {
         switch (createDisposition) {
             case FILE_CREATE:
-                return CREATE_NEW.getMask();
+                return CREATE_NEW.intValue();
             case FILE_OPEN:
-                return OPEN_EXISTING.getMask();
+                return OPEN_EXISTING.intValue();
             case FILE_OPEN_IF:
-                return OPEN_ALWAYS.getMask();
+                return OPEN_ALWAYS.intValue();
             case FILE_OVERWRITE:
-                return TRUNCATE_EXISTING.getMask();
+                return TRUNCATE_EXISTING.intValue();
             case FILE_SUPERSEDE:
                 // The documentation isn't clear on the difference between replacing a file
                 // and truncating it.
                 // For now we just map it to create/truncate
             case FILE_OVERWRITE_IF:
-                return CREATE_ALWAYS.getMask();
+                return CREATE_ALWAYS.intValue();
             default:
                 //TODO: maybe throw an exception
                 return 0;

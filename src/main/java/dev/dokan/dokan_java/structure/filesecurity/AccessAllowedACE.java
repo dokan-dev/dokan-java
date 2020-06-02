@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryType;
@@ -9,11 +9,11 @@ import java.nio.ByteBuffer;
 
 public class AccessAllowedACE extends AccessControlEntry {
 
-	EnumIntegerSet<AccessMask> rights;
+	MaskValueSet<AccessMask> rights;
 
 	SecurityIdentifier sid;
 
-	public AccessAllowedACE(EnumIntegerSet<AccessControlEntryFlag> flags, SecurityIdentifier sid, EnumIntegerSet<AccessMask> rights) {
+	public AccessAllowedACE(MaskValueSet<AccessControlEntryFlag> flags, SecurityIdentifier sid, MaskValueSet<AccessMask> rights) {
 		super(AccessControlEntryType.ACCESS_ALLOWED_ACE_TYPE, flags);
 		this.rights = rights;
 		this.sid = sid;
@@ -23,9 +23,9 @@ public class AccessAllowedACE extends AccessControlEntry {
 	public byte[] toByteArray() {
 		ByteBuffer buf = ByteBuffer.allocate(sizeOfByteArray());
 		buf.put(type.toByteArray());
-		buf.put((byte) flags.toInt());
+		buf.put((byte) flags.intValue());
 		buf.putShort(Short.reverseBytes((short) sizeOfByteArray()));
-		buf.putInt(Integer.reverseBytes(rights.toInt()));
+		buf.putInt(Integer.reverseBytes(rights.intValue()));
 		buf.put(sid.toByteArray());
 		return buf.array();
 	}

@@ -1,13 +1,14 @@
 package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Enumeration of the different ACE control flags.
  * <p>
  * From the <a href="https://msdn.microsoft.com/en-us/library/cc230296.aspx">Microsoft documentation</a>: An unsigned 8-bit integer that specifies a set of ACE type-specific control flags. This field can be a combination of the following values.
  */
-public enum AccessControlEntryFlag implements EnumInteger {
+public enum AccessControlEntryFlag implements MaskValueEnum {
 
 	/**
 	 * Child objects that are containers, such as directories, inherit the ACE as an effective ACE. The inherited ACE is inheritable unless the NO_PROPAGATE_INHERIT_ACE bit flag is also set.
@@ -53,15 +54,18 @@ public enum AccessControlEntryFlag implements EnumInteger {
 	SUCCESSFUL_ACCESS_ACE_FLAG(0x40);
 
 
-	private final int mask;
+	private final int maskingValue;
 
-	AccessControlEntryFlag(int mask) {
-		this.mask = mask;
+	AccessControlEntryFlag(int maskingValue) {
+		this.maskingValue = maskingValue;
 	}
 
+	public static MaskValueSet<AccessControlEntryFlag> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
+	}
 
 	@Override
-	public int getMask() {
-		return mask;
+	public int intValue() {
+		return this.maskingValue;
 	}
 }

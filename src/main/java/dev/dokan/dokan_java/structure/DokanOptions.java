@@ -5,6 +5,7 @@ import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,10 +69,10 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 
 	}
 
-	public DokanOptions(final String mountPoint, final short threadCount, final EnumIntegerSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
+	public DokanOptions(final String mountPoint, final short threadCount, final MaskValueSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
-		Options = mountOptions.toInt();
+		Options = mountOptions.intValue();
 		if (uncName != null) {
 			UNCName = new WString(uncName);
 		} else {
@@ -82,8 +83,8 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 		SectorSize = sectorSize;
 	}
 
-	public EnumIntegerSet<MountOption> getMountOptions() {
-		return EnumIntegerSet.enumSetFromInt(this.Options, MountOption.values());
+	public MaskValueSet<MountOption> getMountOptions() {
+		return MaskValueSet.maskValueSet(this.Options, MountOption.values());
 	}
 
 	@Override

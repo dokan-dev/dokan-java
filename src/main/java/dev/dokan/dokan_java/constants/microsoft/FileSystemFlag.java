@@ -1,9 +1,9 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.DokanOperations;
-import dev.dokan.dokan_java.constants.EnumInteger;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.DokanOperations;
+import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
 
 /**
  * Properties which the implemented filesystem supports.
@@ -12,12 +12,12 @@ import com.sun.jna.platform.win32.WinNT;
  * Returned in {@link DokanOperations#GetVolumeInformation} to the kernel layer indicating what properties your file system implementation supports.
  * </p>
  *
- * <p> They can be arbitrary combined within an {@link EnumIntegerSet}. However FILE_FILE_COMPRESSION and FILE_VOL_IS_COMPRESSED are mutually exclusive.</p>
+ * <p> They can be arbitrary combined within an {@link MaskValueSet}. However FILE_FILE_COMPRESSION and FILE_VOL_IS_COMPRESSED are mutually exclusive.</p>
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getvolumeinformationa#parameters">Microsoft Documentation of function GetVolumeInformation</a>, Parameter {@code lpFileSystemFlags}
  * @see <a href="https://msdn.microsoft.com/en-us/library/cc246323.aspx">Listing of possible values</a>
  */
-public enum FileSystemFlag implements EnumInteger {
+public enum FileSystemFlag implements MaskValueEnum {
     NONE(0),
     CASE_PRESERVED_NAMES(WinNT.FILE_CASE_PRESERVED_NAMES),
     CASE_SENSITIVE_SEARCH(WinNT.FILE_CASE_SENSITIVE_SEARCH),
@@ -41,17 +41,18 @@ public enum FileSystemFlag implements EnumInteger {
     VOLUME_IS_COMPRESSED(WinNT.FILE_VOLUME_IS_COMPRESSED),
     VOLUME_QUOTAS(WinNT.FILE_VOLUME_QUOTAS);
 
-    private final int mask;
+    private final int maskingValue;
 
-    public static EnumIntegerSet<FileSystemFlag> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<FileSystemFlag> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
-    FileSystemFlag(final int mask) {
-        this.mask = mask;
+    FileSystemFlag(final int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
-    public int getMask() {
-        return this.mask;
+    @Override
+    public int intValue() {
+        return this.maskingValue;
     }
 }
