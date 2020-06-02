@@ -1,8 +1,8 @@
 package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.nio.file.Path;
 
@@ -15,10 +15,10 @@ public class EasyFileInfo extends AbstractFileInfo {
 	private int numberOfLinks;
 
 	public EasyFileInfo(Path path) {
-		this(path, FileAttribute.NORMAL.getMask());
+		this(path, FileAttribute.NORMAL.maskingValue());
 	}
 
-	public EasyFileInfo(Path path, EnumIntegerSet<FileAttribute> attributes) {
+	public EasyFileInfo(Path path, MaskValueSet<FileAttribute> attributes) {
 		super(attributes);
 		this.path = path;
 	}

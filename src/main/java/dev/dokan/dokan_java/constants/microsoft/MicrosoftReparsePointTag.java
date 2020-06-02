@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 public enum MicrosoftReparsePointTag implements EnumInteger {
 
@@ -16,14 +16,18 @@ public enum MicrosoftReparsePointTag implements EnumInteger {
 	IO_REPARSE_TAG_SYMLINK(0xA000000C),
 	IO_REPARSE_TAG_WIM(0x80000008);
 
-	private final int mask;
+	private final int intValue;
 
-	MicrosoftReparsePointTag(int mask) {
-		this.mask = mask;
+	MicrosoftReparsePointTag(int intValue) {
+		this.intValue = intValue;
+	}
+
+	public static MicrosoftReparsePointTag fromInt(final int value) {
+		return EnumInteger.enumFromInt(value, values());
 	}
 
 	@Override
-	public int getMask() {
-		return this.mask;
+	public int intValue() {
+		return this.intValue;
 	}
 }

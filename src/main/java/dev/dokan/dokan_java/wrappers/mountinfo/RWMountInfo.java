@@ -2,14 +2,14 @@ package dev.dokan.dokan_java.wrappers.mountinfo;
 
 
 import dev.dokan.dokan_java.constants.dokany.MountOption;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 
 public interface RWMountInfo extends ROMountInfo {
 
     void setThreadCount(short threadCount);
 
-    void setMountOptions(EnumIntegerSet<MountOption> mountOptions);
+    void setMountOptions(MaskValueSet<MountOption> mountOptions);
 
     void setFlags(int flags);
 

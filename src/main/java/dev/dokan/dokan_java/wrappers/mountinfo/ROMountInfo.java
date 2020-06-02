@@ -2,8 +2,8 @@ package dev.dokan.dokan_java.wrappers.mountinfo;
 
 
 import dev.dokan.dokan_java.constants.dokany.MountOption;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 
 public interface ROMountInfo {
@@ -12,7 +12,7 @@ public interface ROMountInfo {
 
     short getThreadCount();
 
-    EnumIntegerSet<MountOption> getMountOptions();
+    MaskValueSet<MountOption> getMountOptions();
 
     int getFlags();
 

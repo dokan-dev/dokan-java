@@ -4,8 +4,8 @@ package dev.dokan.dokan_java.wrappers.mountinfo;
 import com.sun.jna.WString;
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 
 public class MountInfo implements RWMountInfo {
@@ -69,13 +69,13 @@ public class MountInfo implements RWMountInfo {
     }
 
     @Override
-    public EnumIntegerSet<MountOption> getMountOptions() {
-        return MountOption.fromInt(this.mountOptions);
+    public MaskValueSet<MountOption> getMountOptions() {
+        return MountOption.maskValueSet(this.mountOptions);
     }
 
     @Override
-    public void setMountOptions(EnumIntegerSet<MountOption> mountOptions) {
-        this.mountOptions = mountOptions.toInt();
+    public void setMountOptions(MaskValueSet<MountOption> mountOptions) {
+        this.mountOptions = mountOptions.intValue();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class MountInfo implements RWMountInfo {
 
     @Override
     public boolean getFlag(MountOption flag) {
-        return (this.mountOptions & flag.getMask()) != 0;
+        return (this.mountOptions & flag.maskingValue()) != 0;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class MountInfo implements RWMountInfo {
     @Override
     public boolean updateFlag(MountOption flag, boolean value) {
         boolean prev = getFlag(flag);
-        this.mountOptions &= value ? flag.getMask() : ~flag.getMask();
+        this.mountOptions &= value ? flag.maskingValue() : ~flag.maskingValue();
 
         return prev;
     }

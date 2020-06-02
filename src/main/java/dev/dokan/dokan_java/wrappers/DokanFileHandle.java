@@ -1,9 +1,9 @@
 package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.constants.dokany.DokanFileInfoFlag;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +23,7 @@ public class DokanFileHandle { //TODO Add Getters?!
 		this.processId = nativeInfo.ProcessId;
 		this.dokanOpts = nativeInfo.DokanOpts; //TODO Copy/Different link?
 
-		EnumIntegerSet<DokanFileInfoFlag> flagSet = new EnumIntegerSet<>(DokanFileInfoFlag.class);
+		MaskValueSet<DokanFileInfoFlag> flagSet = MaskValueSet.emptySet(DokanFileInfoFlag.class);
 		if(nativeInfo.deleteOnClose()) {
 			flagSet.add(DokanFileInfoFlag.DELETE_ON_CLOSE);
 		}
@@ -42,11 +42,11 @@ public class DokanFileHandle { //TODO Add Getters?!
 		if(nativeInfo.writeToEndOfFile()) {
 			flagSet.add(DokanFileInfoFlag.WRITE_TO_END_OF_FILE);
 		}
-		this.flags = new AtomicInteger(flagSet.toInt());
+		this.flags = new AtomicInteger(flagSet.intValue());
 	}
 
-	public EnumIntegerSet<DokanFileInfoFlag> getFileInfo() {
-		return EnumIntegerSet.enumSetFromInt(this.flags.get(), DokanFileInfoFlag.values());
+	public MaskValueSet<DokanFileInfoFlag> getFileInfo() {
+		return MaskValueSet.maskValueSet(this.flags.get(), DokanFileInfoFlag.values());
 	}
 
 	public int getFlags() {
@@ -58,7 +58,7 @@ public class DokanFileHandle { //TODO Add Getters?!
 	}
 
 	public boolean getFlag(DokanFileInfoFlag flag) {
-		return (this.flags.get() & flag.getMask()) != 0;
+		return (this.flags.get() & flag.maskingValue()) != 0;
 	}
 
 	public boolean setFlag(DokanFileInfoFlag flag) {
@@ -70,8 +70,8 @@ public class DokanFileHandle { //TODO Add Getters?!
 	}
 
 	public boolean updateFlag(DokanFileInfoFlag flag, boolean value) {
-		int prev = this.flags.getAndUpdate(current -> current & (value ? flag.getMask() : ~flag.getMask()));
-		return (prev & flag.getMask()) != 0;
+		int prev = this.flags.getAndUpdate(current -> current & (value ? flag.maskingValue() : ~flag.maskingValue()));
+		return (prev & flag.maskingValue()) != 0;
 	}
 
 	public long getContext() {

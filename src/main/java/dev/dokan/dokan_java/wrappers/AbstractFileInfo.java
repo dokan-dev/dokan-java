@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.constants.dokan_java.DefaultFileTimePolicy;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,8 +25,8 @@ public class AbstractFileInfo {
 	private DefaultFileTimePolicy fileTimePolicy = DefaultFileTimePolicy.INHERIT_ELSE_1970;
 	private long fileSize;
 
-	public AbstractFileInfo(EnumIntegerSet<FileAttribute> attributes) {
-		this(attributes.isEmpty() ? FileAttribute.NORMAL.getMask() : attributes.toInt());
+	public AbstractFileInfo(MaskValueSet<FileAttribute> attributes) {
+		this(attributes.isEmpty() ? FileAttribute.NORMAL.maskingValue() : attributes.intValue());
 	}
 
 	public AbstractFileInfo(int attributes) {
@@ -41,12 +41,12 @@ public class AbstractFileInfo {
 		this.fileAttributes.set(flags);
 	}
 
-	public EnumIntegerSet<FileAttribute> getFileAttributes() {
-		return EnumIntegerSet.enumSetFromInt(this.fileAttributes.get(), FileAttribute.values());
+	public MaskValueSet<FileAttribute> getFileAttributes() {
+		return MaskValueSet.maskValueSet(this.fileAttributes.get(), FileAttribute.values());
 	}
 
 	public boolean getFlag(FileAttribute flag) {
-		return (this.fileAttributes.get() & flag.getMask()) != 0;
+		return (this.fileAttributes.get() & flag.maskingValue()) != 0;
 	}
 
 	public boolean setFlag(FileAttribute flag) {
@@ -58,8 +58,8 @@ public class AbstractFileInfo {
 	}
 
 	public boolean updateFlag(FileAttribute flag, boolean value) {
-		int prev = this.fileAttributes.getAndUpdate(current -> current & (value ? flag.getMask() : ~flag.getMask()));
-		return (prev & flag.getMask()) != 0;
+		int prev = this.fileAttributes.getAndUpdate(current -> current & (value ? flag.maskingValue() : ~flag.maskingValue()));
+		return (prev & flag.maskingValue()) != 0;
 	}
 
 	public void setTimes(long creationTime, long lastAccessTime, long lastWriteTime) {

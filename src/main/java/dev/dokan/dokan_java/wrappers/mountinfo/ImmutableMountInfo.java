@@ -4,8 +4,8 @@ package dev.dokan.dokan_java.wrappers.mountinfo;
 import com.sun.jna.WString;
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 
 public class ImmutableMountInfo implements ROMountInfo {
@@ -64,8 +64,8 @@ public class ImmutableMountInfo implements ROMountInfo {
     }
 
     @Override
-    public EnumIntegerSet<MountOption> getMountOptions() {
-        return MountOption.fromInt(this.mountOptions);
+    public MaskValueSet<MountOption> getMountOptions() {
+        return MountOption.maskValueSet(this.mountOptions);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ImmutableMountInfo implements ROMountInfo {
 
     @Override
     public boolean getFlag(MountOption flag) {
-        return (this.mountOptions & flag.getMask()) != 0;
+        return (this.mountOptions & flag.maskingValue()) != 0;
     }
 
 //    @Override

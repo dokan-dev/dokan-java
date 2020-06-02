@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Supplementary class to bundle information of the mounted volume and its filesystem.
@@ -15,13 +15,13 @@ public final class VolumeInformation {
 	private final String name;
 	private final int serialNumber;
 	private final String fileSystemName;
-	private final EnumIntegerSet<FileSystemFlag> fileSystemFeatures;
+	private final MaskValueSet<FileSystemFlag> fileSystemFeatures;
 
 	public static final int DEFAULT_MAX_COMPONENT_LENGTH = 256;
 	public static final int DEFAULT_SERIAL_NUMBER = 305419896;
 	public static final String DEFAULT_VOLUME_NAME = "VOLUME1";
 	public static final String DEFAULT_FS_NAME = "DOKANY";
-	public static final EnumIntegerSet<FileSystemFlag> DEFAULT_FS_FEATURES = new EnumIntegerSet<>(FileSystemFlag.class);
+	public static final MaskValueSet<FileSystemFlag> DEFAULT_FS_FEATURES = MaskValueSet.emptySet(FileSystemFlag.class);
 
 	static {
 		DEFAULT_FS_FEATURES.add(FileSystemFlag.CASE_PRESERVED_NAMES);
@@ -61,7 +61,7 @@ public final class VolumeInformation {
 		return this.fileSystemName;
 	}
 
-	public EnumIntegerSet<FileSystemFlag> getFileSystemFeatures() {
+	public MaskValueSet<FileSystemFlag> getFileSystemFeatures() {
 		return this.fileSystemFeatures;
 	}
 
@@ -104,7 +104,7 @@ public final class VolumeInformation {
 		return "VolumeInformation(maxComponentLength=" + this.getMaxComponentLength() + ", name=" + this.getName() + ", serialNumber=" + this.getSerialNumber() + ", fileSystemName=" + this.getFileSystemName() + ", fileSystemFeatures=" + this.getFileSystemFeatures() + ")";
 	}
 
-	public VolumeInformation(final int maxComponentLength, final String name, final int serialNumber, final String fileSystemName, final EnumIntegerSet<FileSystemFlag> fileSystemFeatures) {
+	public VolumeInformation(final int maxComponentLength, final String name, final int serialNumber, final String fileSystemName, final MaskValueSet<FileSystemFlag> fileSystemFeatures) {
 		this.maxComponentLength = maxComponentLength;
 		this.name = name;
 		this.serialNumber = serialNumber;

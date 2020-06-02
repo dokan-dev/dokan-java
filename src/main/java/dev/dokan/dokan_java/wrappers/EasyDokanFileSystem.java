@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.constants.microsoft.CreateOption;
 import dev.dokan.dokan_java.constants.microsoft.CreationDisposition;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.constants.microsoft.FileShareAccess;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.filesecurity.SelfRelativeSecurityDescriptor;
 
 import java.nio.file.Path;
@@ -27,10 +27,10 @@ public interface EasyDokanFileSystem {
 		String relativePath,
 		EasyDokanIOSecurityContext securityContext,
 		DesiredAccessMask desiredAccess,
-		EnumIntegerSet<FileAttribute> fileAttributes,
-		EnumIntegerSet<FileShareAccess> shareAccess,
+		MaskValueSet<FileAttribute> fileAttributes,
+		MaskValueSet<FileShareAccess> shareAccess,
 		CreationDisposition creationDisposition,
-		EnumIntegerSet<CreateOption> createOptions,
+		MaskValueSet<CreateOption> createOptions,
 		DokanFileHandle dokanFileHandle
 	); //--> zwCreateFile
 
@@ -70,7 +70,7 @@ public interface EasyDokanFileSystem {
 	@NativeName("setFileAttributes")
 	void setFileAttributes(Path absolutePath,
 		String relativePath,
-		EnumIntegerSet<FileAttribute> fileAttributes,
+		MaskValueSet<FileAttribute> fileAttributes,
 		DokanFileHandle dokanFileHandle);
 
 	@NativeName("setFileTime")
@@ -138,7 +138,7 @@ public interface EasyDokanFileSystem {
 	void unmounted(DokanFileHandle dokanFileHandle); //TODO Path?
 
 	//	int getFileSecurity(WString rawPath,
-	//		int /* SecurityInformation */ rawSecurityInformation, //Requested information //DesiredAccessMask OR Similar CLASS OR EnumIntegerSet
+	//		int /* SecurityInformation */ rawSecurityInformation, //Requested information //DesiredAccessMask OR Similar CLASS OR MaskValueSet
 	//		Pointer rawSecurityDescriptor, //Pointer to Buffer. Buffer gets copy of Security Descriptor. SECURITY_DESCRIPTOR in Self relative secdesc format //SelfRelativeSecurityDescriptor
 	//		int rawSecurityDescriptorLength, //available length for secdesc
 	//		IntByReference rawSecurityDescriptorLengthNeeded, //callback needed length for secdesc //Should be computed by dokany

@@ -4,7 +4,7 @@ import dev.dokan.dokan_java.constants.microsoft.AccessMask;
 import dev.dokan.dokan_java.constants.microsoft.DirectoryAccessMask;
 import dev.dokan.dokan_java.constants.microsoft.FileAccessMask;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,10 +14,10 @@ public class DesiredAccessMask {
 	private final AtomicInteger accessMask;
 
 	public DesiredAccessMask(int rawAccessMask, int rawFileAttributes) {
-		this(rawAccessMask, (rawFileAttributes & FileAttribute.DIRECTORY.getMask()) != 0);
+		this(rawAccessMask, (rawFileAttributes & FileAttribute.DIRECTORY.maskingValue()) != 0);
 	}
 
-	public DesiredAccessMask(int rawAccessMask, EnumIntegerSet<FileAttribute> fileAttributes) {
+	public DesiredAccessMask(int rawAccessMask, MaskValueSet<FileAttribute> fileAttributes) {
 		this(rawAccessMask, fileAttributes.contains(FileAttribute.DIRECTORY));
 	}
 
@@ -28,12 +28,12 @@ public class DesiredAccessMask {
 		this.accessMask = new AtomicInteger(rawAccessMask);
 	}
 
-	public EnumIntegerSet<AccessMask> getBasicRights() {
-		return EnumIntegerSet.enumSetFromInt(this.accessMask.get(), AccessMask.values());
+	public MaskValueSet<AccessMask> getBasicRights() {
+		return MaskValueSet.maskValueSet(this.accessMask.get(), AccessMask.values());
 	}
 
-	public EnumIntegerSet<FileAccessMask> getSpecificRights() {
-		return EnumIntegerSet.enumSetFromInt(this.accessMask.get(), FileAccessMask.values());
+	public MaskValueSet<FileAccessMask> getSpecificRights() {
+		return MaskValueSet.maskValueSet(this.accessMask.get(), FileAccessMask.values());
 	}
 
 	public boolean isDirectory() {
@@ -49,11 +49,11 @@ public class DesiredAccessMask {
 	}
 
 	public boolean getFlag(AccessMask flag) {
-		return getFlag(flag.getMask());
+		return getFlag(flag.maskingValue());
 	}
 
 	public boolean getFlag(FileAccessMask flag) {
-		return getFlag(flag.getMask());
+		return getFlag(flag.maskingValue());
 	}
 
 	public boolean getFlag(DirectoryAccessMask flag) {
@@ -64,7 +64,7 @@ public class DesiredAccessMask {
 	}
 
 	public boolean silentGetFlag(DirectoryAccessMask flag) {
-		return getFlag(flag.getMask());
+		return getFlag(flag.maskingValue());
 	}
 
 	public boolean getFlag(int flag) {
@@ -80,7 +80,7 @@ public class DesiredAccessMask {
 	}
 
 	public boolean updateFlag(AccessMask flag, boolean value) {
-		return updateFlag(flag.getMask(), value);
+		return updateFlag(flag.maskingValue(), value);
 	}
 
 	public boolean setFlag(FileAccessMask flag) {
@@ -92,7 +92,7 @@ public class DesiredAccessMask {
 	}
 
 	public boolean updateFlag(FileAccessMask flag, boolean value) {
-		return updateFlag(flag.getMask(), value);
+		return updateFlag(flag.maskingValue(), value);
 	}
 
 	public boolean setFlag(DirectoryAccessMask flag) {
@@ -125,7 +125,7 @@ public class DesiredAccessMask {
 	}
 
 	public boolean silentUpdateFlag(DirectoryAccessMask flag, boolean value) {
-		return updateFlag(flag.getMask(), value);
+		return updateFlag(flag.maskingValue(), value);
 	}
 
 	public boolean updateFlag(int flag, boolean value) {
