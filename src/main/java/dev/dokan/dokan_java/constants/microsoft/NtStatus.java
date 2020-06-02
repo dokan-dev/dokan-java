@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 
 /**
  * NTSTATUS values are status codes indicating the success or reason of failure of called methods.
@@ -1810,21 +1810,25 @@ public enum NtStatus implements EnumInteger {
     VHD_DIFFERENCING_CHAIN_CYCLE_DETECTED(0XC03A0018, "The chain of virtual hard disks is corrupted. A   differencing disk is indicated in its own parent chain."),
     VHD_DIFFERENCING_CHAIN_ERROR_IN_PARENT(0XC03A0019, "The chain of virtual hard disks is inaccessible. There   was an error opening a virtual hard disk further up the chain.");
 
-    private final int mask;
+    private final int intValue;
     private final String description;
 
-    NtStatus(final int mask, final String description) {
-        this.mask = mask;
+    NtStatus(final int intValue, final String description) {
+        this.intValue = intValue;
         this.description = description;
     }
 
+    public static NtStatus fromInt(final int value) {
+        return EnumInteger.enumFromInt(value, values());
+    }
+
     @Override
-    public int getMask() {
-        return mask;
+    public int intValue() {
+        return this.intValue;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
 }

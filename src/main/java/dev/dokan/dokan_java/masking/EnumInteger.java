@@ -1,9 +1,9 @@
-package dev.dokan.dokan_java.constants;
+package dev.dokan.dokan_java.masking;
 
 /**
- * An EnumInteger is an object that is represented by an 32bit integer value.
+ * An EnumInteger is an enum that is represented by an 32bit integer value.
  */
-public interface EnumInteger {
+public interface EnumInteger extends IntegerConvertible {
 
     /**
      * Converts an 32bit integer into an object.
@@ -17,20 +17,18 @@ public interface EnumInteger {
      *
      * @throws IllegalArgumentException if none of the EnumIntegers equals the given value
      */
-    static <T extends EnumInteger> T enumFromInt(final int value, final T[] enumValues) {
+    static <T extends Enum<T> & EnumInteger> T enumFromInt(final int value, final T[] enumValues) {
         for (final T current : enumValues) {
-            if (value == current.getMask()) {
+            if (value == current.intValue()) {
                 return current;
             }
         }
+
         throw new IllegalArgumentException("Invalid int value: " + value);
     }
 
-    /**
-     * Returns the 32bit integer value which represents this object.
-     *
-     * @return the value representing this object.
-     */
-    int getMask();
+    static <T extends Enum<T> & EnumInteger> T enumFromInt(final int value, final Class<T> type) {
+        return enumFromInt(value, type.getEnumConstants());
+    }
 
 }

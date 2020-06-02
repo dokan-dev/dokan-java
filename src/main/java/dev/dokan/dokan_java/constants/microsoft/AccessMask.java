@@ -1,13 +1,14 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Enumeration of the possible AccesMask options.
  * For more info see the <a href="https://msdn.microsoft.com/en-us/library/cc230294.aspx"> Microsoft Developer Documentation</a> or <a href="https://docs.microsoft.com/en-us/windows/desktop/SecAuthZ/access-mask">the normal documentation.</a>
  */
-public enum AccessMask implements EnumInteger {
+public enum AccessMask implements MaskValueEnum {
 	/**
 	 * GENERIC_READ
 	 * When used in an Access Request operation: When read access to an object is requested, this bit is translated to a combination of bits. These are most often set in the lower 16 bits of the ACCESS_MASK. (Individual protocol specifications MAY specify a different configuration.) The bits that are set are implementation dependent. During this translation, the GENERIC_READ bit is cleared. The resulting ACCESS_MASK bits are the actual permissions that are checked against the ACE structures in the security descriptor that attached to the object.
@@ -97,15 +98,18 @@ public enum AccessMask implements EnumInteger {
 	 */
 	DELETE(WinNT.DELETE);
 
-	private int mask;
+	private int maskingValue;
 
-	AccessMask(long mask) {
-		this.mask = (int) mask;
+	AccessMask(long maskingValue) {
+		this.maskingValue = (int) maskingValue;
 	}
 
+	public static MaskValueSet<AccessMask> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
+	}
 
 	@Override
-	public int getMask() {
-		return mask;
+	public int intValue() {
+		return this.maskingValue;
 	}
 }

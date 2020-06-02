@@ -10,22 +10,19 @@ import dev.dokan.dokan_java.DokanFileSystemStub;
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.FileSystemInformation;
-import dev.dokan.dokan_java.constants.EnumInteger;
 import dev.dokan.dokan_java.constants.microsoft.CreateDisposition;
 import dev.dokan.dokan_java.constants.microsoft.CreateOption;
-import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
-import dev.dokan.dokan_java.constants.microsoft.Win32ErrorCodes;
+import dev.dokan.dokan_java.masking.EnumInteger;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import dev.dokan.dokan_java.structure.DokanIOSecurityContext;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
 
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.DosFileAttributes;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -89,7 +86,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         }
 
         if (Files.isDirectory(p)) {
-            if ( EnumIntegerSet.enumSetFromInt(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
+            if (MaskValueSet.maskValueSet(rawCreateOptions, CreateOption.values()).contains(CreateOption.FILE_NON_DIRECTORY_FILE)) {
                 return NtStatuses.STATUS_FILE_IS_A_DIRECTORY;
             } else {
                 dokanFileInfo.IsDirectory = 1;
@@ -198,7 +195,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         rawVolumeNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.volumeName, rawVolumeNameSize));
         rawVolumeSerialNumber.setValue(this.volumeSerialnumber);
         rawMaximumComponentLength.setValue(this.fileSystemInformation.getMaxComponentLength());
-        rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().toInt());
+        rawFileSystemFlags.setValue(this.fileSystemInformation.getFileSystemFeatures().intValue());
         rawFileSystemNameBuffer.setWideString(0L, DokanUtils.trimStrToSize(this.fileSystemInformation.getFileSystemName(), rawFileSystemNameSize));
         return NtStatuses.STATUS_SUCCESS;
     }

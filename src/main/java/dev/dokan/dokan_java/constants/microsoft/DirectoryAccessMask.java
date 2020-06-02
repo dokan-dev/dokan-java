@@ -1,25 +1,30 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Additional {@link AccessMask} values specific to directories.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsoft documentation of ZwCreateFile</a>, Section Parameters, Parameter {@code DesiredAccess}
  */
-public enum DirectoryAccessMask implements EnumInteger {
+public enum DirectoryAccessMask implements MaskValueEnum {
     LIST_DIRECTORY(WinNT.FILE_LIST_DIRECTORY),
     TRAVERSE(WinNT.FILE_TRAVERSE);
 
-    private final int mask;
+	private final int maskingValue;
 
-    DirectoryAccessMask(int mask) {
-        this.mask = mask;
-    }
+	DirectoryAccessMask(int maskingValue) {
+		this.maskingValue = maskingValue;
+	}
 
-    @Override
-    public int getMask() {
-        return mask;
-    }
+	public static MaskValueSet<DirectoryAccessMask> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
+	}
+
+	@Override
+	public int intValue() {
+		return this.maskingValue;
+	}
 }

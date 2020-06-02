@@ -1,12 +1,13 @@
 package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
  * Enumeration of the different control flags that can be set in the header of a security descriptor
  * The documentation is taken from the official <a href=https://msdn.microsoft.com/en-us/library/cc230366.aspx>Microsoft doc</a>.
  */
-public enum SecurityDescriptorControlFlag implements EnumInteger {
+public enum SecurityDescriptorControlFlag implements MaskValueEnum {
 
 	/**
 	 * Self-Relative
@@ -104,14 +105,17 @@ public enum SecurityDescriptorControlFlag implements EnumInteger {
 	 */
 	OD(1 << 0);
 
-	private final int mask;
+	private final int maskingValue;
 
-	SecurityDescriptorControlFlag(int mask) {
-		this.mask = mask;
+	SecurityDescriptorControlFlag(int maskingValue) {
+		this.maskingValue = maskingValue;
 	}
 
+	public static MaskValueSet<SecurityDescriptorControlFlag> maskValueSet(final int mask) {
+		return MaskValueSet.maskValueSet(mask, values());
+	}
 	@Override
-	public int getMask() {
-		return mask;
+	public int intValue() {
+		return this.maskingValue;
 	}
 }

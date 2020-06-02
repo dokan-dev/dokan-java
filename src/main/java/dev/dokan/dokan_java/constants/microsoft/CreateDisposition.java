@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.constants.microsoft;
 
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.DokanOperations;
-import dev.dokan.dokan_java.constants.EnumInteger;
+import dev.dokan.dokan_java.masking.EnumInteger;
 import com.sun.jna.ptr.IntByReference;
 
 /**
@@ -74,14 +74,18 @@ public enum CreateDisposition implements EnumInteger {
     FILE_OVERWRITE(CreateDispositions.FILE_OVERWRITE),
     FILE_OVERWRITE_IF(CreateDispositions.FILE_OVERWRITE_IF);
 
-    private final int mask;
+    private final int intValue;
 
-    CreateDisposition(int mask) {
-        this.mask = mask;
+    CreateDisposition(int intValue) {
+        this.intValue = intValue;
+    }
+
+    public static CreateDisposition fromInt(final int value) {
+        return EnumInteger.enumFromInt(value, values());
     }
 
     @Override
-    public int getMask() {
-        return mask;
+    public int intValue() {
+        return this.intValue;
     }
 }

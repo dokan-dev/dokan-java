@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.masking.MaskValueEnum;
 
 /**
  * Enum of flags specifying the options to apply when the driver creates or opens the file.
@@ -9,7 +9,7 @@ import dev.dokan.dokan_java.structure.EnumIntegerSet;
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsofts documentation of ZwCreateFile</a>
  * @see <a href="https://dokan-dev.github.io/dokany-doc/html/struct_d_o_k_a_n___o_p_e_r_a_t_i_o_n_s.html#a40c2f61e1287237f5fd5c2690e795183">Dokany documentation of ZwCreateFile</a>
  */
-public enum CreateOption implements EnumInteger {
+public enum CreateOption implements MaskValueEnum {
     FILE_DIRECTORY_FILE(CreateOptions.FILE_DIRECTORY_FILE),
     FILE_WRITE_THROUGH(CreateOptions.FILE_WRITE_THROUGH),
     FILE_SEQUENTIAL_ONLY(CreateOptions.FILE_SEQUENTIAL_ONLY),
@@ -29,19 +29,19 @@ public enum CreateOption implements EnumInteger {
     FILE_NO_COMPRESSION(CreateOptions.FILE_NO_COMPRESSION),
     FILE_SESSION_AWARE(CreateOptions.FILE_SESSION_AWARE);
 
-    private final int mask;
+    private final int maskingValue;
 
-    CreateOption(final int i) {
-        mask = i;
+    CreateOption(final int maskingValue) {
+        this.maskingValue = maskingValue;
     }
 
-    public static EnumIntegerSet<CreateOption> fromInt(final int value) {
-        return EnumIntegerSet.enumSetFromInt(value, values());
+    public static MaskValueSet<CreateOption> maskValueSet(final int mask) {
+        return MaskValueSet.maskValueSet(mask, values());
     }
 
     @Override
-    public int getMask() {
-        return mask;
+    public int intValue() {
+        return this.maskingValue;
     }
 
 }

@@ -1,23 +1,22 @@
-package dev.dokan.dokan_java.structure;
+package dev.dokan.dokan_java.masking;
 
-import dev.dokan.dokan_java.constants.EnumInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EnumIntegerSetTest {
+public class MaskValueSetTest {
 
     @Test
     void fromIntOverEnumIntegerSetToInt() {
-        int val = TestEnum.A.getMask() | TestEnum.B.getMask() | TestEnum.C.getMask();
-        EnumIntegerSet<TestEnum> testSet = EnumIntegerSet.enumSetFromInt(val, TestEnum.values());
+        int val = TestEnum.A.intValue() | TestEnum.B.intValue() | TestEnum.C.intValue();
+        MaskValueSet<TestEnum> testSet = MaskValueSet.maskValueSet(val, TestEnum.values());
         Assertions.assertFalse(testSet.contains(TestEnum.D));
         Assertions.assertTrue(testSet.contains(TestEnum.A));
         Assertions.assertTrue(testSet.contains(TestEnum.B));
         Assertions.assertTrue(testSet.contains(TestEnum.C));
-        Assertions.assertEquals(val, testSet.toInt());
+        Assertions.assertEquals(val, testSet.intValue());
     }
 
-    enum TestEnum implements EnumInteger {
+    enum TestEnum implements MaskValueEnum {
         A(0x01),
         B(0x08),
         C(0x110),
@@ -30,7 +29,7 @@ public class EnumIntegerSetTest {
         }
 
         @Override
-        public int getMask() {
+        public int intValue() {
             return val;
         }
     }

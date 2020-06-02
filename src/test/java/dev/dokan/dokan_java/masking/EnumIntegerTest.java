@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.constants;
+package dev.dokan.dokan_java.masking;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ public class EnumIntegerTest {
     @Test
     void FromIntegerOverEnumToInteger() {
         int val = 4096;
-        Assertions.assertEquals(val, EnumInteger.enumFromInt(val, TestEnum.values()).getMask());
+        Assertions.assertEquals(val, EnumInteger.enumFromInt(val, TestEnum.values()).intValue());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class EnumIntegerTest {
         }
 
         @Override
-        public int getMask() {
+        public int intValue() {
             return val;
         }
     }

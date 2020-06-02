@@ -2,7 +2,7 @@ package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.Byteable;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SecurityDescriptorControlFlag;
-import dev.dokan.dokan_java.structure.EnumIntegerSet;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -42,10 +42,10 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
      * Control
      * An unsigned 16-bit field that specifies control access bit flags. The Self Relative (SR) bit MUST be set when the security descriptor is in self-relative format, represented by a EnumIntegerSet of ControlFlags
      *
-     * @see EnumIntegerSet
+     * @see MaskValueSet
      * @see SecurityDescriptorControlFlag
      */
-    private EnumIntegerSet<SecurityDescriptorControlFlag> control;
+    private MaskValueSet<SecurityDescriptorControlFlag> control;
 
     /**
      * OwnerSid
@@ -89,7 +89,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
      *
      * @param control
      */
-    private SelfRelativeSecurityDescriptor(EnumIntegerSet<SecurityDescriptorControlFlag> control) {
+    private SelfRelativeSecurityDescriptor(MaskValueSet<SecurityDescriptorControlFlag> control) {
         this.control = control;
         this.ownerSid = Optional.empty();
         this.groupSid = Optional.empty();
@@ -97,7 +97,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
         this.dacl = Optional.empty();
     }
 
-    private SelfRelativeSecurityDescriptor(EnumIntegerSet<SecurityDescriptorControlFlag> control, SecurityIdentifier ownerSid, SecurityIdentifier groupSid, AccessControlList sacl, AccessControlList dacl) {
+    private SelfRelativeSecurityDescriptor(MaskValueSet<SecurityDescriptorControlFlag> control, SecurityIdentifier ownerSid, SecurityIdentifier groupSid, AccessControlList sacl, AccessControlList dacl) {
         this.control = control;
         if (ownerSid != null) {
             this.ownerSid = Optional.of(ownerSid);
@@ -145,7 +145,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
         ByteBuffer buf = ByteBuffer.allocate(sizeOfByteArray());
         buf.put(revision);
         buf.put(sbz1);
-        buf.putShort(Short.reverseBytes((short) control.toInt()));
+        buf.putShort(Short.reverseBytes((short) control.intValue()));
         buf.putInt(Integer.reverseBytes(offsetOwner));
         buf.putInt(Integer.reverseBytes(offsetGroup));
         buf.putInt(Integer.reverseBytes(offsetSacl));
@@ -168,8 +168,8 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
                 + dacl.map(AccessControlList::sizeOfByteArray).orElse(0);
     }
 
-    public static SelfRelativeSecurityDescriptor createEmptySD(EnumIntegerSet<SecurityDescriptorControlFlag> flags) {
-        if ((flags.toInt() & (SecurityDescriptorControlFlag.DP.getMask() | SecurityDescriptorControlFlag.SP.getMask())) == 0) {
+    public static SelfRelativeSecurityDescriptor createEmptySD(MaskValueSet<SecurityDescriptorControlFlag> flags) {
+        if ((flags.intValue() & (SecurityDescriptorControlFlag.DP.intValue() | SecurityDescriptorControlFlag.SP.intValue())) == 0) {
             flags.add(SecurityDescriptorControlFlag.SR);
             return new SelfRelativeSecurityDescriptor(flags);
         } else {
@@ -178,13 +178,13 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
         }
     }
 
-    public static SelfRelativeSecurityDescriptor createSD(EnumIntegerSet<SecurityDescriptorControlFlag> flags, SecurityIdentifier owner, SecurityIdentifier group, AccessControlList sacl, AccessControlList dacl) {
-        int controlMask = flags.toInt();
-        if ((controlMask & SecurityDescriptorControlFlag.DP.getMask()) != 0 && dacl == null) {
+    public static SelfRelativeSecurityDescriptor createSD(MaskValueSet<SecurityDescriptorControlFlag> flags, SecurityIdentifier owner, SecurityIdentifier group, AccessControlList sacl, AccessControlList dacl) {
+        int controlMask = flags.intValue();
+        if ((controlMask & SecurityDescriptorControlFlag.DP.intValue()) != 0 && dacl == null) {
             //abort
             return null;
         }
-        if ((controlMask & SecurityDescriptorControlFlag.SP.getMask()) != 0 && sacl == null) {
+        if ((controlMask & SecurityDescriptorControlFlag.SP.intValue()) != 0 && sacl == null) {
             //abort
             return null;
         }
