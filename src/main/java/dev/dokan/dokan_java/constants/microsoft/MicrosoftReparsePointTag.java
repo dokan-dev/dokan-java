@@ -1,8 +1,11 @@
 package dev.dokan.dokan_java.constants.microsoft;
 
-import dev.dokan.dokan_java.masking.EnumInteger;
 
-public enum MicrosoftReparsePointTag implements EnumInteger {
+import dev.dokan.dokan_java.masking.EnumInteger;
+import dev.dokan.dokan_java.structure.ReparsePointTag;
+
+
+public enum MicrosoftReparsePointTag implements ReparsePointTag {
 
 	IO_REPARSE_TAG_CSV(0x80000009),
 	IO_REPARSE_TAG_DEDUP(0x80000013),
@@ -15,6 +18,9 @@ public enum MicrosoftReparsePointTag implements EnumInteger {
 	IO_REPARSE_TAG_SIS(0x80000007),
 	IO_REPARSE_TAG_SYMLINK(0xA000000C),
 	IO_REPARSE_TAG_WIM(0x80000008);
+
+	private static final String SOURCE = "WinNT.h";
+	private static final String DEFINED_BY = "Microsoft";
 
 	private final int intValue;
 
@@ -29,5 +35,15 @@ public enum MicrosoftReparsePointTag implements EnumInteger {
 	@Override
 	public int intValue() {
 		return this.intValue;
+	}
+
+	@Override
+	public String getSource() {
+		return SOURCE;
+	}
+
+	@Override
+	public String getDefinedBy() {
+		return DEFINED_BY;
 	}
 }

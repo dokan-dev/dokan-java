@@ -6,6 +6,7 @@ import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.constants.microsoft.MicrosoftReparsePointTag;
 import dev.dokan.dokan_java.masking.EnumInteger;
 import dev.dokan.dokan_java.masking.MaskValueSet;
+import dev.dokan.dokan_java.structure.ReparsePointTag;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -57,15 +58,15 @@ public class FindFileInfo extends AbstractFileInfo {
 		return EnumInteger.enumFromInt(getReparsePointTagValue(), possibleValues);
 	}
 
-	public <T extends EnumInteger> void setReparsePointTag(T tag) {
+	public <T extends Enum<T> & ReparsePointTag> void setReparsePointTag(T tag) {
 		setReparsePointTagValue(tag.intValue());
 	}
 
-	public <T extends Enum<?>> T getReparsePointTag(Function<Integer, T> parser) {
+	public <T extends Enum<T> & ReparsePointTag> T getReparsePointTag(Function<Integer, T> parser) {
 		return parser.apply(getReparsePointTagValue());
 	}
 
-	public <T extends Enum<?>> void setReparsePointTag(T tag, Function<T, Integer> parser) {
+	public <T extends Enum<T> & ReparsePointTag> void setReparsePointTag(T tag, Function<T, Integer> parser) {
 		setReparsePointTagValue(parser.apply(tag));
 	}
 
