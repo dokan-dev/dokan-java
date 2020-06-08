@@ -3,25 +3,34 @@ package dev.dokan.dokan_java.wrappers;
 import dev.dokan.dokan_java.constants.dokany.DokanFileInfoFlag;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
-import dev.dokan.dokan_java.structure.DokanOptions;
+import dev.dokan.dokan_java.wrappers.mountinfo.MountInfo;
+import dev.dokan.dokan_java.wrappers.mountinfo.ROMountInfo;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DokanFileHandle { //TODO Add Getters?!
+public class DokanFileHandle {
 
 	private static final long INVALID_HANDLE = 0L;
 
 	private final AtomicInteger flags;
 	private final long dokanContext; //DokanFileInfo tells us to "never modify". Happy to oblige
+	private final ROMountInfo mountInfo;
+
 	private long context;
 	private int processId;
-	private DokanOptions dokanOpts; //TODO
 
 	public DokanFileHandle(DokanFileInfo nativeInfo) {
 		this.context = nativeInfo.Context;
 		this.dokanContext = nativeInfo.DokanContext;
 		this.processId = nativeInfo.ProcessId;
-		this.dokanOpts = nativeInfo.DokanOpts; //TODO Copy/Different link?
+		/*
+		 * FIXME
+		 * This copy is as expensive as it is useless. A reference to a stored MountInfo-Object would be far more useful.
+		 * Due to bug/issue #46 this would be inherently unsafe, so it's a copy for now...
+		 *
+		 * See https://github.com/dokan-dev/dokan-java/issues/46
+		 */
+		this.mountInfo = new MountInfo(nativeInfo.DokanOpts);
 
 		MaskValueSet<DokanFileInfoFlag> flagSet = MaskValueSet.emptySet(DokanFileInfoFlag.class);
 		if(nativeInfo.deleteOnClose()) {
@@ -47,6 +56,10 @@ public class DokanFileHandle { //TODO Add Getters?!
 
 	public MaskValueSet<DokanFileInfoFlag> getFileInfo() {
 		return MaskValueSet.maskValueSet(this.flags.get(), DokanFileInfoFlag.values());
+	}
+
+	public void setFileInfo(MaskValueSet<DokanFileInfoFlag> flagSet) {
+		this.flags.set(flagSet.intValue());
 	}
 
 	public int getFlags() {
@@ -102,11 +115,7 @@ public class DokanFileHandle { //TODO Add Getters?!
 		this.processId = processId;
 	}
 
-	public DokanOptions getDokanOptions() {
-		return this.dokanOpts;
-	}
-
-	public void setDokanOptions(DokanOptions dokanOpts) {
-		this.dokanOpts = dokanOpts;
+	public ROMountInfo getMountInfo() {
+		return mountInfo;
 	}
 }
