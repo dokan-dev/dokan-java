@@ -68,13 +68,8 @@ public class DesiredAccessMask {
 	}
 
 	public boolean getFlag(int flag) {
-		/*
-		 * This may be more performant, but it doesn't really matter
-		 * Integer.highestOneBit(flag) != Integer.lowestOneBit(flag)
-		 */
-		if(Integer.bitCount(flag) != 1) {
-			throw new IllegalArgumentException("Result for more than one flag is undefined!");
-		}
+		ensureSingleFlag(flag);
+
 		return (this.accessMask.get() & flag) != 0;
 	}
 
@@ -136,8 +131,24 @@ public class DesiredAccessMask {
 	}
 
 	public boolean updateFlag(int flag, boolean value) {
+		ensureSingleFlag(flag);
+
 		int prev = this.accessMask.getAndUpdate(current -> current & (value ? flag : ~flag));
 		return (prev & flag) != 0;
+	}
+
+	private void ensureSingleFlag(int flag) {
+		if(!isSingleFlag(flag)) {
+			throw new IllegalArgumentException("Result for more than one flag is undefined!");
+		}
+	}
+
+	private boolean isSingleFlag(int flag) {
+		/*
+		 * This may be more performant, but it doesn't really matter
+		 * Integer.highestOneBit(flag) != Integer.lowestOneBit(flag)
+		 */
+		return Integer.bitCount(flag) == 1;
 	}
 
 	private FileAccessMask getFileAccessMask(DirectoryAccessMask attribute) {
