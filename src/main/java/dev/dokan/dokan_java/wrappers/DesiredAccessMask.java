@@ -68,6 +68,13 @@ public class DesiredAccessMask {
 	}
 
 	public boolean getFlag(int flag) {
+		/*
+		 * This may be more performant, but it doesn't really matter
+		 * Integer.highestOneBit(flag) != Integer.lowestOneBit(flag)
+		 */
+		if(Integer.bitCount(flag) != 1) {
+			throw new IllegalArgumentException("Result for more than one flag is undefined!");
+		}
 		return (this.accessMask.get() & flag) != 0;
 	}
 
