@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T>, IntegerConvertible {
 
-    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> noneOf(Class<T> clazz) {
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> emptySet(Class<T> clazz) {
         return new MaskValueSetImpl<>(clazz);
     }
 
@@ -22,15 +22,10 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T>,
         return new MaskValueSetImpl<T>(clazz.getEnumConstants());
     }
 
-    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> copyOf(MaskValueSet<T> set) {
-        return new MaskValueSetImpl<T>(set);
-    }
-
-    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> copyOf(EnumSet<T> set) {
-        return new MaskValueSetImpl<T>(set);
-    }
-
     static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> copyOf(Collection<T> collection) {
+        if(collection instanceof MaskValueSet) {
+            return new MaskValueSetImpl<T>((MaskValueSet<T>) collection);
+        }
         return new MaskValueSetImpl<T>(collection);
     }
 

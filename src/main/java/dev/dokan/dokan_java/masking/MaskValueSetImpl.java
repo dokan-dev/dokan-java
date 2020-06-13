@@ -21,10 +21,6 @@ public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends Abstrac
         this.elements = EnumSet.copyOf(set.elements());
     }
 
-    public MaskValueSetImpl(EnumSet<T> set) {
-        this.elements = EnumSet.copyOf(set);
-    }
-
     public MaskValueSetImpl(Collection<T> collection) {
         this.elements = EnumSet.copyOf(collection);
     }
