@@ -5,12 +5,12 @@ import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
-import com.sun.jna.ptr.LongByReference;
+import com.sun.jna.ptr.IntByReference;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
+import dev.dokan.dokan_java.masking.MaskValueSet;
 import dev.dokan.dokan_java.structure.DokanControl;
 import dev.dokan.dokan_java.structure.DokanOptions;
-import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -248,9 +248,11 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 
 	private boolean volumeIsStillMounted() {
 		char[] mntPtCharArray = mountPoint.toAbsolutePath().toString().toCharArray();
-		LongByReference length = new LongByReference();
-		Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, length);
-		List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length.getValue());
+		IntByReference lengthPointer = new IntByReference();
+		Pointer startOfList = DokanNativeMethods.DokanGetMountPointList(false, lengthPointer);
+
+		@Unsigned int length = lengthPointer.getValue();
+		List<DokanControl> list = DokanControl.getDokanControlList(startOfList, length);
 		// It is not enough that the entry.MountPoint contains the actual mount point. It also has to ends afterwards.
 		boolean mountPointInList = list.stream().anyMatch(entry ->
 				Arrays.equals(entry.MountPoint, 12, 12 + mntPtCharArray.length, mntPtCharArray, 0, mntPtCharArray.length)
