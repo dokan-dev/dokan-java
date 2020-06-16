@@ -9,4 +9,4 @@
 # References
 Basic Types/Size: [Web](https://docs.microsoft.com/en-us/cpp/c-language/storage-of-basic-types?view=vs-2019) | [Permalink](https://web.archive.org/web/20200616151823/https://docs.microsoft.com/en-us/cpp/c-language/storage-of-basic-types?view=vs-2019) <br>
 Windows Data Types/Mapped C Data Types: [Web](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types) | [Permalink](https://web.archive.org/web/20200616152122/https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types) <br>
-JNA Data Types: [Web](https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.html) | [Permalink](https://web.archive.org/web/20200616153134/http://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.html) <br>
+JNA Data Types: [Web](https://java-native-access.github.io/jna/5.5.0/javadoc/com/sun/jna/platform/win32/WinDef.html) | [Permalink](https://web.archive.org/web/20200616212719/https://java-native-access.github.io/jna/5.5.0/javadoc/com/sun/jna/platform/win32/WinDef.html) <br>
