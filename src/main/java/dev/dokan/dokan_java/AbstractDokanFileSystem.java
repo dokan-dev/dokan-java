@@ -176,7 +176,7 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 	 * @param options an {@link MaskValueSet} containing {@link MountOption}s
 	 */
 	@Override
-	public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, MaskValueSet<MountOption> options) {
+	public final synchronized void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, @Unsigned int timeout, @Unsigned int allocationUnitSize, @Unsigned int sectorSize, String UNCName, @Unsigned short threadCount, MaskValueSet<MountOption> options) {
 		this.dokanOptions = new DokanOptions(mountPoint.toString(), threadCount, options, UNCName, timeout, allocationUnitSize, sectorSize);
 		this.mountPoint = mountPoint;
 		this.volumeName = volumeName;
@@ -218,10 +218,10 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 	 */
 	public void mount(Path mountPoint, MaskValueSet<MountOption> mountOptions) {
 		String uncName = null;
-		short threadCount = 5;
-		long timeout = 3000;
-		long allocationUnitSize = 4096;
-		long sectorsize = 512;
+		@Unsigned short threadCount = 5;
+		@Unsigned int timeout = 3000;
+		@Unsigned int allocationUnitSize = 4096;
+		@Unsigned int sectorsize = 512;
 		String volumeName = "DOKAN";
 		int volumeSerialnumber = 30975;
 		mount(mountPoint, volumeName, volumeSerialnumber, false, timeout, allocationUnitSize, sectorsize, uncName, threadCount, mountOptions);

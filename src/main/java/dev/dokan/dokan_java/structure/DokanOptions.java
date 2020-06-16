@@ -1,10 +1,11 @@
 package dev.dokan.dokan_java.structure;
 
 
-import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.constants.dokany.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
+import dev.dokan.dokan_java.DokanNativeMethods;
+import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.Arrays;
@@ -53,23 +54,23 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Max timeout in milliseconds of each request before Dokan gives up to wait events to complete.
 	 */
-	public long Timeout;
+	public int Timeout;
 
 	/**
 	 * Allocation Unit Size of the volume. This will affect the file size.
 	 */
-	public long AllocationUnitSize;
+	public int AllocationUnitSize;
 
 	/**
 	 * Sector Size of the volume. This will affect then file size.
 	 */
-	public long SectorSize;
+	public int SectorSize;
 
 	public DokanOptions() {
 
 	}
 
-	public DokanOptions(final String mountPoint, final short threadCount, final MaskValueSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
+	public DokanOptions(String mountPoint, @Unsigned short threadCount, MaskValueSet<MountOption> mountOptions, String uncName, @Unsigned int timeout, @Unsigned int allocationUnitSize, @Unsigned int sectorSize) {
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
 		Options = mountOptions.intValue();

@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.structure;
 
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -20,7 +21,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
     /**
      * File System Type
      */
-    public long Type;
+    public int Type;
 
     /**
      * Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)
@@ -45,16 +46,15 @@ public class DokanControl extends Structure implements Structure.ByReference {
     /**
      * Session ID of calling process
      */
-    public long SessionId;
+    public int SessionId;
 
     public DokanControl(Pointer p) {
         this(p, 0);
     }
 
-    public DokanControl(Pointer p, long offset) {
+    public DokanControl(Pointer p, long currentOffset) {
         super(p);
-        long currentOffset = offset;
-        this.Type = p.getLong(currentOffset);
+        this.Type = p.getInt(currentOffset);
         currentOffset += NativeLong.SIZE;
         this.MountPoint = p.getCharArray(currentOffset, WinNT.MAX_PATH);
         currentOffset += WinNT.MAX_PATH * 2;
@@ -63,8 +63,8 @@ public class DokanControl extends Structure implements Structure.ByReference {
         this.DeviceName = p.getCharArray(currentOffset, 64);
         currentOffset += 64 * 2;
         this.DeviceObject = new Pointer(p.getLong(currentOffset));
-        currentOffset += NativeLong.SIZE;
-        this.SessionId = p.getLong(currentOffset);
+        currentOffset += Native.POINTER_SIZE;
+        this.SessionId = p.getInt(currentOffset);
     }
 
 
