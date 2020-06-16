@@ -3,6 +3,7 @@ package dev.dokan.dokan_java.structure;
 
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
+import dev.dokan.dokan_java.Unsigned;
 
 
 /**
@@ -23,6 +24,7 @@ public class DokanIOSecurityContext extends Structure implements Structure.ByRef
 	/**
 	 * An ACCESS_MASK value that expresses the access rights that are requested in the IRP_MJ_CREATE request.
 	 */
+	@Unsigned
 	public int DesiredAccess;
 
 }

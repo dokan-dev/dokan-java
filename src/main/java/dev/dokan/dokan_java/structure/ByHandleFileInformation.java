@@ -1,12 +1,13 @@
 package dev.dokan.dokan_java.structure;
 
-import dev.dokan.dokan_java.DokanOperations;
-import dev.dokan.dokan_java.DokanUtils;
-import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.DokanOperations;
+import dev.dokan.dokan_java.DokanUtils;
+import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
      * The file attributes of a file. For possible values and their descriptions, see File Attribute Constants. The FILE_ATTRIBUTE_SPARSE_FILE attribute on the file is set if any of the streams of the file have ever been
      * sparse.
      */
+    @Unsigned
     public int dwFileAttributes;
 
     /**
@@ -61,31 +63,37 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
     /**
      * The serial number of the volume that contains a file.
      */
+    @Unsigned
     public int dwVolumeSerialNumber;
 
     /**
      * The high-order DWORD value of the file size, in bytes. This value is zero unless the file size is greater than MAXDWORD. The size of the file is equal to (nFileSizeHigh * (MAXDWORD+1)) + nFileSizeLow.
      */
+    @Unsigned
     public int nFileSizeHigh;
 
     /**
      * The low-order DWORD value of the file size, in bytes.
      */
+    @Unsigned
     public int nFileSizeLow;
 
     /**
      * The high-order DWORD value of the file size, in bytes. This value is zero unless the file size is greater than MAXDWORD. The size of the file is equal to (nFileSizeHigh* (MAXDWORD+1)) + nFileSizeLow.
      */
+    @Unsigned
     public int nFileIndexHigh;
 
     /**
      * The low-order DWORD value of the file size, in bytes.
      */
+    @Unsigned
     public int nFileIndexLow;
 
     /**
      * The number of links to this file. For the FAT file system this member is always 1. For the NTFS file system, it can be more than 1.
      */
+    @Unsigned
     public int nNumberOfLinks = 1;
 
     private Path filePath;

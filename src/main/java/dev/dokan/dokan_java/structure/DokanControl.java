@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java.structure;
 
+
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -21,6 +22,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
     /**
      * File System Type
      */
+    @Unsigned
     public int Type;
 
     /**
@@ -46,6 +48,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
     /**
      * Session ID of calling process
      */
+    @Unsigned
     public int SessionId;
 
     public DokanControl(Pointer p) {

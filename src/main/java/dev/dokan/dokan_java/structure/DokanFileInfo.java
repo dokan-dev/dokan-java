@@ -1,8 +1,9 @@
 package dev.dokan.dokan_java.structure;
 
+import com.sun.jna.Structure;
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.DokanOperations;
-import com.sun.jna.Structure;
+import dev.dokan.dokan_java.Unsigned;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
      * Context that can be used to carry information between operation. The context can carry whatever type like {@link com.sun.jna.platform.win32.WinNT.HANDLE}, {@link Structure}, {@link com.sun.jna.ptr.IntByReference},
      * {@link com.sun.jna.Pointer} that will help the implementation understand the request context of the event.
      */
+    @Unsigned
     public long Context;
 
     /**
@@ -28,6 +30,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     /**
      * Reserved. Used internally by Dokan library. Never modify.
      */
+    @Unsigned
     public long DokanContext;
 
     /**
@@ -53,6 +56,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     /**
      * Process ID for the thread that originally requested a given I/O operation.
      */
+    @Unsigned
     public int ProcessId;
 
     /**

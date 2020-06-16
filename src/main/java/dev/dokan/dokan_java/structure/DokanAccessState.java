@@ -1,9 +1,9 @@
 package dev.dokan.dokan_java.structure;
 
 
-import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinNT;
+import dev.dokan.dokan_java.Unsigned;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +48,7 @@ public class DokanAccessState extends Structure {
 	 * A driver can also check for the TOKEN_IS_RESTRICTED flag.
 	 * These flags are defined in Ntifs.h.
 	 */
+	@Unsigned
 	public int Flags;
 
 	/**
@@ -55,17 +56,20 @@ public class DokanAccessState extends Structure {
 	 * A driver uses this member to determine if the Windows security system can grant access.
 	 * If access can be granted, the driver updates the PreviouslyGrantedAccess and RemainingDesiredAccess members accordingly.
 	 */
+	@Unsigned
 	public int RemainingDesiredAccess;
 
 	/**
 	 * An ACCESS_MASK type that specifies the information about access that has already been granted to the caller of one of the <a href="https://docs.microsoft.com/previous-versions/windows/hardware/drivers/ff563711(v=vs.85)">Security Reference Monitor Routines</a>
 	 * The Windows security system grants certain rights based on the privileges of the caller, such as traverse right (the ability to traverse through a directory as part of opening a subdirectory or file).
 	 */
+	@Unsigned
 	public int PreviouslyGrantedAccess;
 
 	/**
 	 * An ACCESS_MASK type that contains the original access rights that were requested by the caller.
 	 */
+	@Unsigned
 	public int OriginalDesiredAccess;
 
 	/**

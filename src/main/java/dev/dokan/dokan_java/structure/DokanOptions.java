@@ -22,21 +22,25 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Version of the Dokan features requested (version "123" is equal to Dokan version 1.2.3).
 	 */
+	@Unsigned
 	public short Version = DokanNativeMethods.getMinimumRequiredDokanVersion();
 
 	/**
 	 * Number of threads to be used internally by Dokan library. More thread will handle more events at the same time.
 	 */
+	@Unsigned
 	public short ThreadCount;
 
 	/**
 	 * Features enable for the mount. It is a combination of {@link MountOption} masks.
 	 */
+	@Unsigned
 	public int Options;
 
 	/**
 	 * FileSystem can store anything here
 	 */
+	@Unsigned
 	public long GlobalContext = 0L;
 
 	/**
@@ -54,16 +58,19 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Max timeout in milliseconds of each request before Dokan gives up to wait events to complete.
 	 */
+	@Unsigned
 	public int Timeout;
 
 	/**
 	 * Allocation Unit Size of the volume. This will affect the file size.
 	 */
+	@Unsigned
 	public int AllocationUnitSize;
 
 	/**
 	 * Sector Size of the volume. This will affect then file size.
 	 */
+	@Unsigned
 	public int SectorSize;
 
 	public DokanOptions() {
