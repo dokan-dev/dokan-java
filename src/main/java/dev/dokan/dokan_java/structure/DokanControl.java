@@ -25,7 +25,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
     /**
      * Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)
      */
-    public char[] MountPoint = new char[260];
+    public char[] MountPoint = new char[WinNT.MAX_PATH];
 
     /**
      * UNC name used for network volume
@@ -95,9 +95,11 @@ public class DokanControl extends Structure implements Structure.ByReference {
          */
         assert !(length < 0);
         if (length != 0) {
-            list.add(new DokanControl(start));
-            for (int i = 1; i < length; i++) {
-                list.add(new DokanControl(start, i * list.get(0).size()));
+            long offset = 0;
+            for(int i = 0; i < length; i++) {
+                DokanControl control = new DokanControl(start, offset);
+                list.add(control);
+                offset += control.size();
             }
         }
         return list;
