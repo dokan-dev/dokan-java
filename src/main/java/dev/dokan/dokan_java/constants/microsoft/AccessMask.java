@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.masking.MaskValueEnum;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
- * Enumeration of the possible AccesMask options.
+ * Enumeration of the possible AccessMask options.
  * For more info see the <a href="https://msdn.microsoft.com/en-us/library/cc230294.aspx"> Microsoft Developer Documentation</a> or <a href="https://docs.microsoft.com/en-us/windows/desktop/SecAuthZ/access-mask">the normal documentation.</a>
  */
 public enum AccessMask implements MaskValueEnum {
