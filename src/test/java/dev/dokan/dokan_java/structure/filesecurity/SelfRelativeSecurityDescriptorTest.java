@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
 
-import dev.dokan.dokan_java.constants.microsoft.AccessMask;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SecurityDescriptorControlFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.SidIdentifierAuthority;
@@ -65,7 +65,7 @@ public class SelfRelativeSecurityDescriptorTest {
 		//set the flag
 		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
+		MaskValueSet<BasicAccessMaskFlag> mask = MaskValueSet.of(BasicAccessMaskFlag.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");// everyone sid
 		//create ace
@@ -91,7 +91,7 @@ public class SelfRelativeSecurityDescriptorTest {
 		//test DACL rev2 with accessAllowACE
 		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
+		MaskValueSet<BasicAccessMaskFlag> mask = MaskValueSet.of(BasicAccessMaskFlag.GENERIC_ALL);
 		//set the sid to world sid resp. everyone
 		SecurityIdentifier sid = SecurityIdentifier.fromString("S-1-1-0");
 		//create ace
@@ -141,7 +141,7 @@ public class SelfRelativeSecurityDescriptorTest {
 		//ace control
 		MaskValueSet<AccessControlEntryFlag> flags = MaskValueSet.of(AccessControlEntryFlag.CONTAINER_INHERIT_ACE, AccessControlEntryFlag.OBJECT_INHERIT_ACE);
 		//set the mask
-		MaskValueSet<AccessMask> mask = MaskValueSet.of(AccessMask.GENERIC_ALL);
+		MaskValueSet<BasicAccessMaskFlag> mask = MaskValueSet.of(BasicAccessMaskFlag.GENERIC_ALL);
 		//create ace
 		AccessControlList daclRev2WithAccessAllow = AccessControlList.createDaclRevision2(Collections.singletonList(new AccessAllowedACE(flags, oSid, mask)));
 

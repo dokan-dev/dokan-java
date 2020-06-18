@@ -7,7 +7,7 @@ import dev.dokan.dokan_java.masking.MaskValueEnum;
 
 
 /**
- * File attribute flags. They are  metadata values stored by the file system on disk and are used by the system.
+ * File attribute flags. They are metadata values stored on the disk by the filesystem to be used by the system.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/FileIO/file-attribute-constants">Microsoft documentation of file attribute constants</a>
  * @see <a href="https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilea">Microsoft documentation of CreateFileA function including the list of valid file attributes</a>

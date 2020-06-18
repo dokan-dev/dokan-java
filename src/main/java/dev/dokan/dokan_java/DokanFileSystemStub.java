@@ -1,5 +1,6 @@
 package dev.dokan.dokan_java;
 
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import com.sun.jna.Pointer;
@@ -24,7 +25,7 @@ public class DokanFileSystemStub extends AbstractDokanFileSystem {
      * When your filesystem uses the win32 codes (i.e. setting usesKernelFlagsAndCodes to false), some of the parameters are different form the description:
      * </p>
      * <ol>
-     *     <li>rawDesiredAccess represents the generic access mask of {@link dev.dokan.dokan_java.constants.microsoft.AccessMask} with specific one</li>
+     *     <li>rawDesiredAccess represents the generic access mask of {@link BasicAccessMaskFlag} with specific one</li>
      *     <li>rawFileAttributes contains besides the file attributes also file flags (see <a href=https://docs.microsoft.com/de-de/windows/win32/api/fileapi/nf-fileapi-createfilea>Microsoft documentation of CreateFile</a>) </li>
      *     <li>rawCreateDisposition represents an {@link dev.dokan.dokan_java.constants.microsoft.CreationDisposition} value</li>
      * </ol>

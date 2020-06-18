@@ -1,15 +1,15 @@
-package dev.dokan.dokan_java.constants.microsoft;
+package dev.dokan.dokan_java.constants.microsoft.accessmaskflags;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.masking.MaskValueEnum;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
- * Additional {@link AccessMask} values specific to files.
+ * Additional {@link BasicAccessMaskFlag} values specific to files.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsoft documentation of ZwCreateFile</a>, Section Parameters, Parameter {@code DesiredAccess}
  */
-public enum FileAccessMask implements MaskValueEnum {
+public enum FileAccessMaskFlag implements MaskValueEnum {
     READ_DATA(WinNT.FILE_READ_DATA),
     READ_ATTRIBUTES(WinNT.FILE_READ_ATTRIBUTES),
     READ_EA(WinNT.FILE_READ_EA),
@@ -21,11 +21,11 @@ public enum FileAccessMask implements MaskValueEnum {
 
     private final int maskingValue;
 
-    FileAccessMask(int maskingValue) {
+    FileAccessMaskFlag(int maskingValue) {
         this.maskingValue = maskingValue;
     }
 
-    public static MaskValueSet<FileAccessMask> maskValueSet(final int mask) {
+    public static MaskValueSet<FileAccessMaskFlag> maskValueSet(final int mask) {
         return MaskValueSet.maskValueSet(mask, values());
     }
 

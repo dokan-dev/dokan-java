@@ -3,7 +3,7 @@ package dev.dokan.dokan_java.constants.microsoft.filesecurity;
 import dev.dokan.dokan_java.Byteable;
 
 /**
- * Enumeration of Well known SidIdentifierAuthoritys
+ * Enumeration of Well known SidIdentifierAuthorities
  */
 public enum SidIdentifierAuthority implements Byteable {
 
