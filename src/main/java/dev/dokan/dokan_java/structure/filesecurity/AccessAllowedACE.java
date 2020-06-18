@@ -1,7 +1,7 @@
 package dev.dokan.dokan_java.structure.filesecurity;
 
 import dev.dokan.dokan_java.masking.MaskValueSet;
-import dev.dokan.dokan_java.constants.microsoft.BasicAccessMaskFlag;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryFlag;
 import dev.dokan.dokan_java.constants.microsoft.filesecurity.AccessControlEntryType;
 

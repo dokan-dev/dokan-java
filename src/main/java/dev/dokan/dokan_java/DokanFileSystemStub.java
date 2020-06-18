@@ -1,6 +1,6 @@
 package dev.dokan.dokan_java;
 
-import dev.dokan.dokan_java.constants.microsoft.BasicAccessMaskFlag;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
 import dev.dokan.dokan_java.structure.ByHandleFileInformation;
 import dev.dokan.dokan_java.structure.DokanFileInfo;
 import com.sun.jna.Pointer;

@@ -1,4 +1,4 @@
-package dev.dokan.dokan_java.constants.microsoft;
+package dev.dokan.dokan_java.constants.microsoft.accessmaskflags;
 
 import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.masking.MaskValueEnum;
