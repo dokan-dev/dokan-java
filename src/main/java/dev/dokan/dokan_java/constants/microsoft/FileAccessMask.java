@@ -5,7 +5,7 @@ import dev.dokan.dokan_java.masking.MaskValueEnum;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 /**
- * Additional {@link AccessMask} values specific to files.
+ * Additional {@link BasicAccessMaskFlag} values specific to files.
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsoft documentation of ZwCreateFile</a>, Section Parameters, Parameter {@code DesiredAccess}
  */
