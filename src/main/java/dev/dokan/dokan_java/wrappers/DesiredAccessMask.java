@@ -1,17 +1,14 @@
 package dev.dokan.dokan_java.wrappers;
 
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
-import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
 import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.DirectoryAccessMaskFlag;
 import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.FileAccessMaskFlag;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class DesiredAccessMask {
+public class DesiredAccessMask extends BasicDesiredAccessMask {
 
 	private final boolean isDirectory;
-	private final AtomicInteger accessMask;
 
 	public DesiredAccessMask(int rawAccessMask, int rawFileAttributes) {
 		this(rawAccessMask, (rawFileAttributes & FileAttribute.DIRECTORY.maskingValue()) != 0);
@@ -24,32 +21,16 @@ public class DesiredAccessMask {
 	//TODO Check for illegal flags if isDirectory=true
 	//See https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatefile Note below first table
 	public DesiredAccessMask(int rawAccessMask, boolean isDirectory) {
+		super(rawAccessMask);
 		this.isDirectory = isDirectory;
-		this.accessMask = new AtomicInteger(rawAccessMask);
-	}
-
-	public MaskValueSet<BasicAccessMaskFlag> getBasicRights() {
-		return MaskValueSet.maskValueSet(this.accessMask.get(), BasicAccessMaskFlag.values());
 	}
 
 	public MaskValueSet<FileAccessMaskFlag> getSpecificRights() {
-		return MaskValueSet.maskValueSet(this.accessMask.get(), FileAccessMaskFlag.values());
+		return FileAccessMaskFlag.maskValueSet(this.accessMask.get());
 	}
 
 	public boolean isDirectory() {
 		return this.isDirectory;
-	}
-
-	public int getAccessMask() {
-		return this.accessMask.get();
-	}
-
-	public void setAccessMask(int accessMask) {
-		this.accessMask.set(accessMask);
-	}
-
-	public boolean getFlag(BasicAccessMaskFlag flag) {
-		return getFlag(flag.maskingValue());
 	}
 
 	public boolean getFlag(FileAccessMaskFlag flag) {
@@ -65,24 +46,6 @@ public class DesiredAccessMask {
 
 	public boolean silentGetFlag(DirectoryAccessMaskFlag flag) {
 		return getFlag(flag.maskingValue());
-	}
-
-	public boolean getFlag(int flag) {
-		ensureSingleFlag(flag);
-
-		return (this.accessMask.get() & flag) != 0;
-	}
-
-	public boolean setFlag(BasicAccessMaskFlag flag) {
-		return updateFlag(flag, true);
-	}
-
-	public boolean unsetFlag(BasicAccessMaskFlag flag) {
-		return updateFlag(flag, false);
-	}
-
-	public boolean updateFlag(BasicAccessMaskFlag flag, boolean value) {
-		return updateFlag(flag.maskingValue(), value);
 	}
 
 	public boolean setFlag(FileAccessMaskFlag flag) {
@@ -130,28 +93,7 @@ public class DesiredAccessMask {
 		return updateFlag(flag.maskingValue(), value);
 	}
 
-	public boolean updateFlag(int flag, boolean value) {
-		ensureSingleFlag(flag);
-
-		int prev = this.accessMask.getAndUpdate(current -> current & (value ? flag : ~flag));
-		return (prev & flag) != 0;
-	}
-
-	private void ensureSingleFlag(int flag) {
-		if(!isSingleFlag(flag)) {
-			throw new IllegalArgumentException("Result for more than one flag is undefined!");
-		}
-	}
-
-	private boolean isSingleFlag(int flag) {
-		/*
-		 * This may be more performant, but it doesn't really matter
-		 * Integer.highestOneBit(flag) != Integer.lowestOneBit(flag)
-		 */
-		return Integer.bitCount(flag) == 1;
-	}
-
-	private FileAccessMaskFlag getFileAccessMaskFlag(DirectoryAccessMaskFlag attribute) {
+	private FileAccessMaskFlag getFileAccessMask(DirectoryAccessMaskFlag attribute) {
 		//This lookup is fine, but a different kind of mapping would be preferable
 		switch(attribute) {
 		case LIST_DIRECTORY: //1
