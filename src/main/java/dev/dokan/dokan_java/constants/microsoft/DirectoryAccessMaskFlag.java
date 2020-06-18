@@ -9,17 +9,17 @@ import dev.dokan.dokan_java.masking.MaskValueSet;
  *
  * @see <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-zwcreatefile">Microsoft documentation of ZwCreateFile</a>, Section Parameters, Parameter {@code DesiredAccess}
  */
-public enum DirectoryAccessMask implements MaskValueEnum {
+public enum DirectoryAccessMaskFlag implements MaskValueEnum {
     LIST_DIRECTORY(WinNT.FILE_LIST_DIRECTORY),
     TRAVERSE(WinNT.FILE_TRAVERSE);
 
 	private final int maskingValue;
 
-	DirectoryAccessMask(int maskingValue) {
+	DirectoryAccessMaskFlag(int maskingValue) {
 		this.maskingValue = maskingValue;
 	}
 
-	public static MaskValueSet<DirectoryAccessMask> maskValueSet(final int mask) {
+	public static MaskValueSet<DirectoryAccessMaskFlag> maskValueSet(final int mask) {
 		return MaskValueSet.maskValueSet(mask, values());
 	}
 
