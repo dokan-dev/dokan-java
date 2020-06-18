@@ -1,9 +1,9 @@
 package dev.dokan.dokan_java.wrappers;
 
-import dev.dokan.dokan_java.constants.microsoft.AccessMask;
-import dev.dokan.dokan_java.constants.microsoft.DirectoryAccessMask;
-import dev.dokan.dokan_java.constants.microsoft.FileAccessMask;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.BasicAccessMaskFlag;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.DirectoryAccessMaskFlag;
+import dev.dokan.dokan_java.constants.microsoft.accessmaskflags.FileAccessMaskFlag;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,12 +28,12 @@ public class DesiredAccessMask {
 		this.accessMask = new AtomicInteger(rawAccessMask);
 	}
 
-	public MaskValueSet<AccessMask> getBasicRights() {
-		return MaskValueSet.maskValueSet(this.accessMask.get(), AccessMask.values());
+	public MaskValueSet<BasicAccessMaskFlag> getBasicRights() {
+		return MaskValueSet.maskValueSet(this.accessMask.get(), BasicAccessMaskFlag.values());
 	}
 
-	public MaskValueSet<FileAccessMask> getSpecificRights() {
-		return MaskValueSet.maskValueSet(this.accessMask.get(), FileAccessMask.values());
+	public MaskValueSet<FileAccessMaskFlag> getSpecificRights() {
+		return MaskValueSet.maskValueSet(this.accessMask.get(), FileAccessMaskFlag.values());
 	}
 
 	public boolean isDirectory() {
@@ -48,22 +48,22 @@ public class DesiredAccessMask {
 		this.accessMask.set(accessMask);
 	}
 
-	public boolean getFlag(AccessMask flag) {
+	public boolean getFlag(BasicAccessMaskFlag flag) {
 		return getFlag(flag.maskingValue());
 	}
 
-	public boolean getFlag(FileAccessMask flag) {
+	public boolean getFlag(FileAccessMaskFlag flag) {
 		return getFlag(flag.maskingValue());
 	}
 
-	public boolean getFlag(DirectoryAccessMask flag) {
+	public boolean getFlag(DirectoryAccessMaskFlag flag) {
 		if(!this.isDirectory) {
 			throw new IllegalArgumentException("Not a directory!");
 		}
 		return silentGetFlag(flag);
 	}
 
-	public boolean silentGetFlag(DirectoryAccessMask flag) {
+	public boolean silentGetFlag(DirectoryAccessMaskFlag flag) {
 		return getFlag(flag.maskingValue());
 	}
 
@@ -73,60 +73,60 @@ public class DesiredAccessMask {
 		return (this.accessMask.get() & flag) != 0;
 	}
 
-	public boolean setFlag(AccessMask flag) {
+	public boolean setFlag(BasicAccessMaskFlag flag) {
 		return updateFlag(flag, true);
 	}
 
-	public boolean unsetFlag(AccessMask flag) {
+	public boolean unsetFlag(BasicAccessMaskFlag flag) {
 		return updateFlag(flag, false);
 	}
 
-	public boolean updateFlag(AccessMask flag, boolean value) {
+	public boolean updateFlag(BasicAccessMaskFlag flag, boolean value) {
 		return updateFlag(flag.maskingValue(), value);
 	}
 
-	public boolean setFlag(FileAccessMask flag) {
+	public boolean setFlag(FileAccessMaskFlag flag) {
 		return updateFlag(flag, true);
 	}
 
-	public boolean unsetFlag(FileAccessMask flag) {
+	public boolean unsetFlag(FileAccessMaskFlag flag) {
 		return updateFlag(flag, false);
 	}
 
-	public boolean updateFlag(FileAccessMask flag, boolean value) {
+	public boolean updateFlag(FileAccessMaskFlag flag, boolean value) {
 		return updateFlag(flag.maskingValue(), value);
 	}
 
-	public boolean setFlag(DirectoryAccessMask flag) {
+	public boolean setFlag(DirectoryAccessMaskFlag flag) {
 		if(!this.isDirectory) {
 			throw new IllegalArgumentException("Not a directory!");
 		}
 		return silentSetFlag(flag);
 	}
 
-	public boolean unsetFlag(DirectoryAccessMask flag) {
+	public boolean unsetFlag(DirectoryAccessMaskFlag flag) {
 		if(!this.isDirectory) {
 			throw new IllegalArgumentException("Not a directory!");
 		}
 		return silentUnsetFlag(flag);
 	}
 
-	public boolean updateFlag(DirectoryAccessMask flag, boolean value) {
+	public boolean updateFlag(DirectoryAccessMaskFlag flag, boolean value) {
 		if(!this.isDirectory) {
 			throw new IllegalArgumentException("Not a directory!");
 		}
 		return silentUpdateFlag(flag, value);
 	}
 
-	public boolean silentSetFlag(DirectoryAccessMask flag) {
+	public boolean silentSetFlag(DirectoryAccessMaskFlag flag) {
 		return silentUpdateFlag(flag, true);
 	}
 
-	public boolean silentUnsetFlag(DirectoryAccessMask flag) {
+	public boolean silentUnsetFlag(DirectoryAccessMaskFlag flag) {
 		return silentUpdateFlag(flag, false);
 	}
 
-	public boolean silentUpdateFlag(DirectoryAccessMask flag, boolean value) {
+	public boolean silentUpdateFlag(DirectoryAccessMaskFlag flag, boolean value) {
 		return updateFlag(flag.maskingValue(), value);
 	}
 
@@ -151,13 +151,13 @@ public class DesiredAccessMask {
 		return Integer.bitCount(flag) == 1;
 	}
 
-	private FileAccessMask getFileAccessMask(DirectoryAccessMask attribute) {
+	private FileAccessMaskFlag getFileAccessMaskFlag(DirectoryAccessMaskFlag attribute) {
 		//This lookup is fine, but a different kind of mapping would be preferable
 		switch(attribute) {
 		case LIST_DIRECTORY: //1
-			return FileAccessMask.READ_DATA;
+			return FileAccessMaskFlag.READ_DATA;
 		case TRAVERSE: //32
-			return FileAccessMask.EXECUTE;
+			return FileAccessMaskFlag.EXECUTE;
 		}
 		throw new IllegalStateException();
 	}
