@@ -3,17 +3,33 @@ package dev.dokan.dokan_java.masking;
 
 import java.util.AbstractSet;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Objects;
 
 
-public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> implements MaskValueSet<T> {
+public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends AbstractSet<T> implements MaskValueSet<T>, Cloneable {
 
     private final EnumSet<T> elements;
 
-    public MaskValueSetImpl(final Class<T> clazz) {
+    public MaskValueSetImpl(Class<T> clazz) {
         this.elements = EnumSet.noneOf(clazz);
+    }
+
+    public MaskValueSetImpl(MaskValueSet<T> set) {
+        this.elements = EnumSet.copyOf(set.elements());
+    }
+
+    public MaskValueSetImpl(Collection<T> collection) {
+        this.elements = EnumSet.copyOf(collection);
+    }
+
+    @SuppressWarnings("unchecked")
+    public MaskValueSetImpl(T[] values) {
+        this((Class<T>) values.getClass().getComponentType());
+
+        add(values);
     }
 
     @SafeVarargs
@@ -29,6 +45,17 @@ public class MaskValueSetImpl<T extends Enum<T> & MaskValueEnum> extends Abstrac
         }
 
         Arrays.stream(items).filter(Objects::nonNull).forEach(this::add);
+    }
+
+    @Override
+    public EnumSet<T> elements() {
+        return this.elements.clone();
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod") //Yes, that's okay here
+    @Override
+    public MaskValueSet<T> clone() {
+        return new MaskValueSetImpl<>(this.elements);
     }
 
     @Override
