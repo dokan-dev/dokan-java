@@ -3,6 +3,8 @@ package dev.dokan.dokan_java.masking;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.constants.microsoft.FileSystemFlag;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -14,6 +16,21 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T>,
 
     static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> emptySet(Class<T> clazz) {
         return new MaskValueSetImpl<>(clazz);
+    }
+
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> allOf(Class<T> clazz) {
+        return new MaskValueSetImpl<T>(clazz.getEnumConstants());
+    }
+
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> copyOf(Collection<T> collection) {
+        if(collection instanceof MaskValueSet) {
+            return new MaskValueSetImpl<T>((MaskValueSet<T>) collection);
+        }
+        return new MaskValueSetImpl<T>(collection);
+    }
+
+    static <T extends Enum<T> & MaskValueEnum> MaskValueSet<T> of(T[] values) {
+        return new MaskValueSetImpl<T>(values);
     }
 
     @SafeVarargs
@@ -50,5 +67,9 @@ public interface MaskValueSet<T extends Enum<T> & MaskValueEnum> extends Set<T>,
     }
 
     void add(T... items);
+
+    EnumSet<T> elements();
+
+    MaskValueSet<T> clone();
 
 }
