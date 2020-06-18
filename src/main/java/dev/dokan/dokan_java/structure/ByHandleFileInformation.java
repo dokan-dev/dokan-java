@@ -7,6 +7,7 @@ import com.sun.jna.platform.win32.WinNT;
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.UnsignedNumbers;
 import dev.dokan.dokan_java.constants.microsoft.FileAttribute;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
@@ -104,7 +105,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
         this(null, null, null);
     }
 
-    public ByHandleFileInformation(Path filePath, int attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, int volumeSerialNumber, long fileSize, long fileIndex) {
+    public ByHandleFileInformation(Path filePath, @Unsigned int attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, @Unsigned int volumeSerialNumber, @Unsigned long fileSize, @Unsigned long fileIndex) {
         this.filePath = filePath;
         this.dwFileAttributes = attrs;
         this.setTimes(creationTime.toMillis(), lastAccessTime.toMillis(), lastWriteTime.toMillis());
@@ -113,7 +114,7 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
         this.dwVolumeSerialNumber = volumeSerialNumber;
     }
 
-    public ByHandleFileInformation(Path filePath, MaskValueSet<FileAttribute> attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, int volumeSerialNumber, long fileSize, long fileIndex) {
+    public ByHandleFileInformation(Path filePath, MaskValueSet<FileAttribute> attrs, FileTime creationTime, FileTime lastAccessTime, FileTime lastWriteTime, @Unsigned int volumeSerialNumber, @Unsigned long fileSize, @Unsigned long fileIndex) {
         this.filePath = filePath;
         this.dwFileAttributes = attrs.intValue();
         this.setTimes(creationTime.toMillis(), lastAccessTime.toMillis(), lastWriteTime.toMillis());
@@ -196,14 +197,14 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
      *
      * @param sizeToSet the new size of the file
      */
-    public void setFileSize(final long sizeToSet) {
+    public void setFileSize(@Unsigned final long sizeToSet) {
         this.fileSize = sizeToSet;
         final WinNT.LARGE_INTEGER largeInt = new WinNT.LARGE_INTEGER(sizeToSet);
         this.nFileSizeHigh = largeInt.getHigh().intValue();
         this.nFileSizeLow = largeInt.getLow().intValue();
     }
 
-    protected final void setSizesExplicit(final long size, final int sizeHigh, final int sizeLow) {
+    protected final void setSizesExplicit(@Unsigned final long size, @Unsigned final int sizeHigh, @Unsigned final int sizeLow) {
         this.fileSize = size;
         this.nFileSizeHigh = sizeHigh;
         this.nFileSizeLow = sizeLow;
@@ -213,14 +214,14 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
         return this.fileSize;
     }
 
-    public void setIndex(final long index) {
+    public void setIndex(@Unsigned final long index) {
         this.fileIndex = index;
         final WinNT.LARGE_INTEGER largeInt = new WinNT.LARGE_INTEGER(index);
         this.nFileIndexHigh = largeInt.getHigh().intValue();
         this.nFileIndexLow = largeInt.getLow().intValue();
     }
 
-    protected void setIndexExplicit(final long index, final int indexHigh, final int indexLow) {
+    protected void setIndexExplicit(@Unsigned final long index, @Unsigned final int indexHigh, @Unsigned final int indexLow) {
         this.fileIndex = index;
         this.nFileIndexHigh = indexHigh;
         this.nFileIndexLow = indexLow;
@@ -252,6 +253,17 @@ public class ByHandleFileInformation extends Structure implements Structure.ByRe
 
     @Override
     public String toString() {
-        return "ByHandleFileInfo(filePath=" + this.filePath + ", fileIndex=" + this.fileIndex + ", fileSize=" + this.fileSize + ", nFileIndexHigh=" + this.nFileIndexHigh + ", nFileIndexLow=" + this.nFileIndexLow + ", dwFileAttributes=" + this.dwFileAttributes + ", ftCreationTime=" + this.ftCreationTime + ", ftLastAccessTime=" + this.ftLastAccessTime + ", ftLastWriteTime=" + this.ftLastWriteTime + ", nFileSizeHigh=" + this.nFileSizeHigh + ", nFileSizeLow=" + this.nFileSizeLow + ", dwVolumeSerialNumber=" + this.dwVolumeSerialNumber + ", nNumberOfLinks=" + this.nNumberOfLinks + ")";
+        return String.format("ByHandleFileInfo(filePath=%s, fileIndex=%s, fileSize=%s, nFileIndexHigh=%s, nFileIndexLow=%s, dwFileAttributes=%s, ftCreationTime=%s, ftLastAccessTime=%s, ftLastWriteTime=%s, nFileSizeHigh=%s, nFileSizeLow=%s, dwVolumeSerialNumber=%s, nNumberOfLinks=%s)",
+                this.filePath,
+                UnsignedNumbers.toUnsignedString(this.fileIndex),
+                UnsignedNumbers.toUnsignedString(this.fileSize),
+                UnsignedNumbers.toUnsignedString(this.nFileIndexHigh),
+                UnsignedNumbers.toUnsignedString(this.nFileIndexLow),
+                UnsignedNumbers.toUnsignedString(this.dwFileAttributes),
+                this.ftCreationTime, this.ftLastAccessTime, this.ftLastWriteTime,
+                UnsignedNumbers.toUnsignedString(this.nFileSizeHigh),
+                UnsignedNumbers.toUnsignedString(this.nFileSizeLow),
+                UnsignedNumbers.toUnsignedString(this.dwVolumeSerialNumber),
+                UnsignedNumbers.toUnsignedString(this.nNumberOfLinks));
     }
 }

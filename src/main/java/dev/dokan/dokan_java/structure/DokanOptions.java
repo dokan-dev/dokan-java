@@ -5,6 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.WString;
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.UnsignedNumbers;
 import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
@@ -102,6 +103,16 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 
 	@Override
 	public String toString() {
-		return "DeviceOptions(Version=" + this.Version + ", ThreadCount=" + this.ThreadCount + ", Options=" + this.Options + ", mountOptions=" + this.getMountOptions() + ", GlobalContext=" + this.GlobalContext + ", MountPoint=" + this.MountPoint + ", UNCName=" + this.UNCName + ", Timeout=" + this.Timeout + ", AllocationUnitSize=" + this.AllocationUnitSize + ", SectorSize=" + this.SectorSize + ")";
+		return String.format("DeviceOptions(Version=%s, ThreadCount=%s, Options=%s, mountOptions=%s, GlobalContext=%s, MountPoint=%s, UNCName=%s, Timeout=%s, AllocationUnitSize=%s, SectorSize=%s)",
+				UnsignedNumbers.toUnsignedString(this.Version),
+				UnsignedNumbers.toUnsignedString(this.ThreadCount),
+				UnsignedNumbers.toUnsignedString(this.Options),
+				this.getMountOptions(),
+				UnsignedNumbers.toUnsignedString(this.GlobalContext),
+				this.MountPoint,
+				this.UNCName,
+				UnsignedNumbers.toUnsignedString(this.Timeout),
+				UnsignedNumbers.toUnsignedString(this.AllocationUnitSize),
+				UnsignedNumbers.toUnsignedString(this.SectorSize));
 	}
 }
