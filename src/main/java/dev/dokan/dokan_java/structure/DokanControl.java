@@ -77,7 +77,14 @@ public class DokanControl extends Structure implements Structure.ByReference {
     }
 
     /**
-     * Creates a java {@link List} of {@link DokanControl} strcutures given the pointer returned by NativeMethods#DokanGetMountPointList(boolean, LongByReference).
+     * Creates a java {@link List} of {@link DokanControl} strcutures given the pointer returned by NativeMethods#DokanGetMountPointList(boolean, LongByReference).<br>
+     * <br>
+     * <b>Implementation note:</b><br>
+     * Length is an unsigned 32-bit int. Java only supports arrays and lists up to an index size of 2<sup>31</sup>-1 ({@link Integer#MAX_VALUE Integer.MAX_VALUE}).
+     * A list that exceeds this size is unrealistic (it would need at least 2 GB of space, even if it only stored unique Byte-Objects).
+     * Any value that exceeds {@link Integer#MAX_VALUE Integer.MAX_VALUE}, has it's 32nd bit set (at least when using Two's complement for storing it).
+     * The 32nd bit defines the sign of a java int, therefore a {@code length < 0} indicates that this threshold has been reached.
+     * In this case the application crashes ("fail-fast") to allow someone to take care of this issue.
      *
      * @param start  the initial pointer returned by the native method
      * @param length the number of elements in the array. Also acquired with the native method call.
@@ -85,17 +92,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
      */
     public static List<DokanControl> getDokanControlList(Pointer start, @Unsigned int length) { //TODO Relocate
         List<DokanControl> list = new ArrayList<>();
-        /*
-         * Let's do the math:
-         * A list that uses an unsigned int (32 bit) as index could save up to 2^32 objects.
-         * Even if it only saved one byte in each entry (not accounting for the actual overhead of the entries themselves),
-         * that would be 2^32 bytes = 4 GB for that list alone!
-         * If the list of active Dokan MountPoints exceeds 2^31 (signed int) entries, we probably have other problems.
-         *
-         * But let's assume that this could still happen:
-         * In this case we want the application to crash so that someone else can fix that nonsense.
-         * "assert" seems like a good choice for this case (for once).
-         */
+
         assert !(length < 0);
         if (length != 0) {
             long offset = 0;
