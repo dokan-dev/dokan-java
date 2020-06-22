@@ -93,7 +93,9 @@ public class DokanControl extends Structure implements Structure.ByReference {
     public static List<DokanControl> getDokanControlList(Pointer start, @Unsigned int length) { //TODO Relocate
         List<DokanControl> list = new ArrayList<>();
 
-        assert !(length < 0);
+        if(length < 0) {
+            throw new AssertionError(String.format("Illegal length: %s (%d)", Integer.toUnsignedString(length), length));
+        }
         if (length != 0) {
             long offset = 0;
             for(int i = 0; i < length; i++) {
