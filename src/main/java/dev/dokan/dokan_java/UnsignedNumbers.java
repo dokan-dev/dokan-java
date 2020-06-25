@@ -160,4 +160,64 @@ public class UnsignedNumbers {
     public static int compareUnsigned(long x, long y) {
         return Long.compareUnsigned(x, y);
     }
+
+    /////////////////////////////////////////////////////////
+    ////////////////////// Conversions //////////////////////
+    /////////////////////////////////////////////////////////
+
+    //////////////////////    byte     //////////////////////
+
+    public static @Unsigned byte toUnsignedByte(@Unsigned short value) {
+        return (byte) value;
+    }
+
+    public static @Unsigned byte toUnsignedByte(@Unsigned int value) {
+        return (byte) value;
+    }
+
+    public static @Unsigned byte toUnsignedByte(@Unsigned long value) {
+        return (byte) value;
+    }
+
+    //////////////////////    short    //////////////////////
+
+    public static @Unsigned short toUnsignedShort(@Unsigned byte value) {
+        return (short) (((short) value) & BYTE_MASK);
+    }
+
+    public static @Unsigned short toUnsignedShort(@Unsigned int value) {
+        return (short) value;
+    }
+
+    public static @Unsigned short toUnsignedShort(@Unsigned long value) {
+        return (short) value;
+    }
+
+    //////////////////////     int     //////////////////////
+
+    public static @Unsigned int toUnsignedInt(@Unsigned byte value) {
+        return ((int) value) & BYTE_MASK;
+    }
+
+    public static @Unsigned int toUnsignedInt(@Unsigned short value) {
+        return ((int) value) & SHORT_MASK;
+    }
+
+    public static @Unsigned int toUnsignedInt(@Unsigned long value) {
+        return (int) value;
+    }
+
+    //////////////////////    long     //////////////////////
+
+    public static @Unsigned long toUnsignedLong(@Unsigned byte value) {
+        return ((long) value) & BYTE_MASK;
+    }
+
+    public static @Unsigned long toUnsignedLong(@Unsigned short value) {
+        return ((long) value) & SHORT_MASK;
+    }
+
+    public static @Unsigned long toUnsignedLong(@Unsigned int value) {
+        return ((long) value) & INT_MASK;
+    }
 }
