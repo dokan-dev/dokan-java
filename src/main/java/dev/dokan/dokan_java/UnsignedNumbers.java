@@ -3,6 +3,10 @@ package dev.dokan.dokan_java;
 
 public class UnsignedNumbers {
 
+    private static final short BYTE_MASK = 0xff;
+    private static final int SHORT_MASK = 0xffff;
+    private static final long INT_MASK = 0xffffff;
+
     public static String toUnsignedString(@Unsigned byte value) {
         return toUnsignedString(Byte.toUnsignedInt(value));
     }
