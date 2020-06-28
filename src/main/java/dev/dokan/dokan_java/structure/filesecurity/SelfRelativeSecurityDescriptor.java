@@ -72,7 +72,7 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
      * Sacl
      * The SACL of the object. The length of the SID MUST be a multiple of 4. This field MUST be present if the SP flag is set.
      * <p>
-     * This implementation guarantees the existence of a SACL if SP-flag is set by only writing the flag if this strucutre is present.
+     * This implementation guarantees the existence of a SACL if SP-flag is set by only writing the flag if this structure is present.
      */
     private Optional<AccessControlList> sacl;
 
@@ -80,12 +80,12 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
      * Dacl
      * The DACL of the object. The length of the SID MUST be a multiple of 4. This field MUST be present if the DP flag is set.
      * <p>
-     * This implementation guarantees the existence of a DACL if DP-flag is set by only writing the flag if this strucutre is present.
+     * This implementation guarantees the existence of a DACL if DP-flag is set by only writing the flag if this structure is present.
      */
     private Optional<AccessControlList> dacl;
 
     /**
-     * Creates an empty SecurtiyDescriptor.
+     * Creates an empty SecurityDescriptor.
      *
      * @param control
      */
@@ -160,8 +160,8 @@ public class SelfRelativeSecurityDescriptor implements Byteable {
     @Override
     public int sizeOfByteArray() {
         return 2 // the first fixed bytes (revision and sbz1)
-                + 2 // the 16bit big  control mask
-                + 4 * 4 // the 4 32bit integer offset values indicating the offset to the following varaible length data fields
+                + 2 // the 16bit big control mask
+                + 4 * 4 // the 4 32bit integer offset values indicating the offset to the following variable length data fields
                 + ownerSid.map(SecurityIdentifier::sizeOfByteArray).orElse(0)
                 + groupSid.map(SecurityIdentifier::sizeOfByteArray).orElse(0)
                 + sacl.map(AccessControlList::sizeOfByteArray).orElse(0)

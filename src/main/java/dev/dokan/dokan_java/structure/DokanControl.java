@@ -77,7 +77,7 @@ public class DokanControl extends Structure implements Structure.ByReference {
     }
 
     /**
-     * Creates a java {@link List} of {@link DokanControl} strcutures given the pointer returned by NativeMethods#DokanGetMountPointList(boolean, LongByReference).<br>
+     * Creates a java {@link List} of {@link DokanControl} structures given the pointer returned by NativeMethods#DokanGetMountPointList(boolean, LongByReference).<br>
      * <br>
      * <b>Implementation note:</b><br>
      * Length is an unsigned 32-bit int. Java only supports arrays and lists up to an index size of 2<sup>31</sup>-1 ({@link Integer#MAX_VALUE Integer.MAX_VALUE}).
