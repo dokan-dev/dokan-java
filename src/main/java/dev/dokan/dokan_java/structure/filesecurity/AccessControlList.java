@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Objectoriented implementation of the ACL-structure used in a {@link SelfRelativeSecurityDescriptor}.
+ * Object-oriented implementation of the ACL-structure used in a {@link SelfRelativeSecurityDescriptor}.
  * For more information, please read the <a href="https://msdn.microsoft.com/en-us/library/cc230297.aspx">official Microsoft documentation</a>.
  */
 public class AccessControlList implements Byteable {
@@ -55,7 +55,7 @@ public class AccessControlList implements Byteable {
 	private final short sbz2 = 0;
 
 	/**
-	 * List of AccessControlEntrys in this ACL
+	 * List of AccessControlEntries in this ACL
 	 */
 	private List<AccessControlEntry> aces;
 

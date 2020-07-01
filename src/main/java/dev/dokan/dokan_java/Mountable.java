@@ -27,7 +27,7 @@ public interface Mountable extends AutoCloseable {
      * @param threadCount        the number of threads spawned for processing filesystem calls
      * @param options            an {@link MaskValueSet} containing {@link MountOption}s
      */
-    void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, long timeout, long allocationUnitSize, long sectorSize, String UNCName, short threadCount, MaskValueSet<MountOption> options);
+    void mount(Path mountPoint, String volumeName, int volumeSerialnumber, boolean blocking, @Unsigned int timeout, @Unsigned int allocationUnitSize, @Unsigned int sectorSize, String UNCName, @Unsigned short threadCount, MaskValueSet<MountOption> options);
 
     /**
      * Unmount this object.

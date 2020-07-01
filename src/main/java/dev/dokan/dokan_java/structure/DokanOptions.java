@@ -1,10 +1,12 @@
 package dev.dokan.dokan_java.structure;
 
 
-import dev.dokan.dokan_java.DokanNativeMethods;
-import dev.dokan.dokan_java.constants.dokany.MountOption;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
+import dev.dokan.dokan_java.DokanNativeMethods;
+import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.UnsignedNumbers;
+import dev.dokan.dokan_java.constants.dokany.MountOption;
 import dev.dokan.dokan_java.masking.MaskValueSet;
 
 import java.util.Arrays;
@@ -21,21 +23,25 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Version of the Dokan features requested (version "123" is equal to Dokan version 1.2.3).
 	 */
+	@Unsigned
 	public short Version = DokanNativeMethods.getMinimumRequiredDokanVersion();
 
 	/**
 	 * Number of threads to be used internally by Dokan library. More thread will handle more events at the same time.
 	 */
+	@Unsigned
 	public short ThreadCount;
 
 	/**
 	 * Features enable for the mount. It is a combination of {@link MountOption} masks.
 	 */
+	@Unsigned
 	public int Options;
 
 	/**
 	 * FileSystem can store anything here
 	 */
+	@Unsigned
 	public long GlobalContext = 0L;
 
 	/**
@@ -53,23 +59,26 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 	/**
 	 * Max timeout in milliseconds of each request before Dokan gives up to wait events to complete.
 	 */
-	public long Timeout;
+	@Unsigned
+	public int Timeout;
 
 	/**
 	 * Allocation Unit Size of the volume. This will affect the file size.
 	 */
-	public long AllocationUnitSize;
+	@Unsigned
+	public int AllocationUnitSize;
 
 	/**
 	 * Sector Size of the volume. This will affect then file size.
 	 */
-	public long SectorSize;
+	@Unsigned
+	public int SectorSize;
 
 	public DokanOptions() {
 
 	}
 
-	public DokanOptions(final String mountPoint, final short threadCount, final MaskValueSet<MountOption> mountOptions, final String uncName, final long timeout, final long allocationUnitSize, final long sectorSize) {
+	public DokanOptions(String mountPoint, @Unsigned short threadCount, MaskValueSet<MountOption> mountOptions, String uncName, @Unsigned int timeout, @Unsigned int allocationUnitSize, @Unsigned int sectorSize) {
 		MountPoint = new WString(mountPoint);
 		ThreadCount = threadCount;
 		Options = mountOptions.intValue();
@@ -94,6 +103,16 @@ public class DokanOptions extends Structure implements Structure.ByReference {
 
 	@Override
 	public String toString() {
-		return "DeviceOptions(Version=" + this.Version + ", ThreadCount=" + this.ThreadCount + ", Options=" + this.Options + ", mountOptions=" + this.getMountOptions() + ", GlobalContext=" + this.GlobalContext + ", MountPoint=" + this.MountPoint + ", UNCName=" + this.UNCName + ", Timeout=" + this.Timeout + ", AllocationUnitSize=" + this.AllocationUnitSize + ", SectorSize=" + this.SectorSize + ")";
+		return String.format("DeviceOptions(Version=%s, ThreadCount=%s, Options=%s, mountOptions=%s, GlobalContext=%s, MountPoint=%s, UNCName=%s, Timeout=%s, AllocationUnitSize=%s, SectorSize=%s)",
+				UnsignedNumbers.toUnsignedString(this.Version),
+				UnsignedNumbers.toUnsignedString(this.ThreadCount),
+				UnsignedNumbers.toUnsignedString(this.Options),
+				this.getMountOptions(),
+				UnsignedNumbers.toUnsignedString(this.GlobalContext),
+				this.MountPoint,
+				this.UNCName,
+				UnsignedNumbers.toUnsignedString(this.Timeout),
+				UnsignedNumbers.toUnsignedString(this.AllocationUnitSize),
+				UnsignedNumbers.toUnsignedString(this.SectorSize));
 	}
 }

@@ -10,6 +10,7 @@ import dev.dokan.dokan_java.DokanFileSystemStub;
 import dev.dokan.dokan_java.DokanOperations;
 import dev.dokan.dokan_java.DokanUtils;
 import dev.dokan.dokan_java.FileSystemInformation;
+import dev.dokan.dokan_java.Unsigned;
 import dev.dokan.dokan_java.constants.microsoft.CreateDisposition;
 import dev.dokan.dokan_java.constants.microsoft.CreateOption;
 import dev.dokan.dokan_java.constants.microsoft.NtStatuses;
@@ -93,7 +94,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
             }
         }
 
-        long val = this.handleHandler.incrementAndGet();
+        @Unsigned long val = this.handleHandler.incrementAndGet();
         if (val == 0) {
             val = this.handleHandler.incrementAndGet();
         }
@@ -135,7 +136,7 @@ public class DirListingFileSystem extends DokanFileSystemStub {
         if (attr.fileKey() != null) {
             index = (long) attr.fileKey();
         }
-        int fileAttr = 0;
+        @Unsigned int fileAttr = 0;
         fileAttr |= attr.isArchive() ? WinNT.FILE_ATTRIBUTE_ARCHIVE : 0;
         fileAttr |= attr.isSystem() ? WinNT.FILE_ATTRIBUTE_SYSTEM : 0;
         fileAttr |= attr.isHidden() ? WinNT.FILE_ATTRIBUTE_HIDDEN : 0;
