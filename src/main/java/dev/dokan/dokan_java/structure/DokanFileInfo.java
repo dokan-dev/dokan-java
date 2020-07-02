@@ -1,8 +1,11 @@
 package dev.dokan.dokan_java.structure;
 
+
+import com.sun.jna.Structure;
 import dev.dokan.dokan_java.DokanNativeMethods;
 import dev.dokan.dokan_java.DokanOperations;
-import com.sun.jna.Structure;
+import dev.dokan.dokan_java.Unsigned;
+import dev.dokan.dokan_java.UnsignedNumbers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +21,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
      * Context that can be used to carry information between operation. The context can carry whatever type like {@link com.sun.jna.platform.win32.WinNT.HANDLE}, {@link Structure}, {@link com.sun.jna.ptr.IntByReference},
      * {@link com.sun.jna.Pointer} that will help the implementation understand the request context of the event.
      */
+    @Unsigned
     public long Context;
 
     /**
@@ -28,6 +32,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     /**
      * Reserved. Used internally by Dokan library. Never modify.
      */
+    @Unsigned
     public long DokanContext;
 
     /**
@@ -53,6 +58,7 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
     /**
      * Process ID for the thread that originally requested a given I/O operation.
      */
+    @Unsigned
     public int ProcessId;
 
     /**
@@ -99,7 +105,17 @@ public class DokanFileInfo extends Structure implements Structure.ByReference {
 
     @Override
     public String toString() {
-        return "DokanFileInfo(Context=" + this.Context + ", DokanContext=" + this.DokanContext + ", DokanOpts=" + this.DokanOpts + ", ProcessId=" + this.ProcessId + ", IsDirectory=" + this.IsDirectory + ", DeleteOnClose=" + this.DeleteOnClose + ", PagingIo=" + this.PagingIo + ", SynchronousIo=" + this.SynchronousIo + ", Nocache=" + this.Nocache + ", WriteToEndOfFile=" + this.WriteToEndOfFile + ")";
+        return String.format("DokanFileInfo(Context=%s, DokanContext=%s, DokanOpts=%s, ProcessId=%s, IsDirectory=%s/%s, DeleteOnClose=%s/%s, PagingIo=%s/%s, SynchronousIo=%s/%s, Nocache=%s/%s, WriteToEndOfFile=%s/%s)",
+                UnsignedNumbers.toUnsignedString(this.Context),
+                UnsignedNumbers.toUnsignedString(this.DokanContext),
+                this.DokanOpts,
+                UnsignedNumbers.toUnsignedString(this.ProcessId),
+                this.IsDirectory, isDirectory(),
+                this.DeleteOnClose, deleteOnClose(),
+                this.PagingIo, pagingIo(),
+                this.SynchronousIo, synchronousIo(),
+                this.Nocache, noCache(),
+                this.WriteToEndOfFile, writeToEndOfFile());
     }
 
 }

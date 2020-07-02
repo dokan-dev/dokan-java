@@ -3,6 +3,7 @@ package dev.dokan.dokan_java.structure;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import dev.dokan.dokan_java.Unsigned;
 
 
 /**
@@ -17,11 +18,13 @@ public class UnicodeString extends Structure {
 	/**
 	 * The length, in bytes, of the string stored in {@link UnicodeString#Buffer}.
 	 */
+	@Unsigned
 	public short Length;
 
 	/**
 	 * The length, in bytes, of {@link UnicodeString#Buffer}.
 	 */
+	@Unsigned
 	public short MaximumLength;
 
 	/**

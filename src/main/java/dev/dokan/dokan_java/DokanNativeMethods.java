@@ -6,7 +6,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import dev.dokan.dokan_java.constants.dokany.MountError;
 import dev.dokan.dokan_java.structure.DokanControl;
@@ -200,10 +199,10 @@ public class DokanNativeMethods implements StdCallLibrary {
 	 * </p>
 	 *
 	 * @param uncOnly - Get only instances that have UNC Name.
-	 * @param nbRead - Number of instances successfully retrieved
+	 * @param nbRead - {@link Unsigned} Number of instances successfully retrieved
 	 * @return a pointer to the start of the allocated array of {@link DokanControl} elemets.
 	 */
-	static native Pointer DokanGetMountPointList(boolean uncOnly, LongByReference nbRead);
+	static native Pointer DokanGetMountPointList(boolean uncOnly, @Unsigned IntByReference nbRead);
 
 	/**
 	 * Release Mount point list resources from {@link #DokanGetMountPointList}.
