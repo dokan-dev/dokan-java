@@ -157,7 +157,7 @@ public abstract class AbstractDokanFileSystem implements DokanFileSystem {
 		}
 	}
 
-	private boolean isImplemented(String funcName) {
+	public boolean isImplemented(String funcName) {
 		return !notImplementedMethods.contains(funcName);
 	}
 

@@ -75,6 +75,15 @@ To publish to your local Maven repository, execute as the third step `./gradlew.
 ## Examples
 An example user filesystems using this library can be found in the examples package [dev.dokan.dokan_java.examples](https://github.com/dokan-dev/dokan-java/tree/develop/src/main/java/dev/dokan/dokan_java/examples).
 
+## Versioning
+Dokan-Java uses it's own versioning system and therefore doesn't match the versions of Dokany.
+For Dokan-Java to work you need to have a suitable version of Dokany installed on your machine. The following table helps you choose the correct Dokany-version.
+
+| Dokan-Java Version | Minimum Version of Dokany |
+|--------------------|---------------------------|
+| 1.0.0 - 1.1.X      | 1.2.0.1000                |
+| 1.2.0+             | 1.3.0.1000                |
+
 ## Contributing
 You're encouraged to contribute.
  Fork the code and then submit a pull request.
