@@ -30,6 +30,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     protected final FileSystemInformation fileSystemInformation;
     protected final DokanyOperations dokanyOperations;
     protected final boolean usesKernelFlagsAndCodes;
+    protected final boolean installShutdownHook;
     protected Path mountPoint;
     protected String volumeName;
     protected int volumeSerialnumber;
@@ -38,12 +39,17 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
     private final AtomicBoolean isMounted;
     private Set<String> notImplementedMethods;
 
-    public AbstractDokanyFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
+    public AbstractDokanyFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes, boolean installShutdownHook) {
         this.fileSystemInformation = fileSystemInformation;
         this.usesKernelFlagsAndCodes = usesKernelFlagsAndCodes;
+        this.installShutdownHook = installShutdownHook;
         this.isMounted = new AtomicBoolean(false);
         this.dokanyOperations = new DokanyOperations();
         init(dokanyOperations);
+    }
+
+    public AbstractDokanyFileSystem(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
+        this(fileSystemInformation,usesKernelFlagsAndCodes,true);
     }
 
     private void init(DokanyOperations dokanyOperations) {
@@ -247,7 +253,7 @@ public abstract class AbstractDokanyFileSystem implements DokanyFileSystem {
         try {
             int mountStatus;
 
-            if (DokanyUtils.canHandleShutdownHooks()) {
+            if (installShutdownHook && DokanyUtils.canHandleShutdownHooks()) {
                 Runtime.getRuntime().addShutdownHook(new Thread(this::unmount));
             }
 
