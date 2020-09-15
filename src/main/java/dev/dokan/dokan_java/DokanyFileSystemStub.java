@@ -1,17 +1,21 @@
 package dev.dokan.dokan_java;
 
-import dev.dokan.dokan_java.structure.ByHandleFileInformation;
-import dev.dokan.dokan_java.structure.DokanFileInfo;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
+import dev.dokan.dokan_java.structure.ByHandleFileInformation;
+import dev.dokan.dokan_java.structure.DokanFileInfo;
 
 public class DokanyFileSystemStub extends AbstractDokanyFileSystem {
 
     public DokanyFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes) {
         super(fileSystemInformation, usesKernelFlagsAndCodes);
+    }
+
+    public DokanyFileSystemStub(FileSystemInformation fileSystemInformation, boolean usesKernelFlagsAndCodes, boolean installShutdownHook) {
+        super(fileSystemInformation, usesKernelFlagsAndCodes,installShutdownHook);
     }
 
     /**
